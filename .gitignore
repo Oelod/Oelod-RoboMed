@@ -1,0 +1,48 @@
+# Oelod RoboMed — Institutional .gitignore
+# Senior Engineer Edition
+
+# --- Institutional Secrets ---
+.env
+.env.local
+.env.production
+.env.development
+*.env
+secrets.json
+
+# --- Dependency Manifests ---
+node_modules/
+dist/
+build/
+.next/
+out/
+.vercel
+bower_components/
+
+# --- Clinical AI Assets ---
+ai-service/venv/
+ai-service/__pycache__/
+ai-service/.pytest_cache/
+ai-service/model/*.pkl
+ai-service/model_info.json
+*.pyc
+
+# --- Institutional Logs & Artifacts ---
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+*.log
+.gemini/
+artifacts/
+scratch/
+tmp/
+.mongoms/
+test_output.txt
+
+# --- OS / IDE Metadata ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo

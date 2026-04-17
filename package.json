@@ -1,0 +1,21 @@
+{
+  "name": "robomed",
+  "version": "1.0.0",
+  "description": "RoboMed AI Healthcare Platform — Monorepo",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently --names \"BACKEND,AI,FRONTEND\" --prefix-colors \"cyan,magenta,yellow\" \"npm run dev --prefix backend\" \"python ai-service/app.py\" \"npm run dev --prefix frontend\"",
+    "install:all": "npm install --prefix backend && npm install --prefix frontend && pip install -r ai-service/requirements.txt",
+    "train:ai": "python ai-service/model/generate_synthetic.py && python ai-service/model/train.py",
+    "test:backend": "npm test --prefix backend",
+    "test:ai": "cd ai-service && python -m pytest tests/ -v",
+    "test:frontend": "npm test --prefix frontend",
+    "test:all": "npm run test:backend && npm run test:ai && npm run test:frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "mongoose": "^9.4.1"
+  }
+}

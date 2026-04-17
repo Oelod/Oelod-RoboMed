@@ -1,0 +1,81 @@
+const jwt = require('jsonwebtoken');
+const emitter = require('../events/emitter');
+
+module.exports = (io) => {
+  // Listen for internal chat events to broadcast to specific case rooms
+  emitter.on('chat.message_sent', ({ conversationId, message, participants }) => {
+    // Broadcast to the conversation room
+    io.to(`conversation_${conversationId}`).emit('chat.message', { conversationId, message });
+  });
+
+  emitter.on('chat.message_updated', ({ conversationId, messageId, text }) => {
+    // Broadcast text updates (primarily for AI transcriptions)
+    io.to(`conversation_${conversationId}`).emit('chat.message_update', { messageId, text });
+  });
+  // Middleware to authenticate socket connections
+  io.use((socket, next) => {
+    try {
+      let token = socket.handshake.auth?.token;
+      
+      // Fallback for cookie parsing if needed
+      if (!token && socket.handshake.headers.cookie) {
+        const match = socket.handshake.headers.cookie.match(/(?:^|; )RoboMed_Access=([^;]*)/);
+        if (match) token = match[1];
+      }
+
+      if (!token) {
+        return next(new Error('Authentication error: No token provided'));
+      }
+
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      socket.user = decoded; // { id, roles, activeRole }
+      
+      next();
+    } catch (err) {
+      next(new Error('Authentication error: Invalid token'));
+    }
+  });
+
+  io.on('connection', (socket) => {
+    console.log(`[Socket] User connected: ${socket.user._id}`);
+    
+    // Join a personal room based on user ID for direct notifications
+    socket.join(socket.user._id);
+    
+    // If the user is a doctor, they can also join specialty rooms to receive broadcasting of new cases
+    if (socket.user.roles.includes('doctor')) {
+      // (Optional: fetch doctor details here or let client emit their specialty to join a room)
+      socket.on('join_specialty', (specialty) => {
+        if (specialty) {
+           socket.join(`specialty_${specialty}`);
+           console.log(`[Socket] Doctor ${socket.user._id} joined specialty_${specialty}`);
+        }
+      });
+    }
+
+    // --- Chat Handlers (Phase 5) ---
+    socket.on('join_conversation', (conversationId) => {
+      if (conversationId) {
+        socket.join(`conversation_${conversationId}`);
+        console.log(`[Socket] User ${socket.user._id} joined conversation room: ${conversationId}`);
+      }
+    });
+
+    socket.on('join_case', (caseId) => {
+      if (caseId) {
+        socket.join(`case_${caseId}`);
+        console.log(`[Socket] User ${socket.user._id} joined case room: ${caseId}`);
+      }
+    });
+
+    socket.on('typing', ({ conversationId, isTyping }) => {
+      if (conversationId) {
+        socket.to(`conversation_${conversationId}`).emit('user_typing', { senderId: socket.user._id, isTyping });
+      }
+    });
+
+    socket.on('disconnect', () => {
+      console.log(`[Socket] User disconnected: ${socket.user._id}`);
+    });
+  });
+};

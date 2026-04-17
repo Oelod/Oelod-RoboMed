@@ -1,0 +1,31 @@
+config:
+  target: 'http://localhost:5000'
+  phases:
+    - duration: 60
+      arrivalRate: 5
+      name: Warm up
+    - duration: 120
+      arrivalRate: 10
+      rampTo: 50
+      name: Ramp up load
+    - duration: 60
+      arrivalRate: 50
+      name: Sustained institutional load
+  defaults:
+    headers:
+      Content-Type: 'application/json'
+
+scenarios:
+  - name: "Clinical Health Check"
+    flow:
+      - get:
+          url: "/health"
+  
+  - name: "Triage Prediction Performance"
+    flow:
+      - post:
+          url: "/api/cases"
+          json:
+            symptoms: ["fever", "chills", "joint pain"]
+            description: "Simulated load test case."
+          # Note: This will likely fail with 401 in a real env, but we are testing arrival rate capacity on middlewares

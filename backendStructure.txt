@@ -1,0 +1,468 @@
+Backend Route Map
+Base API Prefix
+/api
+________________________________________
+1) Auth Routes
+Mount Path
+/api/auth
+Endpoints
+Register user
+POST /api/auth/register
+Login user
+POST /api/auth/login
+Get current logged-in user
+GET /api/auth/me
+Refresh token
+POST /api/auth/refresh-token
+Logout user
+POST /api/auth/logout
+Request professional role upgrade
+Example: patient requesting doctor/lab/pharmacist role approval.
+POST /api/auth/request-role
+________________________________________
+Sample JSON Responses — Auth
+Successful register
+{
+  "success": true,
+  "message": "Account created successfully",
+  "data": {
+    "user": {
+      "_id": "661b2f7f12ab34cd56ef7890",
+      "fullName": "John Doe",
+      "email": "john@example.com",
+      "roles": ["patient"],
+      "hospitalId": "HSP-0001"
+    },
+    "token": "jwt_token_here"
+  }
+}
+Successful login
+{
+  "success": true,
+  "message": "Login successful",
+  "data": {
+    "user": {
+      "_id": "661b2f7f12ab34cd56ef7890",
+      "fullName": "John Doe",
+      "email": "john@example.com",
+      "roles": ["patient", "doctor"],
+      "activeRole": "patient"
+    },
+    "token": "jwt_token_here"
+  }
+}
+Unauthorized
+{
+  "success": false,
+  "message": "Unauthorized: No token provided"
+}
+Invalid login
+{
+  "success": false,
+  "message": "Invalid email or password"
+}
+________________________________________
+2) Dashboard Routes
+Mount Path
+/api/dashboard
+Endpoints
+Get dashboard summary for current user
+GET /api/dashboard/summary
+Switch active role for multi-role users
+PATCH /api/dashboard/switch-role
+Get dashboard widgets/cards data
+GET /api/dashboard/widgets
+________________________________________
+Sample JSON Responses — Dashboard
+Dashboard summary
+{
+  "success": true,
+  "message": "Dashboard summary fetched successfully",
+  "data": {
+    "user": {
+      "_id": "661b2f7f12ab34cd56ef7890",
+      "fullName": "Dr. Jane Smith",
+      "roles": ["patient", "doctor"],
+      "activeRole": "doctor"
+    },
+    "stats": {
+      "assignedCases": 8,
+      "openCases": 5,
+      "closedCases": 3,
+      "unreadNotifications": 4
+    },
+    "quickActions": [
+      "View assigned cases",
+      "Respond to patient chats",
+      "Review lab updates"
+    ]
+  }
+}
+Role switch
+{
+  "success": true,
+  "message": "Active role switched successfully",
+  "data": {
+    "activeRole": "patient"
+  }
+}
+________________________________________
+3) Cases Routes
+Mount Path
+/api/cases
+Endpoints
+Create new case
+POST /api/cases
+Get all cases visible to current user
+GET /api/cases
+Get single case by ID
+GET /api/cases/:caseId
+Update case details
+Usually doctor/admin controlled.
+PATCH /api/cases/:caseId
+Assign doctor to case
+PATCH /api/cases/:caseId/assign-doctor
+Accept open case by doctor
+PATCH /api/cases/:caseId/accept
+Request lab/scans for case
+PATCH /api/cases/:caseId/request-lab
+Upload lab result to case
+POST /api/cases/:caseId/lab-result
+Add prescription to case
+POST /api/cases/:caseId/prescriptions
+Close case
+PATCH /api/cases/:caseId/close
+Reopen case
+PATCH /api/cases/:caseId/reopen
+Get case history timeline
+GET /api/cases/:caseId/history
+________________________________________
+Sample JSON Responses — Cases
+Create case
+{
+  "success": true,
+  "message": "Case created successfully",
+  "data": {
+    "case": {
+      "_id": "662abcde1234567890fedcba",
+      "caseCode": "CASE-0001",
+      "patient": "661b2f7f12ab34cd56ef7890",
+      "status": "open",
+      "symptoms": ["fever", "headache"],
+      "priority": "medium",
+      "assignedSpecialty": "General Medicine",
+      "createdAt": "2026-03-31T10:20:00.000Z"
+    }
+  }
+}
+Get cases list
+{
+  "success": true,
+  "message": "Cases fetched successfully",
+  "data": {
+    "cases": [
+      {
+        "_id": "662abcde1234567890fedcba",
+        "caseCode": "CASE-0001",
+        "status": "open",
+        "patientName": "John Doe",
+        "assignedDoctor": null,
+        "assignedSpecialty": "General Medicine"
+      }
+    ]
+  }
+}
+Assign doctor
+{
+  "success": true,
+  "message": "Doctor assigned successfully",
+  "data": {
+    "caseId": "662abcde1234567890fedcba",
+    "assignedDoctor": {
+      "_id": "661b2f7f12ab34cd56ef7001",
+      "fullName": "Dr. Jane Smith",
+      "specialty": "General Medicine"
+    },
+    "status": "in-progress"
+  }
+}
+Upload lab result
+{
+  "success": true,
+  "message": "Lab result uploaded successfully",
+  "data": {
+    "caseId": "662abcde1234567890fedcba",
+    "labResult": {
+      "_id": "663111aa22bb33cc44dd55ee",
+      "fileUrl": "/uploads/lab-results/result-001.pdf",
+      "comment": "Malaria parasite test completed",
+      "uploadedBy": "Lab Attendant",
+      "uploadedAt": "2026-03-31T11:00:00.000Z"
+    }
+  }
+}
+Close case
+{
+  "success": true,
+  "message": "Case closed successfully",
+  "data": {
+    "caseId": "662abcde1234567890fedcba",
+    "status": "closed",
+    "closedBy": "661b2f7f12ab34cd56ef7001",
+    "closedAt": "2026-03-31T11:30:00.000Z"
+  }
+}
+Forbidden access
+{
+  "success": false,
+  "message": "Forbidden: You are not allowed to access this case"
+}
+________________________________________
+4) Notifications Routes
+Mount Path
+/api/notifications
+Endpoints
+Get my notifications
+GET /api/notifications
+Get unread notifications count
+GET /api/notifications/unread-count
+Mark one notification as read
+PATCH /api/notifications/:notificationId/read
+Mark all notifications as read
+PATCH /api/notifications/read-all
+Delete notification
+DELETE /api/notifications/:notificationId
+________________________________________
+Sample JSON Responses — Notifications
+Get notifications
+{
+  "success": true,
+  "message": "Notifications fetched successfully",
+  "data": {
+    "notifications": [
+      {
+        "_id": "6644aa11bb22cc33dd44ee55",
+        "title": "Doctor Assigned",
+        "message": "Dr. Jane Smith has been assigned to your case CASE-0001",
+        "type": "case_assignment",
+        "isRead": false,
+        "createdAt": "2026-03-31T09:45:00.000Z"
+      }
+    ]
+  }
+}
+Unread count
+{
+  "success": true,
+  "message": "Unread notifications count fetched successfully",
+  "data": {
+    "unreadCount": 4
+  }
+}
+Mark read
+{
+  "success": true,
+  "message": "Notification marked as read"
+}
+________________________________________
+5) Admin Routes
+Mount Path
+/api/admin
+Endpoints
+Get all users
+GET /api/admin/users
+Get single user
+GET /api/admin/users/:userId
+Approve professional role request
+PATCH /api/admin/users/:userId/approve-role
+Reject professional role request
+PATCH /api/admin/users/:userId/reject-role
+Update user roles manually
+PATCH /api/admin/users/:userId/roles
+Suspend user
+PATCH /api/admin/users/:userId/suspend
+Activate user
+PATCH /api/admin/users/:userId/activate
+Get system dashboard/admin stats
+GET /api/admin/stats
+________________________________________
+Sample JSON Responses — Admin
+Get users
+{
+  "success": true,
+  "message": "Users fetched successfully",
+  "data": {
+    "users": [
+      {
+        "_id": "661b2f7f12ab34cd56ef7890",
+        "fullName": "John Doe",
+        "email": "john@example.com",
+        "roles": ["patient"],
+        "status": "active"
+      },
+      {
+        "_id": "661b2f7f12ab34cd56ef7001",
+        "fullName": "Dr. Jane Smith",
+        "email": "jane@example.com",
+        "roles": ["patient", "doctor"],
+        "status": "active"
+      }
+    ]
+  }
+}
+Approve role
+{
+  "success": true,
+  "message": "Role approved successfully",
+  "data": {
+    "userId": "661b2f7f12ab34cd56ef7890",
+    "roles": ["patient", "lab"]
+  }
+}
+Forbidden admin route
+{
+  "success": false,
+  "message": "Forbidden: Admin access only"
+}
+________________________________________
+6) Search Routes
+Mount Path
+/api/search
+Endpoints
+Global role-scoped search
+GET /api/search?q=malaria
+Search users
+GET /api/search/users?q=jane
+Search cases
+GET /api/search/cases?q=CASE-0001
+Search patients by hospital ID
+Useful for lab/pharmacy/admin workflows.
+GET /api/search/patients?q=HSP-0001
+________________________________________
+Sample JSON Responses — Search
+Global search
+{
+  "success": true,
+  "message": "Search completed successfully",
+  "data": {
+    "query": "malaria",
+    "results": {
+      "cases": [
+        {
+          "_id": "662abcde1234567890fedcba",
+          "caseCode": "CASE-0001",
+          "status": "open"
+        }
+      ],
+      "users": [],
+      "prescriptions": []
+    }
+  }
+}
+Search patient
+{
+  "success": true,
+  "message": "Patients fetched successfully",
+  "data": {
+    "patients": [
+      {
+        "_id": "661b2f7f12ab34cd56ef7890",
+        "hospitalId": "HSP-0001",
+        "fullName": "John Doe"
+      }
+    ]
+  }
+}
+No result
+{
+  "success": true,
+  "message": "No matching records found",
+  "data": {
+    "results": []
+  }
+}
+________________________________________
+7) Chat Routes
+Mount Path
+/api/chat
+Endpoints
+Create or open chat conversation for a case
+POST /api/chat/conversations
+Get my conversations
+GET /api/chat/conversations
+Get one conversation
+GET /api/chat/conversations/:conversationId
+Send message
+POST /api/chat/conversations/:conversationId/messages
+Get messages in conversation
+GET /api/chat/conversations/:conversationId/messages
+Mark conversation messages as read
+PATCH /api/chat/conversations/:conversationId/read
+________________________________________
+Sample JSON Responses — Chat
+Create/open conversation
+{
+  "success": true,
+  "message": "Conversation ready",
+  "data": {
+    "conversation": {
+      "_id": "6655aa11bb22cc33dd44ee55",
+      "caseId": "662abcde1234567890fedcba",
+      "participants": [
+        "661b2f7f12ab34cd56ef7890",
+        "661b2f7f12ab34cd56ef7001"
+      ]
+    }
+  }
+}
+Send message
+{
+  "success": true,
+  "message": "Message sent successfully",
+  "data": {
+    "message": {
+      "_id": "6666ff11aa22bb33cc44dd55",
+      "conversationId": "6655aa11bb22cc33dd44ee55",
+      "sender": "661b2f7f12ab34cd56ef7890",
+      "text": "Good afternoon doctor, I have uploaded the test result.",
+      "createdAt": "2026-03-31T11:40:00.000Z"
+    }
+  }
+}
+Get messages
+{
+  "success": true,
+  "message": "Messages fetched successfully",
+  "data": {
+    "messages": [
+      {
+        "_id": "6666ff11aa22bb33cc44dd55",
+        "sender": "661b2f7f12ab34cd56ef7890",
+        "text": "Good afternoon doctor, I have uploaded the test result.",
+        "createdAt": "2026-03-31T11:40:00.000Z"
+      }
+    ]
+  }
+}
+________________________________________
+Suggested Route File Map
+This is the clean structure these route groups should normally sit in:
+src/
+├── routes/
+│   ├── auth.routes.js
+│   ├── dashboard.routes.js
+│   ├── case.routes.js
+│   ├── notification.routes.js
+│   ├── admin.routes.js
+│   ├── search.routes.js
+│   └── chat.routes.js
+And in your main app bootstrap:
+app.use('/api/auth', authRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/cases', caseRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/search', searchRoutes);
+app.use('/api/chat', chatRoutes);
+________________________________________
+

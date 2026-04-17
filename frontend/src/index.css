@@ -1,0 +1,158 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Global resets & base ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: #030712; /* gray-950 */
+  color: #f9fafb;
+  min-height: 100dvh;
+}
+
+/* ── Scrollbar styling ────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #111827; }
+::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
+
+/* ── Utility layer — reusable component classes ───────────────────── */
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2
+           px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl font-semibold text-xs sm:text-sm
+           bg-brand-600 text-white
+           hover:bg-brand-700 active:scale-95
+           transition-all duration-150 ease-in-out
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2
+           px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl font-semibold text-xs sm:text-sm
+           bg-gray-800 text-gray-200 border border-gray-700
+           hover:bg-gray-700 active:scale-95
+           transition-all duration-150;
+  }
+
+  .card {
+    @apply bg-gray-900 rounded-2xl border border-gray-800 p-4 sm:p-6 shadow-xl;
+  }
+
+  .input {
+    @apply w-full bg-gray-950 border border-gray-800 rounded-xl
+           px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-100 placeholder-gray-600
+           focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/50
+           transition-all duration-150;
+  }
+
+  .input-field {
+    @apply w-full bg-gray-950 border border-gray-800 rounded-xl
+           px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-100 placeholder-gray-600
+           focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/50
+           transition-all duration-150;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2 py-0.5 sm:px-2.5 rounded-full text-[10px] sm:text-xs font-semibold;
+  }
+
+  .badge-high    { @apply badge bg-red-900/60 text-red-300 border border-red-800; }
+  .badge-medium  { @apply badge bg-amber-900/60 text-amber-300 border border-amber-800; }
+  .badge-low     { @apply badge bg-green-900/60 text-green-300 border border-green-800; }
+  .badge-info    { @apply badge bg-blue-900/60 text-blue-300 border border-blue-800; }
+
+  .table-container {
+    @apply w-full overflow-x-auto relative rounded-2xl border border-gray-800;
+  }
+}
+
+/* ── Global Layout Refinement ────────────────────────────────────── */
+#root {
+  @apply flex flex-col min-h-screen overflow-x-hidden;
+}
+
+main {
+  @apply flex-1 p-4 sm:p-6 lg:p-10;
+}
+
+/* ── Print Media Optimization ────────────────────────────────────── */
+@media print {
+    /* 1. Global Reset: Kill all app-like constraints */
+    html, body, #root, #root > div, main, .min-h-screen, .bg-gray-950, .max-w-7xl {
+        height: auto !important;
+        min-height: 0 !important;
+        overflow: visible !important;
+        display: block !important;
+        width: 100% !important;
+        max-width: none !important;
+        background: white !important;
+        color: black !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        position: relative !important;
+        float: none !important;
+    }
+
+    /* 2. Professional Visibility Logic */
+    .no-print, nav, button, .tabs-container, .Governance-Header, header, .no-print-status {
+        display: none !important;
+    }
+
+    /* 3. Shadow-Report Routing: ONLY show the board report if it's explicitly active */
+    #report-printable {
+        display: none !important;
+    }
+
+    [data-print-mode="board-report"] #report-printable {
+        display: block !important;
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        background: white !important;
+        z-index: 9999 !important;
+    }
+
+    /* Hide the rest of the app only during a Board Report print */
+    [data-print-mode="board-report"] #root {
+        display: none !important;
+    }
+
+    /* 4. Table Liberation: No more squishing */
+    .card {
+        background: white !important;
+        border: none !important;
+        box-shadow: none !important;
+        display: block !important;
+    }
+
+    table {
+        width: 100% !important;
+        table-layout: auto !important; /* Allow columns to breathe */
+        border-collapse: collapse !important;
+        margin-top: 20px !important;
+    }
+    
+    th, td {
+        border-bottom: 2px solid #000 !important; /* High contrast lines */
+        padding: 12px 8px !important;
+        text-align: left !important;
+        word-break: break-word !important; /* Prevent text clipping */
+    }
+
+    th {
+        font-weight: 900 !important;
+        text-transform: uppercase !important;
+        border-bottom: 3px solid #000 !important;
+    }
+
+    /* Column Visibility */
+    .print\:table-cell { 
+        display: table-cell !important; 
+    }
+    .print\:hidden {
+        display: none !important;
+    }
+}

@@ -1,0 +1,11 @@
+flask
+scikit-learn
+pandas
+numpy
+joblib
+pytest
+waitress
+requests
+python-dotenv
+SpeechRecognition
+pydub

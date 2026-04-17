@@ -1,0 +1,65 @@
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from './hooks/useAuth';
+
+// Pages (stubbed — filled out in Phase 7)
+import AuthPage          from './pages/AuthPage';
+import PatientDashboard  from './pages/PatientDashboard';
+import DoctorDashboard   from './pages/DoctorDashboard';
+import AdminDashboard    from './pages/AdminDashboard';
+import CaseDetailPage    from './pages/CaseDetailPage';
+import NewCasePage       from './pages/NewCasePage';
+import SearchPage        from './pages/SearchPage';
+import LabDashboard      from './pages/LabDashboard';
+import PharmacyDashboard from './pages/PharmacyDashboard';
+import NotFoundPage      from './pages/NotFoundPage';
+
+// Guards
+// Guards
+import ProtectedRoute    from './components/ProtectedRoute';
+import GlobalNotifications from './components/GlobalNotifications';
+import Navbar from './components/Navbar';
+
+export default function App() {
+  const { user } = useAuth();
+
+  return (
+    <div className="min-h-screen bg-gray-950 flex flex-col">
+      <GlobalNotifications />
+      <Navbar />
+      <div className="flex-1 overflow-auto">
+        <Routes>
+        {/* Public */}
+      <Route path="/login"    element={<AuthPage mode="login" />} />
+      <Route path="/register" element={<AuthPage mode="register" />} />
+
+      {/* Patient */}
+      <Route path="/dashboard" element={
+        <ProtectedRoute roles={['patient', 'doctor', 'admin', 'lab', 'pharmacist']}>
+          {user?.activeRole === 'doctor' ? <DoctorDashboard /> :
+           user?.activeRole === 'admin'  ? <AdminDashboard />  :
+           user?.activeRole === 'lab'    ? <LabDashboard />    :
+           user?.activeRole === 'pharmacist' ? <PharmacyDashboard /> :
+                                           <PatientDashboard />}
+        </ProtectedRoute>
+      } />
+      <Route path="/admin"      element={<ProtectedRoute roles={['admin']}><AdminDashboard /></ProtectedRoute>} />
+      <Route path="/lab"        element={<ProtectedRoute roles={['lab', 'admin']}><LabDashboard /></ProtectedRoute>} />
+      <Route path="/pharmacy"   element={<ProtectedRoute roles={['pharmacist', 'admin']}><PharmacyDashboard /></ProtectedRoute>} />
+      <Route path="/cases/new" element={
+        <ProtectedRoute roles={['patient']}><NewCasePage /></ProtectedRoute>
+      } />
+      <Route path="/cases/:caseId" element={
+        <ProtectedRoute roles={['patient', 'doctor', 'admin']}><CaseDetailPage /></ProtectedRoute>
+      } />
+      <Route path="/search" element={
+        <ProtectedRoute roles={['patient', 'doctor', 'admin']}><SearchPage /></ProtectedRoute>
+      } />
+
+      {/* Default redirect */}
+      <Route path="/"  element={<Navigate to={user ? '/dashboard' : '/login'} replace />} />
+      <Route path="*"  element={<NotFoundPage />} />
+      </Routes>
+      </div>
+    </div>
+  );
+}
