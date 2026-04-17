@@ -20,8 +20,8 @@ const registerSchema = Joi.object({
   // Role-specific fields
   age:            Joi.number().min(0).max(150).optional(),
   gender:         Joi.string().valid('male', 'female', 'other').optional(),
-  specialization: Joi.string().optional(),
-  licenseNumber:  Joi.string().optional(),
+  specialization: Joi.string().optional().allow(''),
+  licenseNumber:  Joi.string().optional().allow(''),
 });
 
 const loginSchema = Joi.object({
