@@ -21,11 +21,18 @@ const register = async (userData) => {
   const roles = role === 'doctor' ? ['doctor', 'patient'] : ['patient'];
   const activeRole = role === 'doctor' ? 'doctor' : 'patient';
 
+  // Institutional Serialization: Convert comma-separated string to array
+  let specialization = userData.specialization || [];
+  if (typeof specialization === 'string') {
+    specialization = specialization.split(',').map(s => s.trim()).filter(Boolean);
+  }
+
   const user = await userRepo.create({
     ...userData,
     hospitalId,
     roles,
     activeRole,
+    specialization,
     profilePicture: profilePicture || '',
   });
 
@@ -236,7 +243,12 @@ const activateUser = async (adminId, targetUserId) => {
   return updated;
 };
 
+const registerPublicKey = async (userId, publicKey) => {
+  return userRepo.updateById(userId, { publicKey });
+};
+
 module.exports = {
   register, login, refreshToken, logout, requestRole,
   switchRole, approveRole, rejectRole, suspendUser, activateUser,
+  registerPublicKey,
 };

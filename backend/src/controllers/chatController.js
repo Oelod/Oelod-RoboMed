@@ -14,11 +14,11 @@ const getMessages = async (req, res) => {
 };
 
 const sendMessage = async (req, res) => {
-  const { text, attachments } = req.body;
+  const { text, attachments, isEncrypted } = req.body;
   if (!text && (!attachments || attachments.length === 0)) {
     return res_.error(res, 'Message text or attachments required', 400);
   }
-  const msg = await chatService.sendMessage(req.params.conversationId, req.user._id, text, attachments);
+  const msg = await chatService.sendMessage(req.params.conversationId, req.user._id, text, attachments, isEncrypted);
   return res_.success(res, { message: msg }, 'Message sent');
 };
 

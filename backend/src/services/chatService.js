@@ -13,12 +13,12 @@ const getOrCreateConversation = async (caseId, userId) => {
     const e = new Error('Only the assigned doctor and patient can access this chat'); e.statusCode = 403; throw e;
   }
 
-  let conv = await Conversation.findOne({ caseId }).populate('participants', 'fullName role profilePicture');
+  let conv = await Conversation.findOne({ caseId }).populate('participants', 'fullName role profilePicture publicKey');
   if (!conv) {
     const participants = [c.patient];
     if (c.doctor) participants.push(c.doctor);
     
-    conv = await (await Conversation.create({ caseId, participants })).populate('participants', 'fullName role profilePicture');
+    conv = await (await Conversation.create({ caseId, participants })).populate('participants', 'fullName role profilePicture publicKey');
   }
   return conv;
 };
@@ -29,12 +29,12 @@ const getMessages = async (conversationId, userId) => {
   if (!conv || !isParticipant) {
     const e = new Error('Not authorized to view these messages'); e.statusCode = 403; throw e;
   }
-  return await Message.find({ conversationId }).sort('createdAt').populate('sender', 'fullName role profilePicture');
+  return await Message.find({ conversationId }).sort('createdAt').populate('sender', 'fullName role profilePicture publicKey');
 };
 
 const { uploadToCloudinary } = require('../utils/uploadFile');
 
-const sendMessage = async (conversationId, senderId, text, attachments = []) => {
+const sendMessage = async (conversationId, senderId, text, attachments = [], isEncrypted = false) => {
   const conv = await Conversation.findById(conversationId).populate('caseId');
   if (!conv) { const e = new Error('Conversation not found'); e.statusCode = 404; throw e; }
   
@@ -51,9 +51,10 @@ const sendMessage = async (conversationId, senderId, text, attachments = []) => 
     conversationId,
     sender: senderId,
     text,
+    isEncrypted,
     attachments,
     readBy: [senderId] // sender has read it
-  })).populate('sender', 'fullName role profilePicture');
+  })).populate('sender', 'fullName role profilePicture publicKey');
 
   conv.lastMessage = msg._id;
   await conv.save();
@@ -84,9 +85,10 @@ const sendAudioMessage = async (conversationId, senderId, fileBuffer) => {
     conversationId,
     sender: senderId,
     text: '[Transcribing Voice Note...]', // Placeholder
+    isEncrypted: false, // Transcripts are usually plaintext by background AI
     attachments: [{ fileUrl: cloudinaryRes.fileUrl, mimeType: 'audio/webm' }],
     readBy: [senderId]
-  })).populate('sender', 'fullName role profilePicture');
+  })).populate('sender', 'fullName role profilePicture publicKey');
 
   conv.lastMessage = msg._id;
   await conv.save();

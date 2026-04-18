@@ -86,4 +86,18 @@ const requestRole = async (req, res) => {
   return res_.success(res, { user }, 'Role request submitted');
 };
 
-module.exports = { register, updateProfilePicture, updateProfile, login, getMe, refreshTokenCtrl, logout, requestRole };
+const updatePublicKey = async (req, res) => {
+  const { publicKey } = req.body;
+  if (!publicKey) return res_.error(res, 'Internal Protocol Error: Public key character-string is required.', 400);
+  
+  const user = await authService.registerPublicKey(req.user._id, publicKey);
+  return res_.success(res, { user }, 'Cryptographic identity established.');
+};
+
+const getPublicKey = async (req, res) => {
+  const user = await userRepo.findById(req.params.userId);
+  if (!user || !user.publicKey) return res_.notFound(res, 'Target identity not found in Registry.');
+  return res_.success(res, { publicKey: user.publicKey });
+};
+
+module.exports = { register, updateProfilePicture, updateProfile, login, getMe, refreshTokenCtrl, logout, requestRole, updatePublicKey, getPublicKey };

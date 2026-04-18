@@ -11,6 +11,7 @@ import NewCasePage       from './pages/NewCasePage';
 import SearchPage        from './pages/SearchPage';
 import LabDashboard      from './pages/LabDashboard';
 import PharmacyDashboard from './pages/PharmacyDashboard';
+import AdminReportsPage from './pages/AdminReportsPage';
 import NotFoundPage      from './pages/NotFoundPage';
 
 // Guards
@@ -45,6 +46,7 @@ export default function App() {
       <Route path="/admin"      element={<ProtectedRoute roles={['admin']}><AdminDashboard /></ProtectedRoute>} />
       <Route path="/lab"        element={<ProtectedRoute roles={['lab', 'admin']}><LabDashboard /></ProtectedRoute>} />
       <Route path="/pharmacy"   element={<ProtectedRoute roles={['pharmacist', 'admin']}><PharmacyDashboard /></ProtectedRoute>} />
+      <Route path="/admin/reports" element={<ProtectedRoute roles={['admin']}><AdminReportsPage /></ProtectedRoute>} />
       <Route path="/cases/new" element={
         <ProtectedRoute roles={['patient']}><NewCasePage /></ProtectedRoute>
       } />

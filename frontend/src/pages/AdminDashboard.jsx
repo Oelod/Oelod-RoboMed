@@ -45,7 +45,7 @@ const AdminStatCard = ({ label, value, icon }) => (
 );
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState('personnel'); // 'personnel' | 'patients' | 'cases' | 'logs' | 'search' | 'migration' | 'policies' | 'audit' | 'office' | 'health'
+  const [activeTab, setActiveTab] = useState('personnel'); // 'personnel' | 'patients' | 'cases' | 'reports' | 'logs' | 'search' | 'migration' | 'policies' | 'audit' | 'office' | 'health'
   const [migrationFile, setMigrationFile] = useState(null);
   const [migrationType, setMigrationType] = useState('patients'); // 'patients' | 'doctors'
   const [migrationStatus, setMigrationStatus] = useState(null);
@@ -332,18 +332,24 @@ export default function AdminDashboard() {
             <p className="text-gray-500 mt-1">Institutional infrastructure and personnel oversight console.</p>
           </div>
           
-          <div className="flex bg-gray-900 p-1 rounded-xl border border-gray-800 no-print">
-             {['personnel', 'patients', 'cases', 'logs', 'search', 'migration', 'policies', 'audit', ...(currentUser?.assignedOffice ? ['office'] : []), ...(currentUser?.adminLevel === 3 ? ['health'] : [])]
+          <div className="flex bg-gray-900 p-1 rounded-xl border border-gray-800 no-print flex-wrap">
+             {['personnel', 'patients', 'cases', 'reports', 'logs', 'search', 'migration', 'policies', 'audit', ...(currentUser?.assignedOffice ? ['office'] : []), ...(currentUser?.adminLevel === 3 ? ['health'] : [])]
               .filter(t => {
                 if (currentUser?.adminLevel === 1) {
-                  return ['personnel', 'patients', 'search', 'office'].includes(t);
+                  return ['personnel', 'patients', 'search', 'office', 'reports'].includes(t);
                 }
                 return true;
               })
               .map((t) => (
                <button 
                  key={t}
-                 onClick={() => setActiveTab(t)}
+                 onClick={() => {
+                   if (t === 'reports') {
+                     window.location.href = '/admin/reports';
+                     return;
+                   }
+                   setActiveTab(t);
+                 }}
                  className={`px-6 py-2 rounded-lg text-xs font-semibold uppercase tracking-widest transition-all ${activeTab === t ? 'bg-gray-800 text-white border border-gray-700 shadow-sm' : 'text-gray-500 hover:text-gray-300'}`}
                >
                  {t === 'cases' ? 'archive' : t === 'policies' ? 'manifest' : t === 'office' ? 'Department' : t === 'health' ? 'Health' : t === 'audit' ? 'Audit' : t}
@@ -831,6 +837,65 @@ export default function AdminDashboard() {
                            </div>
                         </div>
                      )}
+                  </div>
+              ) : activeTab === 'migration' ? (
+                  <div className="p-10 max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-5 duration-700">
+                     <div className="text-center mb-12">
+                        <div className="w-20 h-20 bg-gray-900 rounded-3xl mx-auto flex items-center justify-center text-3xl shadow-xl border border-gray-800 mb-6">📥</div>
+                        <h2 className="text-4xl font-black text-white italic uppercase tracking-tighter">Bulk Migration Engine</h2>
+                        <p className="text-gray-500 font-medium">Character-perfect legacy ingestion manifold for large-scale clinical datasets.</p>
+                     </div>
+
+                     <div className="card !p-10 bg-gray-900 border-brand-500/10 shadow-2xl">
+                        <form onSubmit={handleMigration} className="space-y-8">
+                           <div className="grid grid-cols-2 gap-6">
+                              <button 
+                                type="button" 
+                                onClick={() => setMigrationType('patients')}
+                                className={`py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all ${migrationType === 'patients' ? 'bg-brand-600 text-white border-brand-500 shadow-lg shadow-brand-900/20' : 'bg-gray-950 text-gray-500 border-gray-800'}`}
+                              >
+                                Patient Registry Import
+                              </button>
+                              <button 
+                                type="button" 
+                                onClick={() => setMigrationType('doctors')}
+                                className={`py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all ${migrationType === 'doctors' ? 'bg-brand-600 text-white border-brand-500 shadow-lg shadow-brand-900/20' : 'bg-gray-950 text-gray-500 border-gray-800'}`}
+                              >
+                                Specialist Pool Import
+                              </button>
+                           </div>
+
+                           <div className="p-12 border-2 border-dashed border-gray-800 rounded-[2.5rem] text-center group hover:border-brand-500/30 transition-all">
+                              <input type="file" className="hidden" id="mig-file" accept=".json" onChange={(e) => setMigrationFile(e.target.files[0])} />
+                              <label htmlFor="mig-file" className="cursor-pointer block">
+                                 <span className="text-4xl block mb-4 group-hover:scale-110 transition-transform">📄</span>
+                                 <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
+                                    {migrationFile ? migrationFile.name : 'Select Clinical JSON Manifest'}
+                                 </span>
+                              </label>
+                           </div>
+
+                           <button 
+                              type="submit" 
+                              className="w-full bg-brand-600 hover:bg-brand-500 text-white font-black text-[10px] uppercase tracking-[0.3em] py-5 rounded-3xl transition-all shadow-xl shadow-brand-900/20"
+                              disabled={!migrationFile}
+                           >
+                              Initialize High-Fidelity Migration →
+                           </button>
+
+                           {migrationStatus && (
+                              <div className="mt-8 p-6 bg-black/40 border border-brand-500/20 rounded-2xl">
+                                 <pre className="text-[10px] text-brand-400 font-mono whitespace-pre-wrap">
+                                    {typeof migrationStatus === 'string' ? migrationStatus : JSON.stringify(migrationStatus, null, 2)}
+                                 </pre>
+                              </div>
+                           )}
+                        </form>
+                     </div>
+
+                     <div className="mt-12 text-center text-gray-600">
+                        <p className="text-[10px] font-bold uppercase tracking-widest">Protocol Note: Ingestion is immutable once committed to clinical storage.</p>
+                     </div>
                   </div>
               ) : activeTab === 'policies' ? (
                  <div className="p-10 max-w-6xl mx-auto space-y-16 animate-in slide-in-from-bottom-8 duration-700">

@@ -178,13 +178,11 @@ export default function AuthPage({ mode = 'login' }) {
                   </select>
                 </div>
 
-                {form.role === 'patient' && (
-                  <div>
-                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Age</label>
-                    <input name="age" type="number" placeholder="25"
-                      className="input py-3" value={form.age} onChange={handleChange} />
-                  </div>
-                )}
+                <div>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Age</label>
+                  <input name="age" type="number" placeholder="25"
+                    className="input py-3" value={form.age} onChange={handleChange} />
+                </div>
 
                 {form.role === 'doctor' && (
                   <>

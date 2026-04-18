@@ -101,6 +101,10 @@ const userSchema = new mongoose.Schema(
         'Technical Support / IT'
       ]
     },
+    publicKey: {
+      type: String, // PEM format or JWK string
+      default: null
+    }
   },
   {
     timestamps: true,
@@ -113,8 +117,12 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// ── Pre-save: hash password only when it's new or changed ────────────────────
+// ── Pre-save: hash password and sanitize unique fields ──────────────────────
 userSchema.pre('save', async function (next) {
+  // Sanitize empty strings for sparse unique indices
+  if (this.licenseNumber === '') this.licenseNumber = undefined;
+  if (this.hospitalId === '') this.hospitalId = undefined;
+
   if (!this.isModified('password')) return next();
   this.password = await bcrypt.hash(this.password, 12);
   next();

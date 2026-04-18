@@ -1,0 +1,16 @@
+const express = require('express');
+const router = express.Router();
+const ctrl = require('../controllers/reportController');
+const { isAuth } = require('../middlewares/auth');
+const { requireRole } = require('../middlewares/roleGuard');
+
+router.use(isAuth);
+
+// Patient Route: Submit report
+router.post('/', requireRole('patient'), ctrl.submitReport);
+
+// Admin Routes: Manage reports
+router.get('/', requireRole('admin'), ctrl.getAllReports);
+router.patch('/:reportId', requireRole('admin'), ctrl.updateReport);
+
+module.exports = router;

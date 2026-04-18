@@ -61,4 +61,10 @@ router.post('/logout', ctrl.logout);
 // POST /api/auth/request-role
 router.post('/request-role', isAuth, validate(roleRequestSchema), ctrl.requestRole);
 
+// PATCH /api/auth/public-key
+router.patch('/public-key', isAuth, ctrl.updatePublicKey);
+
+// GET /api/auth/public-key/:userId
+router.get('/public-key/:userId', isAuth, ctrl.getPublicKey);
+
 module.exports = router;

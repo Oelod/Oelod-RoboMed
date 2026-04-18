@@ -10,8 +10,8 @@ export const getMessages = async (conversationId) => {
   return res.data;
 };
 
-export const sendMessage = async (conversationId, text, attachments = []) => {
-  const res = await api.post(`/chat/conversations/${conversationId}/messages`, { text, attachments });
+export const sendMessage = async (conversationId, text, attachments = [], isEncrypted = false) => {
+  const res = await api.post(`/chat/conversations/${conversationId}/messages`, { text, attachments, isEncrypted });
   return res.data;
 };
 
@@ -26,5 +26,10 @@ export const sendVoiceMessage = async (conversationId, audioBlob) => {
 
 export const markChatAsRead = async (conversationId) => {
   const res = await api.patch(`/chat/conversations/${conversationId}/read`);
+  return res.data;
+};
+
+export const getRecipientPublicKey = async (userId) => {
+  const res = await api.get(`/auth/public-key/${userId}`);
   return res.data;
 };

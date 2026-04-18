@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getCaseById, acceptCase, closeCase, uploadAttachments, requestLab, uploadLabResult, getCaseLabs, addPrescription, getCasePrescriptions, acknowledgePrescription, getFullPatientHistory, flagCase, escalateCase, assignDoctor } from '../api/cases';
+import { submitMisconductReport } from '../api/reports';
 import api from '../api/axiosInstance';
 import { useAuth } from '../hooks/useAuth';
 import ChatPanel from '../components/ChatPanel';
+import { toast } from 'react-hot-toast';
 
 export default function CaseDetailPage() {
   const { caseId } = useParams();
@@ -40,6 +42,9 @@ export default function CaseDetailPage() {
 
   const [showResolveModal, setShowResolveModal] = useState(false);
   const [resolveNote, setResolveNote] = useState('');
+
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportForm, setReportForm] = useState({ reason: '', description: '' });
 
   const fetchCase = async () => {
     try {
@@ -198,9 +203,9 @@ export default function CaseDetailPage() {
   const handleAcknowledge = async (rxId) => {
     setActionLoading(true);
     try {
-      await api.post(`/prescriptions/${rxId}/acknowledge`);
+      await acknowledgePrescription(caseId, rxId);
       toast.success('Prescription Legally Acknowledged');
-      refetchPrescriptions();
+      fetchCase();
     } catch (err) {
       toast.error('Acknowledgment failed: ' + (err.response?.data?.message || err.message));
     } finally {
@@ -213,7 +218,7 @@ export default function CaseDetailPage() {
     try {
       await api.patch(`/departments/pharmacy/prescriptions/${rxId}/item/${index}`, { status });
       toast.success(`Medication recorded as ${status}`);
-      refetchPrescriptions();
+      fetchCase();
     } catch (err) {
       toast.error('Failed to update medication: ' + (err.response?.data?.message || err.message));
     } finally {
@@ -284,6 +289,27 @@ export default function CaseDetailPage() {
       alert(err.response?.data?.message || 'Re-assignment failed');
     } finally {
       setActionLoading(false);
+    }
+  };
+
+  const submitReport = async () => {
+    if (!reportForm.reason || reportForm.description.length < 20) {
+       return alert('Institutional Requirement: Please select a reason and provide at least 20 characters of clinical detail.');
+    }
+    setActionLoading(true);
+    try {
+       await submitMisconductReport({
+          caseId,
+          targetDoctor: medicalCase.doctor._id,
+          ...reportForm
+       });
+       toast.success('Clinical conduct report formally logged. Institutional oversight initiated.');
+       setShowReportModal(false);
+       setReportForm({ reason: '', description: '' });
+    } catch (err) {
+       toast.error(err.response?.data?.message || 'Submission Failure');
+    } finally {
+       setActionLoading(false);
     }
   };
 
@@ -685,9 +711,19 @@ export default function CaseDetailPage() {
             </div>
           )}
 
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-             <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Assignment Info</h2>
-             {medicalCase.doctor ? (
+          {medicalCase.doctor && (
+            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+               <div className="flex justify-between items-start mb-4">
+                  <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Assignment Info</h2>
+                  {medicalCase.patient?._id === user?._id && (
+                    <button 
+                      onClick={() => setShowReportModal(true)}
+                      className="text-[9px] font-black text-red-500 uppercase hover:underline flex items-center gap-1"
+                    >
+                      🚩 Report Doctor
+                    </button>
+                  )}
+               </div>
                <div className="flex items-center gap-3">
                  <div className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-lg">
                    👨‍⚕️
@@ -697,12 +733,17 @@ export default function CaseDetailPage() {
                    <p className="text-xs text-gray-500">{medicalCase.doctor.specialization || 'General Practitioner'}</p>
                  </div>
                </div>
-             ) : (
+            </div>
+          )}
+
+          {!medicalCase.doctor && (
+            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+              <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Assignment Info</h2>
                <div className="text-gray-500 italic text-sm text-center py-4">
                  Not yet assigned to a doctor. {medicalCase.assignedSpecialty && `Waiting for ${medicalCase.assignedSpecialty}.`}
                </div>
-             )}
-          </div>
+            </div>
+          )}
 
           {(user?.activeRole === 'doctor' || user?.activeRole === 'admin') && (
             <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
@@ -777,10 +818,10 @@ export default function CaseDetailPage() {
 
       {/* Prescription Tabular Modal */}
       {showRxModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-gray-900 border border-gray-700 p-6 rounded-2xl w-full max-w-3xl">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-gray-900 border border-gray-700 p-6 rounded-2xl w-full max-w-3xl my-8">
              <h3 className="text-lg font-bold text-white mb-4">Issue Prescription</h3>
-             <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+             <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
                {rxForm.map((item, idx) => (
                  <div key={idx} className="bg-gray-800 p-4 rounded-lg border border-gray-700 grid grid-cols-1 sm:grid-cols-2 gap-4">
                    <div>
@@ -814,17 +855,17 @@ export default function CaseDetailPage() {
                      }} />
                    </div>
                    <div className="sm:col-span-2 flex justify-end">
-                      <button className="text-red-400 text-sm hover:text-red-300" onClick={() => {
+                      <button className="text-red-400 text-[10px] font-black uppercase hover:text-red-300" onClick={() => {
                         const newF = [...rxForm]; newF.splice(idx,1); setRxForm(newF);
                       }} disabled={rxForm.length === 1}>× Remove Drug</button>
                    </div>
                  </div>
                ))}
              </div>
-             <button className="mt-3 text-brand-400 text-sm font-semibold hover:underline" onClick={() => setRxForm([...rxForm, { name: '', dosage: '', frequency: '', duration: '', instructions: '' }])}>+ Add Another Drug</button>
+             <button className="mt-4 text-brand-400 text-xs font-black uppercase tracking-widest hover:underline" onClick={() => setRxForm([...rxForm, { name: '', dosage: '', frequency: '', duration: '', instructions: '' }])}>+ Add Another Drug</button>
              
-             <div className="mt-6">
-                <label className="text-xs text-gray-400 font-bold uppercase tracking-widest mb-2 block">Physician Note / Clinical Summary</label>
+             <div className="mt-8 pb-4">
+                <label className="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-3 block">Physician Note / Clinical Summary</label>
                 <textarea 
                   className="input-field w-full h-24 p-4 !resize-none"
                   placeholder="Optional clinical notes for the patient or pharmacist..."
@@ -832,10 +873,10 @@ export default function CaseDetailPage() {
                   onChange={(e) => setRxNotes(e.target.value)}
                 ></textarea>
              </div>
-
-             <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-800">
-               <button className="btn-secondary" onClick={() => setShowRxModal(false)} disabled={actionLoading}>Cancel</button>
-               <button className="btn-primary bg-brand-600 hover:bg-brand-500" onClick={submitPrescription} disabled={actionLoading}>Sign & Issue Prescription</button>
+ 
+             <div className="flex justify-end gap-3 mt-6 pt-6 border-t border-gray-800">
+               <button className="btn-secondary !px-8" onClick={() => setShowRxModal(false)} disabled={actionLoading}>Cancel</button>
+               <button className="btn-primary bg-brand-600 hover:bg-brand-500 !px-10 shadow-xl shadow-brand-600/20" onClick={submitPrescription} disabled={actionLoading}>Sign & Issue Prescription</button>
              </div>
           </div>
         </div>
@@ -911,7 +952,7 @@ export default function CaseDetailPage() {
 
       {/* Manual Assignment Modal (Push) */}
       {showAssignModal && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-gray-900 border border-brand-500/30 p-8 rounded-[2.5rem] w-full max-w-xl shadow-2xl shadow-brand-900/20">
              <h3 className="text-2xl font-black text-white italic uppercase tracking-tighter mb-2">Institutional Re-routing</h3>
              <p className="text-gray-500 text-sm mb-6 uppercase font-bold tracking-widest opacity-60 italic">Manually assigning case to a specific clinician pool.</p>
@@ -986,6 +1027,54 @@ export default function CaseDetailPage() {
              </div>
           </div>
         </div>
+      )}
+
+      {/* Report Misconduct Modal */}
+      {showReportModal && (
+         <div className="fixed inset-0 z-[60] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+            <div className="bg-gray-900 border border-red-500/20 rounded-[2.5rem] p-8 w-full max-w-xl shadow-2xl shadow-red-900/20">
+               <h2 className="text-2xl font-black text-white italic tracking-tighter uppercase mb-2 flex items-center gap-3">
+                 Institutional Misconduct Report
+               </h2>
+               <p className="text-gray-500 text-xs italic mb-8 font-medium">This report triggers an immediate administrative review. False allegations are strictly monitored under ethics protocol.</p>
+               
+               <div className="space-y-6">
+                  <div>
+                     <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest block mb-2">Category of Allegation</label>
+                     <select 
+                        className="w-full bg-gray-800 border border-gray-700 rounded-2xl px-4 py-3 text-sm text-white focus:border-red-500 outline-none transition-all"
+                        value={reportForm.reason}
+                        onChange={(e) => setReportForm(prev => ({ ...prev, reason: e.target.value }))}
+                     >
+                        <option value="">Select misconduct reason...</option>
+                        <option value="Clinical Negligence">Clinical Negligence</option>
+                        <option value="Unprofessional Conduct">Unprofessional Conduct</option>
+                        <option value="Ethics Violation">Ethics Violation</option>
+                        <option value="Communication Failure">Communication Failure</option>
+                        <option value="Privacy Breach">Privacy Breach</option>
+                        <option value="Other">Other</option>
+                     </select>
+                  </div>
+
+                  <div>
+                     <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest block mb-2">Incidence Description (Clinical Detail)</label>
+                     <textarea 
+                        className="w-full bg-gray-800 border border-gray-700 rounded-2xl px-4 py-3 text-sm text-white focus:border-red-500 outline-none transition-all min-h-[150px] resize-none"
+                        placeholder="Please describe the misconduct in detail... (Min 20 characters)"
+                        value={reportForm.description}
+                        onChange={(e) => setReportForm(prev => ({ ...prev, description: e.target.value }))}
+                     />
+                  </div>
+               </div>
+
+               <div className="flex gap-4 mt-8">
+                  <button className="flex-1 btn-secondary" onClick={() => setShowReportModal(false)} disabled={actionLoading}>Seal Protocol</button>
+                  <button className="flex-1 bg-red-600 hover:bg-red-500 text-white font-black text-[10px] uppercase tracking-widest py-4 rounded-2xl transition-all shadow-xl shadow-red-900/40" onClick={submitReport} disabled={actionLoading}>
+                     Submit to Governance →
+                  </button>
+               </div>
+            </div>
+         </div>
       )}
 
     </>

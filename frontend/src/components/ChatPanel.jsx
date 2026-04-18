@@ -1,13 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuthContext } from '../context/AuthContext';
 import { useSocketContext } from '../context/SocketContext';
-import { getOrCreateConversation, getMessages, sendMessage, sendVoiceMessage, markChatAsRead } from '../api/chat';
+import { getOrCreateConversation, getMessages, sendMessage, sendVoiceMessage, markChatAsRead, getRecipientPublicKey } from '../api/chat';
+import * as cryptoService from '../services/cryptoService';
+import { toast } from 'react-hot-toast';
 
 export default function ChatPanel({ caseId, status }) {
   const { user } = useAuthContext();
   const { socket } = useSocketContext();
   const [conversation, setConversation] = useState(null);
   const [messages, setMessages] = useState([]);
+  const [decryptedTexts, setDecryptedTexts] = useState({}); // { messageId: plaintext }
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
@@ -31,9 +34,18 @@ export default function ChatPanel({ caseId, status }) {
         const convRes = await getOrCreateConversation(caseId);
         setConversation(convRes.data.conversation);
         const msgRes = await getMessages(convRes.data.conversation._id);
-        setMessages(msgRes.data.messages);
+        const msgs = msgRes.data.messages;
+        setMessages(msgs);
+        
+        // Institutional Decryption Loop
+        for (const m of msgs) {
+           if (m.isEncrypted && m.text) {
+              const plain = await cryptoService.decryptMessage(m.text, user._id);
+              setDecryptedTexts(prev => ({ ...prev, [m._id]: plain }));
+           }
+        }
+
         setLoading(false);
-        // Mark as read once loaded
         markChatAsRead(convRes.data.conversation._id);
       } catch (err) {
         console.error('Chat init error:', err);
@@ -41,7 +53,7 @@ export default function ChatPanel({ caseId, status }) {
       }
     };
     initChat();
-  }, [caseId]);
+  }, [caseId, user._id]);
 
   useEffect(() => {
     scrollToBottom();
@@ -57,10 +69,16 @@ export default function ChatPanel({ caseId, status }) {
       // payload: { conversationId, message }
       if (payload.conversationId === conversation._id) {
         setMessages(prev => {
-          // Prevent duplicates if sender also received their own broadcast via socket (depending on IO config)
           if (prev.find(m => m._id === payload.message._id)) return prev;
           return [...prev, payload.message];
         });
+
+        // Instant Decryption Handshake
+        if (payload.message.isEncrypted) {
+           cryptoService.decryptMessage(payload.message.text, user._id).then(plain => {
+              setDecryptedTexts(prev => ({ ...prev, [payload.message._id]: plain }));
+           });
+        }
         
         if (payload.message.sender._id !== user._id) {
            markChatAsRead(conversation._id);
@@ -89,10 +107,41 @@ export default function ChatPanel({ caseId, status }) {
 
     setSending(true);
     try {
-      await sendMessage(conversation._id, text.trim());
+      // Find Recipient Cryptographic Identity
+      const recipient = conversation.participants.find(p => p._id !== user._id);
+
+      if (!recipient) {
+         return toast.error('Transmission Failure: Target participant manifold not found.');
+      }
+      
+      // Perform Industrial-Grade Identity Verification
+      let activePublicKey = recipient.publicKey;
+      try {
+         const keyRes = await getRecipientPublicKey(recipient._id);
+         activePublicKey = keyRes.data.publicKey;
+      } catch (err) {
+         console.warn("Institutional Registry Warning: Could not verify latest identity. Falling back to cached manifold.");
+      }
+
+      if (!activePublicKey) {
+         // Fallback to institutional plaintext if identity is not yet established
+         console.warn("Institutional Notice: Recipient identity not established. Broadcasting in plaintext manifold.");
+         await sendMessage(conversation._id, text.trim(), [], false);
+      } else {
+         // High-Fidelity Multi-Recipient E2EE Manifold
+         const keysMap = {
+            [recipient._id]: activePublicKey,
+            [user._id]: user.publicKey
+         };
+         
+         const encryptedText = await cryptoService.encryptMessage(text.trim(), keysMap);
+         await sendMessage(conversation._id, encryptedText, [], true);
+      }
+      
       setText('');
     } catch (err) {
-      alert('Failed to send message');
+      toast.error('Clinical Transmission Failure: Message could not be secured.');
+      console.error(err);
     } finally {
       setSending(false);
     }
@@ -207,7 +256,14 @@ export default function ChatPanel({ caseId, status }) {
                 isMe ? 'bg-brand-600 text-white rounded-tr-none' : 'bg-gray-800 text-gray-200 rounded-tl-none border border-gray-700'
               }`}>
                 {!isMe && <p className="text-[10px] font-bold text-brand-400 mb-1 uppercase tracking-tighter">{msg.sender.fullName}</p>}
-                {msg.text && <p className="text-sm whitespace-pre-wrap leading-relaxed">{msg.text}</p>}
+                {msg.text && (
+                   <div className="flex items-center gap-2">
+                      <p className="text-sm whitespace-pre-wrap leading-relaxed">
+                        {msg.isEncrypted ? (decryptedTexts[msg._id] || '🔒 Decrypting clinical transcript...') : msg.text}
+                      </p>
+                      {msg.isEncrypted && <span className="text-[10px] opacity-40" title="End-to-End Encrypted Manifold">🛡️</span>}
+                   </div>
+                )}
                 {msg.attachments?.map((at, idx) => (
                    <div key={idx} className="mt-2">
                       {at.mimeType?.startsWith('audio') ? (
