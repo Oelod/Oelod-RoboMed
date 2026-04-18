@@ -3,9 +3,32 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import api from '../api/axiosInstance';
 import SearchBar from '../components/SearchBar';
+import { getMyReports } from '../api/reports';
+import { PageSpinner } from '../components/PageSpinner';
+import * as cryptoService from '../services/cryptoService';
+import { useState } from 'react';
 
 export default function PatientDashboard() {
   const { user } = useAuth();
+  const [backupPhrase, setBackupPhrase] = useState('');
+  const [isBackingUp, setIsBackingUp] = useState(false);
+  const [backupStatus, setBackupStatus] = useState(null);
+  
+  const handleIdentityBackup = async (e) => {
+     e.preventDefault();
+     if (!backupPhrase) return;
+     setIsBackingUp(true);
+     setBackupStatus(null);
+     try {
+        await cryptoService.backupIdentity(user._id, backupPhrase);
+        setBackupStatus({ success: true, message: 'Institutional Identity character-perfectly sealed in Escrow.' });
+        setBackupPhrase('');
+     } catch (err) {
+        setBackupStatus({ success: false, message: 'Identity Handshake Failed: Registry connection interrupted.' });
+     } finally {
+        setIsBackingUp(false);
+     }
+  };
 
   const { data: summary, isLoading } = useQuery({
     queryKey: ['dashboard-summary'],
@@ -17,10 +40,16 @@ export default function PatientDashboard() {
     queryFn: () => api.get('/cases').then((r) => r.data.data),
   });
 
+  const { data: reportsData } = useQuery({
+    queryKey: ['my-reports'],
+    queryFn: () => getMyReports().then(res => res.data),
+  });
+
   if (isLoading) return <PageSpinner />;
 
   const stats = summary?.stats || {};
   const cases = casesData?.cases || [];
+  const reports = reportsData?.reports || [];
 
   return (
     <div className="min-h-screen bg-gray-950 p-6">
@@ -79,6 +108,85 @@ export default function PatientDashboard() {
             </ul>
           )}
         </div>
+
+        {/* Misconduct Oversight Section */}
+        {reports.length > 0 && (
+          <div className="card mt-12 !p-4 sm:!p-8 border-t-4 border-t-brand-600">
+            <h2 className="text-lg font-black text-white uppercase italic tracking-tighter mb-8 bg-gray-900/50 p-4 rounded-xl border border-gray-800 inline-block">⚖️ Misconduct Oversight Hub</h2>
+            <div className="space-y-4">
+              {reports.map((r) => (
+                <div key={r._id} className="p-6 rounded-2xl bg-gray-900 border border-gray-800">
+                   <div className="flex justify-between items-start mb-4">
+                      <div>
+                         <p className="text-white font-black uppercase tracking-widest text-xs mb-1">Target: Dr. {r.targetDoctor?.fullName}</p>
+                         <p className="text-gray-500 text-[10px] font-medium italic">Handled by: {r.escalationTarget || 'General Administration'}</p>
+                      </div>
+                      <StatusBadge status={r.status} />
+                   </div>
+                   
+                   <p className="text-gray-300 text-sm mb-6 pb-6 border-b border-gray-800/50">
+                      <span className="text-brand-400 font-bold uppercase text-[10px] block mb-2 tracking-widest">Allegation:</span>
+                      "{r.description || r.reason}"
+                   </p>
+
+                   {r.resolution?.note && (
+                     <div className="p-4 rounded-xl bg-brand-900/10 border border-brand-500/20">
+                        <p className="text-brand-400 font-black uppercase text-[10px] mb-2 tracking-widest leading-none">Statutory Review & Feedback:</p>
+                        <p className="text-gray-200 text-sm italic font-medium">"{r.resolution.note}"</p>
+                        <p className="text-gray-500 text-[9px] uppercase font-black mt-4">Resolved on: {new Date(r.resolution.resolvedAt).toLocaleDateString()}</p>
+                     </div>
+                   )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── IDENTITY ESCROW MANIFOLD ──────────────────────────────────────── */}
+        <div className="card mt-12 !p-4 sm:!p-8 overflow-hidden relative">
+           <div className="absolute top-0 right-0 w-32 h-32 bg-brand-500/5 rounded-full -translate-y-16 translate-x-16 border border-brand-500/10"></div>
+           
+           <h2 className="text-lg font-black text-white uppercase italic tracking-tighter mb-4 flex items-center gap-3">
+             <span className="w-8 h-8 rounded-lg bg-gray-900 border border-gray-800 flex items-center justify-center text-sm not-italic">🔑</span>
+             Identity Escrow Handshake
+           </h2>
+           <p className="text-gray-500 text-[11px] mb-8 font-medium max-w-xl leading-relaxed">
+             Initialize an industrial-grade backup of your cryptographic identity. This allows you to character-perfectly restore your access on new devices using a statutory recovery phrase.
+           </p>
+
+           <form onSubmit={handleIdentityBackup} className="max-w-md space-y-4">
+              <div className="relative">
+                 <input 
+                   type="password" 
+                   placeholder="Enter Statutory Recovery Phrase..." 
+                   className="input !py-4 pr-12"
+                   value={backupPhrase}
+                   onChange={(e) => setBackupPhrase(e.target.value)}
+                   disabled={isBackingUp}
+                 />
+                 <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-700 text-xs">🔒</div>
+              </div>
+              
+              <button 
+                type="submit" 
+                className="btn-primary !px-8 !py-4 text-[10px] font-black uppercase tracking-widest shadow-xl disabled:opacity-50"
+                disabled={isBackingUp || !backupPhrase}
+              >
+                {isBackingUp ? 'Sealing Manifold…' : 'Seal Identity in Escrow →'}
+              </button>
+
+              {backupStatus && (
+                <div className={`mt-4 p-4 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all animate-in slide-in-from-top-2 ${backupStatus.success ? 'bg-brand-900/20 border-brand-500/30 text-brand-400' : 'bg-red-900/20 border-red-500/30 text-red-400'}`}>
+                   {backupStatus.success ? '✓' : '🚨'} {backupStatus.message}
+                </div>
+              )}
+           </form>
+
+           <div className="mt-8 pt-8 border-t border-gray-900 flex items-center gap-3">
+              <span className="text-[9px] font-black text-gray-600 uppercase tracking-[0.2em]">Institutional Security Status:</span>
+              <span className="px-2 py-0.5 rounded bg-gray-900 border border-gray-800 text-gray-500 text-[8px] font-black uppercase">IDENTITY {user?.publicKey ? 'SYNCHRONIZED' : 'LOCAL-ONLY'}</span>
+           </div>
+        </div>
       </div>
     </div>
   );
@@ -106,10 +214,4 @@ const PriorityBadge = ({ priority }) => {
 
 const StatusBadge = ({ status }) => (
   <span className="badge badge-info">{status}</span>
-);
-
-const PageSpinner = () => (
-  <div className="flex items-center justify-center min-h-screen">
-    <div className="animate-spin w-8 h-8 border-2 border-brand-600 border-t-transparent rounded-full" />
-  </div>
 );

@@ -11,6 +11,7 @@ router.post('/', requireRole('patient'), ctrl.submitReport);
 
 // Admin Routes: Manage reports
 router.get('/', requireRole('admin'), ctrl.getAllReports);
+router.get('/my', requireRole('patient'), ctrl.getMyReports);
 router.patch('/:reportId', requireRole('admin'), ctrl.updateReport);
 
 module.exports = router;

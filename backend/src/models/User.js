@@ -104,6 +104,14 @@ const userSchema = new mongoose.Schema(
     publicKey: {
       type: String, // PEM format or JWK string
       default: null
+    },
+    passwordResetToken: {
+      type: String,
+      default: null
+    },
+    passwordResetExpires: {
+      type: Date,
+      default: null
     }
   },
   {

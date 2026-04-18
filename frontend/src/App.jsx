@@ -19,12 +19,14 @@ import NotFoundPage      from './pages/NotFoundPage';
 import ProtectedRoute    from './components/ProtectedRoute';
 import GlobalNotifications from './components/GlobalNotifications';
 import Navbar from './components/Navbar';
+import RestorationOverlay from './components/RestorationOverlay';
 
 export default function App() {
   const { user } = useAuth();
 
   return (
     <div className="min-h-screen bg-gray-950 flex flex-col">
+      <RestorationOverlay />
       <GlobalNotifications />
       <Navbar />
       <div className="flex-1 overflow-auto">
@@ -32,6 +34,8 @@ export default function App() {
         {/* Public */}
       <Route path="/login"    element={<AuthPage mode="login" />} />
       <Route path="/register" element={<AuthPage mode="register" />} />
+      <Route path="/forgot-password" element={<AuthPage mode="forgot" />} />
+      <Route path="/reset-password/:token" element={<AuthPage mode="reset" />} />
 
       {/* Patient */}
       <Route path="/dashboard" element={

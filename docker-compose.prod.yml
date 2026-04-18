@@ -2,15 +2,42 @@
 version: '3.8'
 
 services:
-  # ── Institutional Database ──────────────────────────────────────────────────
+  # ── Institutional Database (Persistence Manifold) ───────────────────────────
   mongodb:
     image: mongo:7
     container_name: robomed_db
     restart: always
     volumes:
       - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - robomed_network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ── Institutional Cache (Scaling Manifold) ──────────────────────────────────
+  redis:
+    image: redis:alpine
+    container_name: robomed_cache
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - robomed_network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
 
   # ── Clinical Logic Manifold (Backend) ───────────────────────────────────────
   backend:
@@ -22,14 +49,21 @@ services:
     environment:
       - NODE_ENV=production
       - MONGODB_URI=mongodb://mongodb:27017/robomed_prod
+      - REDIS_URL=redis://redis:6379
       - AI_SERVICE_URL=http://ai-service:5001
-      # JWT Secrets and Cloudinary credentials should be provided via .env
     env_file:
       - ./backend/.env
     depends_on:
-      - mongodb
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     networks:
       - robomed_network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
 
   # ── Diagnostic Intelligence Node (AI) ────────────────────────────────────────
   ai-service:
@@ -42,6 +76,10 @@ services:
       - FLASK_ENV=production
     networks:
       - robomed_network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
 
   # ── External Portal Delivery (Frontend) ──────────────────────────────────────
   frontend:
@@ -56,6 +94,10 @@ services:
       - backend
     networks:
       - robomed_network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
 
 # ── Shared Infrastructure Matrix ──────────────────────────────────────────────
 networks:

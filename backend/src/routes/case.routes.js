@@ -59,4 +59,7 @@ router.post('/:caseId/prescriptions', validate(prescriptionSchema), ctrl.addPres
 router.get('/:caseId/prescriptions',  ctrl.getCasePrescriptions);
 router.patch('/:caseId/prescriptions/:prescriptionId/acknowledge', ctrl.acknowledgePrescription);
 
+// Phase 9.2 - AI Audio Transcription
+router.post('/:caseId/voice-notes', upload.single('audio'), ctrl.addVoiceNote);
+
 module.exports = router;

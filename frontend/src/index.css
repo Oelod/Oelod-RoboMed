@@ -66,6 +66,12 @@ body {
   .table-container {
     @apply w-full overflow-x-auto relative rounded-2xl border border-gray-800;
   }
+
+  .mirror {
+    transform: rotateY(180deg);
+    -webkit-transform:rotateY(180deg); /* Safari and Chrome */
+    -moz-transform:rotateY(180deg); /* Firefox */
+  }
 }
 
 /* ── Global Layout Refinement ────────────────────────────────────── */

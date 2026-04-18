@@ -1,6 +1,8 @@
 const Report = require('../models/Report');
 const Case = require('../models/Case');
 const AuditLog = require('../models/AuditLog');
+const emailService = require('./emailService');
+const User = require('../models/User');
 
 const createReport = async (userId, payload) => {
   const { caseId, targetDoctor, reason, description } = payload;
@@ -9,7 +11,7 @@ const createReport = async (userId, payload) => {
   const medicalCase = await Case.findById(caseId);
   if (!medicalCase) throw new Error('Case not found');
   if (medicalCase.patient.toString() !== userId.toString()) {
-     throw new Error('Institutional Protocol Error: Reporter must be the patient associated with this clinical case.');
+    throw new Error('Institutional Protocol Error: Reporter must be the patient associated with this clinical case.');
   }
 
   const report = await Report.create({
@@ -26,6 +28,17 @@ const createReport = async (userId, payload) => {
     targetId: targetDoctor,
     metadata: { reportId: report._id, caseId }
   });
+
+  // Industrial Dispatch: Broadcast to Governance Board (Admins)
+  try {
+    const admins = await User.find({ adminLevel: { $gt: 0 } }, 'email');
+    const adminEmails = admins.map(a => a.email);
+    if (adminEmails.length > 0) {
+      await emailService.sendMisconductFlag(adminEmails, report);
+    }
+  } catch (err) {
+    console.error('Institutional Dispatch Failure (Governance):', err.message);
+  }
 
   return report;
 };

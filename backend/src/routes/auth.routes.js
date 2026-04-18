@@ -67,4 +67,10 @@ router.patch('/public-key', isAuth, ctrl.updatePublicKey);
 // GET /api/auth/public-key/:userId
 router.get('/public-key/:userId', isAuth, ctrl.getPublicKey);
 
+// Password Recovery
+router.post('/forgot-password', ctrl.forgotPassword);
+// Cryptographic Identity Manifold
+router.post('/identity/backup', isAuth, ctrl.backupIdentity);
+router.get('/identity/restore', isAuth, ctrl.restoreIdentity);
+
 module.exports = router;

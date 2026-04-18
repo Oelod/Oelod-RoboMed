@@ -178,3 +178,122 @@ export const decryptMessage = async (encryptedDataStr, userId) => {
     return `[[ CRYPTO_ERR: ${err.message || 'Identity Handshake Failed'} ]]`;
   }
 };
+
+// --- Statutory Identity Escrow Handshake ---
+
+/**
+ * Derives a character-perfect AES key from a recovery phrase (PBKDF2)
+ */
+const deriveRecoveryKey = async (phrase, salt) => {
+  const enc = new TextEncoder();
+  const keyMaterial = await window.crypto.subtle.importKey(
+    "raw",
+    enc.encode(phrase),
+    { name: "PBKDF2" },
+    false,
+    ["deriveBits", "deriveKey"]
+  );
+
+  return await window.crypto.subtle.deriveKey(
+    {
+      name: "PBKDF2",
+      salt: salt,
+      iterations: 100000,
+      hash: "SHA-256",
+    },
+    keyMaterial,
+    { name: "AES-GCM", length: 256 },
+    true,
+    ["encrypt", "decrypt"]
+  );
+};
+
+/**
+ * Backs up the institutional identity to the server escrow
+ */
+export const backupIdentity = async (userId, recoveryPhrase) => {
+  try {
+    const privateKey = await getPrivateKey(userId);
+    if (!privateKey) throw new Error("Private Key Manifold Missing.");
+
+    const salt = window.crypto.getRandomValues(new Uint8Array(16));
+    const iv = window.crypto.getRandomValues(new Uint8Array(12));
+    const aesKey = await deriveRecoveryKey(recoveryPhrase, salt);
+
+    // Export RSA Private Key (PKCS#8)
+    const exportedPrivateKey = await window.crypto.subtle.exportKey("pkcs8", privateKey);
+    
+    // Encrypt it
+    const encryptedBlob = await window.crypto.subtle.encrypt(
+      { name: "AES-GCM", iv },
+      aesKey,
+      exportedPrivateKey
+    );
+
+    const payload = {
+      encryptedPrivateKey: btoa(String.fromCharCode(...new Uint8Array(encryptedBlob))),
+      salt: btoa(String.fromCharCode(...salt)),
+      iv: btoa(String.fromCharCode(...iv))
+    };
+
+    const api = (await import('../api/axiosInstance')).default;
+    await api.post('/auth/identity/backup', payload);
+    return true;
+  } catch (err) {
+    console.error("Identity Backup Failure:", err);
+    throw err;
+  }
+};
+
+/**
+ * Restores the institutional identity from the server escrow
+ */
+export const restoreIdentity = async (userId, recoveryPhrase) => {
+  try {
+    const api = (await import('../api/axiosInstance')).default;
+    const res = await api.get('/auth/identity/restore');
+    const { encryptedPrivateKey, salt, iv } = res.data.data.escrow;
+
+    const saltArr = Uint8Array.from(atob(salt), c => c.charCodeAt(0));
+    const ivArr = Uint8Array.from(atob(iv), c => c.charCodeAt(0));
+    const blobArr = Uint8Array.from(atob(encryptedPrivateKey), c => c.charCodeAt(0));
+
+    const aesKey = await deriveRecoveryKey(recoveryPhrase, saltArr);
+
+    // Decrypt the RSA Private Key
+    const decryptedRaw = await window.crypto.subtle.decrypt(
+      { name: "AES-GCM", iv: ivArr },
+      aesKey,
+      blobArr
+    );
+
+    // Import it back into the local manifold
+    const privateKey = await window.crypto.subtle.importKey(
+      "pkcs8",
+      decryptedRaw,
+      {
+        name: "RSA-OAEP",
+        hash: "SHA-256",
+      },
+      true,
+      ["decrypt"]
+    );
+
+    const STORE_NAME = 'InternalKeys';
+    const request = indexedDB.open('RoboMedCrypto', 1);
+    
+    return new Promise((resolve, reject) => {
+      request.onsuccess = () => {
+        const db = request.result;
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        const putReq = tx.objectStore(STORE_NAME).put(privateKey, `${userId}_private`);
+        putReq.onsuccess = () => resolve(true);
+        putReq.onerror = () => reject(putReq.error);
+      };
+      request.onerror = () => reject(request.error);
+    });
+  } catch (err) {
+    console.error("Identity Restoration Failure:", err);
+    throw new Error("Handshake Failed: Recovery phrase might be incorrect.");
+  }
+};

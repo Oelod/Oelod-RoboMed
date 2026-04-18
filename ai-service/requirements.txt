@@ -1,4 +1,5 @@
 flask
+flask-cors
 scikit-learn
 pandas
 numpy
@@ -8,4 +9,5 @@ waitress
 requests
 python-dotenv
 SpeechRecognition
+google-cloud-speech
 pydub

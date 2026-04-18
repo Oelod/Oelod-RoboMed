@@ -12,6 +12,11 @@ const getAllReports = async (req, res) => {
   return res_.success(res, { reports });
 };
 
+const getMyReports = async (req, res) => {
+  const reports = await reportService.getReports({ reporter: req.user._id });
+  return res_.success(res, { reports });
+};
+
 const updateReport = async (req, res) => {
   const report = await reportService.updateReportStatus(req.user._id, req.params.reportId, req.body);
   return res_.success(res, { report }, 'Institutional governance record updated.');
@@ -20,5 +25,6 @@ const updateReport = async (req, res) => {
 module.exports = {
   submitReport,
   getAllReports,
+  getMyReports,
   updateReport
 };

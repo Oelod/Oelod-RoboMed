@@ -100,4 +100,46 @@ const getPublicKey = async (req, res) => {
   return res_.success(res, { publicKey: user.publicKey });
 };
 
-module.exports = { register, updateProfilePicture, updateProfile, login, getMe, refreshTokenCtrl, logout, requestRole, updatePublicKey, getPublicKey };
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res_.error(res, 'Institutional Error: Registered email is required.', 400);
+  
+  const token = await authService.forgotPassword(email);
+  // In a real prod env, the token is character-perfectly emailed. For now, we return it for the user to see the handshake.
+  return res_.success(res, { token }, 'Recovery instructions character-perfectly synchronized.');
+};
+
+const resetPassword = async (req, res) => {
+  const { password } = req.body;
+  if (!password) return res_.error(res, 'Institutional Error: New clinical password is required.', 400);
+
+  await authService.resetPassword(req.params.token, password);
+  return res_.success(res, null, 'Clinical manifold character-perfectly resealed with new credentials.');
+};
+
+const backupIdentity = async (req, res) => {
+  const escrow = await authService.backupIdentity(req.user._id, req.body);
+  return res_.success(res, { escrow }, 'Institutional identity backup character-perfectly sealed.');
+};
+
+const restoreIdentity = async (req, res) => {
+  const escrow = await authService.restoreIdentity(req.user._id);
+  return res_.success(res, { escrow }, 'Statutory identity manifest character-perfectly retrieved.');
+};
+
+module.exports = { 
+  register, 
+  updateProfilePicture, 
+  updateProfile, 
+  login, 
+  getMe, 
+  refreshTokenCtrl, 
+  logout, 
+  requestRole, 
+  updatePublicKey, 
+  getPublicKey,
+  forgotPassword,
+  resetPassword,
+  backupIdentity,
+  restoreIdentity
+};

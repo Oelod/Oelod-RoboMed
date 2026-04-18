@@ -4,6 +4,8 @@ const RefreshToken = require('../models/RefreshToken');
 const { generateHospitalId } = require('../utils/idGen');
 const { generateAccessToken, generateRefreshToken, verifyRefreshToken } = require('../utils/generateToken');
 const emitter = require('../events/emitter');
+const crypto = require('crypto');
+const emailService = require('./emailService');
 
 // ── Register ──────────────────────────────────────────────────────────────────
 const register = async (userData) => {
@@ -247,8 +249,73 @@ const registerPublicKey = async (userId, publicKey) => {
   return userRepo.updateById(userId, { publicKey });
 };
 
+// ── Password Recovery Manifold ──────────────────────────────────────────────
+const forgotPassword = async (email) => {
+  const user = await userRepo.findByEmail(email);
+  if (!user) throw new Error('Institutional Registry Failure: Identity not found.');
+
+  // Generate high-entropy recovery token
+  const resetToken = crypto.randomBytes(32).toString('hex');
+  const tokenHash = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+  await userRepo.updateById(user._id, {
+    passwordResetToken: tokenHash,
+    passwordResetExpires: new Date(Date.now() + 60 * 60 * 1000), // 1 hour expiry
+  });
+
+  // Industrial Dispatch: Character-perfectly broadcast the recovery handshake
+  await emailService.sendPasswordReset(user.email, resetToken);
+
+  return resetToken;
+};
+
+const resetPassword = async (token, newPassword) => {
+  const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+
+  const user = await userRepo.findOne({
+    passwordResetToken: tokenHash,
+    passwordResetExpires: { $gt: Date.now() }
+  });
+
+  if (!user) {
+    const err = new Error('Institutional Protocol Error: Token invalid or expired.');
+    err.statusCode = 400;
+    throw err;
+  }
+
+  // Update password and seal the manifold
+  user.password = newPassword;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+  await user.save();
+
+  await AuditLog.create({ actorId: user._id, action: 'password_reset', targetId: user._id });
+  return user;
+};
+
+const IdentityEscrow = require('../models/IdentityEscrow');
+
+const backupIdentity = async (userId, payload) => {
+  const { encryptedPrivateKey, salt, iv } = payload;
+  return IdentityEscrow.findOneAndUpdate(
+    { userId },
+    { encryptedPrivateKey, salt, iv },
+    { upsert: true, new: true }
+  );
+};
+
+const restoreIdentity = async (userId) => {
+  const escrow = await IdentityEscrow.findOne({ userId });
+  if (!escrow) throw new Error('Institutional Registry Failure: No identity backup found for this participant.');
+  return escrow;
+};
+
 module.exports = {
   register, login, refreshToken, logout, requestRole,
   switchRole, approveRole, rejectRole, suspendUser, activateUser,
   registerPublicKey,
+  forgotPassword, 
+  resetPassword,
+  backupIdentity,
+  restoreIdentity
 };

@@ -8,6 +8,7 @@ export function AuthProvider({ children }) {
   const [user, setUser]       = useState(null);
   const [token, setToken]     = useState(null);  // kept in memory — NOT localStorage
   const [loading, setLoading] = useState(true);
+  const [requiresRestoration, setRequiresRestoration] = useState(false);
 
   // Attach token to all future requests
   useEffect(() => {
@@ -35,35 +36,53 @@ export function AuthProvider({ children }) {
   }, []);
 
   // --- Institutional E2EE Handshake ---
-  useEffect(() => {
-    const initE2EE = async () => {
-      if (!user) return;
+  const initE2EE = useCallback(async (targetUser) => {
+    if (!targetUser) return;
 
-      const priv = await cryptoService.getPrivateKey(user._id);
-      
-      // If we have a public key on server AND a local private key, we are secured.
-      if (user.publicKey && priv) {
-         return; 
-      }
-
-      console.log("Initializing Institutional E2EE Protocol (Identity Restoration Required)...");
-      try {
-        const keyPair = await cryptoService.generateKeyPair();
-        await cryptoService.savePrivateKey(user._id, keyPair);
-        const pubKeyStr = await cryptoService.exportPublicKey(keyPair.publicKey);
-        
-        await api.patch('/auth/public-key', { publicKey: pubKeyStr });
-        setUser(prev => ({ ...prev, publicKey: pubKeyStr }));
-        console.log("Cryptographic identity formally established & synchronized.");
-      } catch (err) {
-        console.error("E2EE Initialization Failure:", err);
-      }
-    };
-
-    if (user && token && !loading) {
-       initE2EE();
+    const priv = await cryptoService.getPrivateKey(targetUser._id);
+    
+    // If we have a public key on server BUT NO local private key, we need restoration.
+    if (targetUser.publicKey && !priv) {
+       setRequiresRestoration(true);
+       return; 
     }
-  }, [user?._id, token, loading]);
+
+    // If we have both, we are secured.
+    if (targetUser.publicKey && priv) {
+       setRequiresRestoration(false);
+       return;
+    }
+
+    console.log("Initializing Institutional E2EE Protocol (Identity Genesis)...");
+    try {
+      const keyPair = await cryptoService.generateKeyPair();
+      await cryptoService.savePrivateKey(targetUser._id, keyPair);
+      const pubKeyStr = await cryptoService.exportPublicKey(keyPair.publicKey);
+      
+      await api.patch('/auth/public-key', { publicKey: pubKeyStr });
+      setUser(prev => ({ ...prev, publicKey: pubKeyStr }));
+      setRequiresRestoration(false);
+      console.log("Cryptographic identity formally established & synchronized.");
+    } catch (err) {
+      console.error("E2EE Initialization Failure:", err);
+    }
+  }, []);
+
+  const handleIdentityRestoration = async (phrase) => {
+    try {
+       await cryptoService.restoreIdentity(user._id, phrase);
+       setRequiresRestoration(false);
+       return true;
+    } catch (err) {
+       throw err;
+    }
+  };
+
+  useEffect(() => {
+    if (user && token && !loading) {
+       initE2EE(user);
+    }
+  }, [user?._id, token, loading, initE2EE]);
 
   const login = useCallback(async (email, password) => {
     const res = await api.post('/auth/login', { email, password }, { withCredentials: true });
@@ -102,7 +121,10 @@ export function AuthProvider({ children }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout, switchRole, refreshUser }}>
+    <AuthContext.Provider value={{ 
+      user, token, loading, requiresRestoration,
+      login, register, logout, switchRole, refreshUser, handleIdentityRestoration 
+    }}>
       {children}
     </AuthContext.Provider>
   );

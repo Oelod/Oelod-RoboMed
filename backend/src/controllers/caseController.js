@@ -181,4 +181,10 @@ const getPatientClinicalHistory = async (req, res) => {
   return res_.success(res, { history }, 'Patient medical history retrieved');
 };
 
-module.exports = { createCase, getCases, getCaseById, acceptCase, closeCase, reopenCase, flagCase, escalateCase, resolveEscalation, assignDoctor, getCaseHistory, addAttachments, requestLab, uploadLabResult, getCaseLabs, addPrescription, getCasePrescriptions, acknowledgePrescription, getPatientClinicalHistory };
+const addVoiceNote = async (req, res) => {
+  if (!req.file) return res_.error(res, 'No clinical audio datastream received', 400);
+  const result = await caseService.processVoiceNote(req.params.caseId, req.user._id, req.file.buffer);
+  return res_.success(res, result, 'Institutional Transcript character-perfectly generated.');
+};
+
+module.exports = { createCase, getCases, getCaseById, acceptCase, closeCase, reopenCase, flagCase, escalateCase, resolveEscalation, assignDoctor, getCaseHistory, addAttachments, requestLab, uploadLabResult, getCaseLabs, addPrescription, getCasePrescriptions, acknowledgePrescription, getPatientClinicalHistory, addVoiceNote };

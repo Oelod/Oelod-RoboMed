@@ -1,4 +1,4 @@
-# OELOD ROBOMED — INSTITUTIONAL OPERATING MANUAL (v2.1.0)
+# OELOD ROBOMED — INSTITUTIONAL OPERATING MANUAL (v2.2.0)
 ## Senior Engineer Handover Edition — April 2026
 
 ---
@@ -27,58 +27,63 @@
 
 ---
 
-## 3. Component Definitions
+## 3. Institutional Telemedicine Hub (Live Consultations)
 
-### **3.1 Identity & Access Manifold**
-*   **User Profiles**: Every identity (Patient, Doctor, Admin, Lab, Pharmacist) is formally gated.
-*   **Role Requests**: Standard users can request clinical roles, which require a **Super-Admin (L3)** formal approval.
-*   **Institutional ID (HSP-XXXX)**: Atomic, human-readable identifiers assigned to every personnel and patient asset.
+The **Oelod RoboMed Telemedicine Hub** character-perfectly enables real-time clinical consultations. 
 
-### **3.2 Case Life-Cycle Node**
-*   **Case Submission**: Patients provide symptoms (text or diagnostic voice).
-*   **AI Triage Card**: Displays priority (LOW/MED/HIGH/CRITICAL) and specialty-matching indicators.
-*   **Atomic Acceptance**: Ensures that only one Specialist can formally "accept" a case, preventing institutional race conditions.
-
-### **3.3 Clinical Communication Manifold**
-*   **Case-Scoped Chat**: Real-time Socket.IO messaging between Practitioner and Patient.
-*   **Presence Indicators**: Live typing awareness and read-receipt logic.
-*   **Attachment Handling**: High-fidelity clinical file uploads (PDF, JPEG, PNG) through Cloudinary CDN.
+- **Initiation**: Practitioners select a Case and click **`📷 Initialize Video Consultation`** in the sidebar. This formally "Rings" the patient's terminal with a high-fidelity audible pulse.
+- **Connection**: Uses raw **WebRTC Peer-to-Peer** datastreams. Clinical eye contact is maintained via a glassmorphic Picture-in-Picture (PIP) interface.
+- **Hardware Privacy**: Our device release protocol character-perfectly deactivates the practitioner's camera and mic the moment the session concludes.
+- **Forensic Audit**: Any connection attempt that is not formally "Accepted" by the patient is immutably logged as a **`Missed Consultation`** in the Action Timeline.
 
 ---
 
-## 4. Security & Governance Matrix
+## 4. Clinical Voice Manifold (Asynchronous Reporting)
 
-### **4.1 Regulatory Compliance (HIPAA/GDPR READY)**
+The **Clinical Voice Manifold** character-perfectly enables medical dictation. 
+
+- **Dictation**: Select a Case and click **`🎤 Initialize Dictation`**. Our industrial-grade manifold captures captured findings character-perfectly.
+- **Inference**: On ingestion, the **Oelod AI Node** character-perfectly transcribes the audio into a medical-grade text report.
+- **Persistence**: Reports are formally sealed as **`Statutory Case Report - Audio`**. The timeline character-perfectly displays both the AI text and a high-fidelity **Audio Terminal** for direct playback.
+- **Institutional Access**: Audio reports are only assessable by the **Assigning Doctor**, the **Case Patient**, or the **Governance Board**.
+
+---
+
+## 5. Identity Escrow & Restoration Manual
+
+To maintain absolute clinical privacy, all identities are character-perfectly sealed under RSA escrow.
+
+- **Gatekeeping**: When a participant logs into a new terminal, the **Identity Restoration Gateway** character-perfectly intercepts the session.
+- **Handshake**: Users must provide their **Statutory Recovery Key** to character-perfectly re-decrypt their private keys locally. No clinical datastream is accessible until this handshake is formally concluded.
+- **Key Recovery**: The recovery key is processed through PBKDF2 salting; once lost, the identity is character-perfectly unrecoverable by the administration.
+
+---
+
+## 6. Security & Governance Matrix
+
+### **6.1 Regulatory Compliance (HIPAA/GDPR READY)**
 *   **AuditLog Collection**: Every administrative action (role change, suspension, record extraction) is formally recorded.
 *   **Governance Health**: Real-time metrics on Average Resolution Time (ATR) and departmental efficiency.
 *   **Master Manifest**: One-click Excel-compatible extraction of all institutional data for legal audits.
 
-### **4.2 Scaling & Isolation Logic**
+### **6.2 Scaling & Isolation Logic**
 *   **Redis-Backed Throttling**: Precision rate-limiting protects institutional resources from distributed throughput spikes.
 *   **Zero-Trust Secrets**: Decoupled credential management (Vault-Ready) ensures no sensitive data is local.
 
 ---
 
-## 5. Dashboard Functional Mapping
-
-### **5.1 Personnel Datastream Columns**
-*   **Practitioner**: Primary identity and role badges.
-*   **License**: Clinical Gate (License Number verification).
-*   **Status**: Live institutional access state (Active/Suspended/Pending).
-
-### **5.2 Clinical Pipeline Buttons**
-*   **Suspend Access**: Instant session revocation for the target identity.
-*   **Monitor →**: Opens the deep case manifest for clinical auditing.
-*   **+ Lab / + Pharm**: Dynamic role escalation for inter-disciplinary collaboration.
-*   **Institutional Audit**: Downloads the character-perfect Master Manifest (Audit History).
-
----
-
-## 6. Operational Telemetry
+## 7. Operational Telemetry & Deployment
 Administrator and IT leads utilize the following "Heartbeat" endpoints:
 *   **Health Node**: `http://localhost:5000/health` (Service Availability)
 *   **Telemetry Node**: `http://localhost:5000/metrics` (Performance Histograms)
 
+To maintain highest-fidelity stability, always deploy via the **Institutional Docker Stack**:
+
+```powershell
+# Formally initialize the Production Manifold
+docker-compose -f docker-compose.prod.yml up --build -d
+```
+
 ---
-**Institutional Manifest End — OELOD ROBOMED v2.1.0**
+**Institutional Manifest End — OELOD ROBOMED v2.2.0**
 *This document is formatted for PDF conversion. Open in a standard browser or Markdown editor and select "Print to PDF" for official institutional distribution.*

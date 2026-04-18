@@ -585,7 +585,7 @@ export default function AdminDashboard() {
                                      </div>
                                   )}
 
-                                  <button onClick={() => handleGenerateComplianceReport(u._id)} className="px-2 py-1 bg-brand-600/10 text-brand-400 border border-brand-500/20 rounded-lg text-[9px] font-black uppercase hover:bg-brand-600 hover:text-white transition-all tracking-widest">📜 Compliance</button>
+                                  <button onClick={() => handleGenerateComplianceReport(u._id)} className="px-2 py-1 bg-brand-600 text-white border border-brand-500 rounded-lg text-[9px] font-black uppercase hover:bg-brand-500 transition-all tracking-widest shadow-lg shadow-brand-900/20 active:scale-95">📘 + COMPLIANCE</button>
                                   <button onClick={() => handleUniversalUnitGrant(u, 'lab')} className={`px-2 py-1 border rounded-lg text-[9px] font-black uppercase transition-all ${u.roles.includes('lab') ? 'bg-white text-black border-white' : 'bg-gray-900 text-gray-500 border-gray-800 hover:text-white'}`}>{u.roles.includes('lab') ? 'Revoke Lab' : '+ Lab'}</button>
                                   <button onClick={() => handleUniversalUnitGrant(u, 'pharmacist')} className={`px-2 py-1 border rounded-lg text-[9px] font-black uppercase transition-all ${u.roles.includes('pharmacist') ? 'bg-white text-black border-white' : 'bg-gray-900 text-gray-500 border-gray-800 hover:text-white'}`}>{u.roles.includes('pharmacist') ? 'Revoke Pharm' : '+ Pharm'}</button>
                                </div>
@@ -1077,6 +1077,69 @@ export default function AdminDashboard() {
               )}
            </div>
         </div>
+
+        {/* ── STATUTORY COMPLIANCE MODAL ────────────────────────────────────── */}
+        {complianceReport && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 sm:p-10 animate-in fade-in duration-300">
+             <div className="absolute inset-0 bg-black/80 backdrop-blur-xl" onClick={() => setComplianceReport(null)}></div>
+             <div className="relative w-full max-w-4xl bg-gray-950 border border-brand-500/30 rounded-[3rem] shadow-[0_0_100px_rgba(var(--brand-500-rgb),0.1)] overflow-hidden flex flex-col max-h-[90vh]">
+                
+                {/* Header */}
+                <div className="p-8 border-b border-gray-900 bg-gray-900/50 flex justify-between items-center">
+                   <div>
+                      <h4 className="text-[10px] font-black text-brand-500 uppercase tracking-[0.4em] mb-1">Institutional Compliance Manifest</h4>
+                      <h3 className="text-2xl font-black text-white italic uppercase tracking-tighter">Statutory Audit: {complianceReport.patient.fullName}</h3>
+                   </div>
+                   <button onClick={() => setComplianceReport(null)} className="w-10 h-10 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-gray-500 hover:text-white transition-all">✕</button>
+                </div>
+
+                {/* Body */}
+                <div className="flex-1 overflow-y-auto p-8 space-y-10 custom-scrollbar">
+                   {/* Summary Section */}
+                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div className="p-6 bg-gray-900/50 rounded-3xl border border-gray-800">
+                         <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Subject PID</p>
+                         <p className="text-lg font-bold text-white font-mono">{complianceReport.patient.hospitalId}</p>
+                      </div>
+                      <div className="p-6 bg-gray-900/50 rounded-3xl border border-gray-800">
+                         <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Event Density</p>
+                         <p className="text-lg font-bold text-white font-mono">{complianceReport.auditTrail.length} Logs</p>
+                      </div>
+                      <div className="p-6 bg-gray-900/50 rounded-3xl border border-gray-800">
+                         <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Manifest Age</p>
+                         <p className="text-lg font-bold text-white font-mono">{new Date(complianceReport.generatedAt).toLocaleDateString()}</p>
+                      </div>
+                   </div>
+
+                   {/* Audit Trail List */}
+                   <div className="space-y-4">
+                      <h5 className="text-[10px] font-black text-gray-500 uppercase tracking-widest pl-4 border-l-2 border-brand-500">Forensic Audit Trail</h5>
+                      <div className="space-y-3">
+                         {complianceReport.auditTrail.map((log, i) => (
+                           <div key={i} className="p-5 bg-gray-900 border border-gray-800 rounded-2xl flex flex-col sm:flex-row justify-between gap-4 group hover:border-brand-500/20 transition-all">
+                              <div>
+                                 <p className="text-[10px] font-mono text-gray-600 mb-1">{new Date(log.createdAt).toLocaleString()} · {log.action.toUpperCase()}</p>
+                                 <p className="text-sm font-medium text-gray-200 uppercase italic">
+                                    Operator: <span className="text-brand-400 font-bold">{log.actorId?.fullName || 'Root Authority'}</span>
+                                 </p>
+                                 <p className="text-[11px] text-gray-500 mt-2 font-mono truncate max-w-sm">{JSON.stringify(log.metadata)}</p>
+                              </div>
+                              <div className="flex items-center">
+                                 <span className="px-3 py-1 bg-gray-950 text-gray-500 text-[10px] font-black rounded-lg border border-gray-800/50">SEALED</span>
+                              </div>
+                           </div>
+                         ))}
+                      </div>
+                   </div>
+                </div>
+
+                {/* Footer Action */}
+                <div className="p-8 border-t border-gray-900 bg-gray-950 flex justify-end gap-4">
+                   <button onClick={() => window.print()} className="px-8 py-3 bg-white text-black text-[10px] font-black uppercase rounded-2xl hover:bg-brand-500 transition-all shadow-xl">📄 Export Manifest</button>
+                </div>
+             </div>
+          </div>
+        )}
       </div>
     </div>
   );

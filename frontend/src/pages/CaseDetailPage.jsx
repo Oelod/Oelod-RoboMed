@@ -5,6 +5,8 @@ import { submitMisconductReport } from '../api/reports';
 import api from '../api/axiosInstance';
 import { useAuth } from '../hooks/useAuth';
 import ChatPanel from '../components/ChatPanel';
+import ClinicalVoiceRecorder from '../components/ClinicalVoiceRecorder';
+import TelemedicineHub from '../components/TelemedicineHub';
 import { toast } from 'react-hot-toast';
 
 export default function CaseDetailPage() {
@@ -651,17 +653,41 @@ export default function CaseDetailPage() {
                   <div>
                     <p className="font-medium text-gray-200 capitalize">{event.event.replace('_', ' ')}</p>
                     <p className="text-sm text-gray-500">{new Date(event.timestamp).toLocaleString()}</p>
-                    {event.note && <p className="text-sm text-gray-400 mt-1 italic">"{event.note}"</p>}
+                      {event.note && <p className="text-sm text-gray-400 mt-1 italic">"{event.note}"</p>}
+                      
+                      {/* Institutional Audio Terminal (Phase 9.2) */}
+                      {event.event === 'voice_note_processed' && event.metadata?.audioUrl && (
+                        <div className="mt-4 p-3 bg-gray-950 border border-brand-500/20 rounded-xl flex items-center gap-4 group hover:border-brand-500/40 transition-all">
+                           <div className="w-10 h-10 rounded-full bg-brand-500/10 flex items-center justify-center text-brand-400 group-hover:scale-110 transition-transform">🎧</div>
+                           <div className="flex-1">
+                              <p className="text-[10px] font-black text-brand-400 uppercase tracking-widest mb-1 italic">Physician Audio Record</p>
+                              <audio controls className="h-8 w-full opacity-80 hover:opacity-100 transition-opacity">
+                                 <source src={event.metadata.audioUrl} type="audio/webm" />
+                                 <source src={event.metadata.audioUrl} type="audio/mpeg" />
+                              </audio>
+                           </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
           </div>
         </div>
 
-        {/* AI & Meta Sidebar */}
-        <div className="space-y-6">
-          {/* Real-time Chat Panel */}
+          {/* AI & Meta Sidebar */}
+          <div className="space-y-6">
+            <TelemedicineHub 
+              caseId={caseId} 
+              targetUserId={isDoctor ? medicalCase.patient?._id : medicalCase.doctor?._id}
+              isDoctor={isDoctor}
+            />
+
+            {isAssignedToMe && medicalCase.status !== 'closed' && (
+              <ClinicalVoiceRecorder caseId={caseId} onProcessed={fetchCase} />
+            )}
+
+            {/* Real-time Chat Panel */}
           {medicalCase.doctor && (
             <ChatPanel caseId={caseId} status={medicalCase.status} />
           )}

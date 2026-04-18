@@ -18,6 +18,8 @@ const findByEmail = (email, includePassword = false) => {
 const findByHospitalId = (hospitalId) =>
   User.findOne({ hospitalId });
 
+const findOne = (filter) => User.findOne(filter);
+
 const create = (data) => User.create(data);
 
 const updateById = (id, update, options = { new: true, runValidators: true }) =>
@@ -45,6 +47,7 @@ module.exports = {
   findByHospitalId,
   create,
   updateById,
+  findOne,
   findAll,
   countAll,
   searchText,

@@ -74,6 +74,41 @@ module.exports = (io) => {
       }
     });
 
+    // --- Telemedicine Signaling (Phase 12) ---
+    // Initiate clinical consultation (Doctor rings Patient)
+    socket.on('call_initiate', ({ caseId, targetUserId }) => {
+      console.log(`[Telemed] Call Initiation: ${socket.user._id} -> ${targetUserId} (Case: ${caseId})`);
+      io.to(targetUserId).emit('call_incoming', { 
+        caseId, 
+        callerId: socket.user._id, 
+        callerName: socket.user.fullName || 'Physician'
+      });
+    });
+
+    // Relay WebRTC signals (Offers, Answers, ICE Candidates)
+    socket.on('call_signal', ({ targetUserId, signalData }) => {
+      io.to(targetUserId).emit('call_signal_received', { 
+        senderId: socket.user._id, 
+        signalData 
+      });
+    });
+
+    socket.on('call_terminate', ({ targetUserId, caseId, wasAccepted }) => {
+      io.to(targetUserId).emit('call_disconnected');
+      
+      // If the doctor hung up before an answer, it's a "Missed Call"
+      if (socket.user.roles.includes('doctor') && !wasAccepted && caseId) {
+        const Case = require('../models/Case');
+        Case.findByIdAndUpdate(caseId, {
+          $push: { timeline: { 
+            event: 'missed_consultation', 
+            actorId: socket.user._id, 
+            note: 'Statutory Notification: Clinical Video Consultation was attempted but not answered.' 
+          }}
+        }).exec().catch(err => console.error('[Socket] Failed to log missed call:', err));
+      }
+    });
+
     socket.on('disconnect', () => {
       console.log(`[Socket] User disconnected: ${socket.user._id}`);
     });

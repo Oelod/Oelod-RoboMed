@@ -318,4 +318,27 @@ const addLabResults = async (caseId, userId, files) => {
   return c;
 };
 
-module.exports = { createCase, getCases, getCaseById, acceptCase, closeCase, reopenCase, flagCase, escalateCase, resolveEscalation, assignDoctor, addAttachments, getPatientHistory, addLabResults };
+const processVoiceNote = async (caseId, userId, fileBuffer) => {
+  const c = await Case.findById(caseId);
+  if (!c) { const e = new Error('Case not found'); e.statusCode = 404; throw e; }
+
+  // 1. Registry Handshake: Upload original audio
+  const uploadRes = await uploadToCloudinary(fileBuffer);
+  
+  // 2. High-Fidelity Transcription: Call AI Node
+  const transcriptionData = await aiService.transcribe(uploadRes.fileUrl);
+  const transcript = transcriptionData?.text || "Institutional Record: Audio received but transcription manifold was bypassed.";
+
+  // 3. Statutory Persistence: Seal in timeline
+  c.timeline.push({ 
+    event: 'voice_note_processed', 
+    actorId: userId, 
+    note: `Statutory Case Report - Audio. Dictated by clinical specialist.`,
+    metadata: { audioUrl: uploadRes.fileUrl, provider: transcriptionData?.provider }
+  });
+  
+  await c.save();
+  return { case: c, transcript };
+};
+
+module.exports = { createCase, getCases, getCaseById, acceptCase, closeCase, reopenCase, flagCase, escalateCase, resolveEscalation, assignDoctor, addAttachments, getPatientHistory, addLabResults, processVoiceNote };

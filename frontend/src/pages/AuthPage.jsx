@@ -23,7 +23,9 @@ export default function AuthPage({ mode = 'login' }) {
   const [profileFile, setProfileFile] = useState(null);
   const [error, setError]   = useState('');
   const [loading, setLoading] = useState(false);
-  const isLogin = mode === 'login';
+  const isLogin  = mode === 'login';
+  const isForgot = mode === 'forgot';
+  const isReset  = mode === 'reset';
 
   const handleChange = (e) => setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
 
@@ -42,7 +44,12 @@ export default function AuthPage({ mode = 'login' }) {
     try {
       if (isLogin) {
         await login(form.email, form.password);
+      } else if (isForgot) {
+        const res = await api.post('/auth/forgot-password', { email: form.email });
+        alert(`Institutional Handshake: If an account exists, instructions were broadcast. [Recovery Token: ${res.data.data.token}]`);
+        // Navigate for testing purposes if token is visible
       } else {
+        // ... registration logic ...
         if (!form.fullName.trim()) { setError('Full name is required'); setLoading(false); return; }
         
         // Use FormData for registration if a file is present
@@ -84,7 +91,7 @@ export default function AuthPage({ mode = 'login' }) {
           <p className="text-brand-500 font-bold text-[10px] uppercase tracking-[0.3em] mt-2">RoboMed System</p>
           <div className="w-12 h-0.5 bg-brand-500/30 mx-auto mt-6"></div>
           <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mt-6 opacity-40">
-            {isLogin ? 'Secure Access Terminal' : 'Institutional Onboarding'}
+            {isLogin ? 'Secure Access Terminal' : isForgot ? 'Recovery Manifold' : 'Institutional Onboarding'}
           </p>
         </div>
 
@@ -208,10 +215,17 @@ export default function AuthPage({ mode = 'login' }) {
         </form>
 
         <p className="text-center text-[10px] font-black uppercase tracking-widest text-gray-500 mt-8">
-          {isLogin ? "New to the platform? " : 'Already registered? '}
-          <a href={isLogin ? '/register' : '/login'} className="text-brand-400 hover:text-brand-300 transition-colors border-b border-brand-400/30 pb-0.5">
-            {isLogin ? 'Begin Induction' : 'Sign in to Terminal'}
-          </a>
+          {isLogin ? (
+            <>
+              New to the platform? <a href="/register" className="text-brand-400 hover:text-brand-300 transition-colors border-b border-brand-400/30 pb-0.5">Begin Induction</a>
+              <br/><br/>
+              <a href="/forgot-password" size="sm" className="text-gray-600 hover:text-gray-400 lowercase italic">Lost access manifold? Initialize Recovery →</a>
+            </>
+          ) : (
+            <a href="/login" className="text-brand-400 hover:text-brand-300 transition-colors border-b border-brand-400/30 pb-0.5">
+              {isForgot ? 'Return to Authentication Terminal' : 'Sign in to Terminal'}
+            </a>
+          )}
         </p>
       </div>
     </div>
