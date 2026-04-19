@@ -656,7 +656,8 @@ export default function CaseDetailPage() {
                       {event.note && <p className="text-sm text-gray-400 mt-1 italic">"{event.note}"</p>}
                       
                       {/* Statutory Audio Terminal (Prominent Enclosure) */}
-                      {event.event && event.event.toLowerCase().replace(/_/g, ' ').includes('voice note processed') && (
+                      {event.event && event.event.toLowerCase().replace(/_/g, ' ').includes('voice note processed') && 
+                       (isDoctor || String(user?._id) === String(medicalCase.patient?._id || medicalCase.patient)) && (
                         <div className="mt-4 p-6 bg-gray-950 border-2 border-brand-500 rounded-[2rem] flex flex-col gap-4 shadow-[0_0_50px_rgba(var(--brand-500-rgb),0.1)] relative overflow-hidden group">
                            {/* Forensic Signal Badge */}
                            <div className="absolute top-0 right-0 bg-brand-500 text-black text-[7px] font-black px-4 py-1 rounded-bl-xl tracking-[0.2em] uppercase">Statutory Audio Record</div>
