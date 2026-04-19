@@ -6,6 +6,7 @@ const timelineEventSchema = new mongoose.Schema({
   actorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   note: { type: String, default: '' },
   timestamp: { type: Date, default: Date.now },
+  metadata: { type: mongoose.Schema.Types.Mixed, default: {} }, // Institutional Metadata Junction
 }, { _id: false });
 
 const aiPredictionSchema = new mongoose.Schema({

@@ -655,16 +655,34 @@ export default function CaseDetailPage() {
                     <p className="text-sm text-gray-500">{new Date(event.timestamp).toLocaleString()}</p>
                       {event.note && <p className="text-sm text-gray-400 mt-1 italic">"{event.note}"</p>}
                       
-                      {/* Institutional Audio Terminal (Phase 9.2) */}
-                      {event.event === 'voice_note_processed' && event.metadata?.audioUrl && (
-                        <div className="mt-4 p-3 bg-gray-950 border border-brand-500/20 rounded-xl flex items-center gap-4 group hover:border-brand-500/40 transition-all">
-                           <div className="w-10 h-10 rounded-full bg-brand-500/10 flex items-center justify-center text-brand-400 group-hover:scale-110 transition-transform">🎧</div>
-                           <div className="flex-1">
-                              <p className="text-[10px] font-black text-brand-400 uppercase tracking-widest mb-1 italic">Physician Audio Record</p>
-                              <audio controls className="h-8 w-full opacity-80 hover:opacity-100 transition-opacity">
-                                 <source src={event.metadata.audioUrl} type="audio/webm" />
-                                 <source src={event.metadata.audioUrl} type="audio/mpeg" />
-                              </audio>
+                      {/* Statutory Audio Terminal (Prominent Enclosure) */}
+                      {event.event && event.event.toLowerCase().replace(/_/g, ' ').includes('voice note processed') && (
+                        <div className="mt-4 p-6 bg-gray-950 border-2 border-brand-500 rounded-[2rem] flex flex-col gap-4 shadow-[0_0_50px_rgba(var(--brand-500-rgb),0.1)] relative overflow-hidden group">
+                           {/* Forensic Signal Badge */}
+                           <div className="absolute top-0 right-0 bg-brand-500 text-black text-[7px] font-black px-4 py-1 rounded-bl-xl tracking-[0.2em] uppercase">Statutory Audio Record</div>
+                           
+                           <div className="flex items-center gap-4">
+                              <div className="w-12 h-12 rounded-full bg-brand-500/10 flex items-center justify-center text-brand-400 text-xl animate-pulse">🎙️</div>
+                              <div className="flex-1">
+                                <p className="text-[10px] font-black text-white uppercase tracking-[0.3em] italic">Physician Case Dictation</p>
+                                <p className="text-[8px] text-gray-500 font-bold uppercase tracking-widest mt-0.5">High-Fidelity Forensic Ingestion · {event.metadata?.provider || 'AI-NODE'}</p>
+                              </div>
+                           </div>
+
+                           {event.metadata?.audioUrl ? (
+                             <audio controls className="w-full h-12 rounded-full overflow-hidden border border-white/10 opacity-90 hover:opacity-100 transition-all bg-white/5">
+                               <source src={event.metadata.audioUrl} type="audio/webm" />
+                               <source src={event.metadata.audioUrl} type="audio/mpeg" />
+                             </audio>
+                           ) : (
+                             <div className="p-3 bg-red-950/20 border border-red-500/40 rounded-xl text-center">
+                                <p className="text-[10px] font-black text-red-400 uppercase tracking-widest animate-pulse">Registry Rupture: Audio Stream Not Found</p>
+                             </div>
+                           )}
+                           
+                           <div className="flex justify-between items-center px-2">
+                             <span className="text-[8px] font-black text-brand-500/50 uppercase tracking-widest">Digital Signature: {event.metadata?.audioUrl ? 'Verified' : 'Ruptured'}</span>
+                             <span className="text-[8px] font-black text-gray-600 uppercase tracking-widest leading-none">ID: {event.metadata?.publicId?.slice(-12) || 'Registry Seal'}</span>
                            </div>
                         </div>
                       )}
@@ -679,7 +697,7 @@ export default function CaseDetailPage() {
           <div className="space-y-6">
             <TelemedicineHub 
               caseId={caseId} 
-              targetUserId={isDoctor ? medicalCase.patient?._id : medicalCase.doctor?._id}
+              targetUserId={String(isDoctor ? medicalCase.patient?._id : medicalCase.doctor?._id)}
               isDoctor={isDoctor}
             />
 

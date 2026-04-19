@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { useSocketContext } from '../context/SocketContext';
 import api from '../api/axiosInstance';
 import { toast } from 'react-hot-toast';
-import { io } from 'socket.io-client';
 
 /**
  * Institutional Telemedicine Hub
@@ -15,8 +15,8 @@ export default function TelemedicineHub({ caseId, targetUserId, isDoctor }) {
   const [localStream, setLocalStream] = useState(null);
   const [remoteStream, setRemoteStream] = useState(null);
   
+  const { socket, connected } = useSocketContext();
   const peerConnection = useRef(null);
-  const socketRef = useRef(null);
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
   const localStreamRef = useRef(null);
@@ -69,20 +69,25 @@ export default function TelemedicineHub({ caseId, targetUserId, isDoctor }) {
   };
 
   useEffect(() => {
-    // Connect to institutional signal registry
-    socketRef.current = io(import.meta.env.VITE_API_URL || 'http://localhost:5000', {
-       auth: { token: localStorage.getItem('token') }
-    });
+    if (!socket || !connected) return;
 
-    socketRef.current.on('call_incoming', (data) => {
+    const handleIncoming = (data) => {
+       console.log('📞 [Telemed] Incoming Handshake:', data);
+       
+       // Statutory Global Notification
+       toast.success(`Institutional Consultation Request from ${data.callerName}. Please navigate to Case Reference ${data.caseId.slice(-8).toUpperCase()} to accept.`, { 
+         duration: 10000,
+         style: { border: '1px solid #c9a747', background: '#000', color: '#fff' }
+       });
+
        if (data.caseId === caseId) {
           setIncomingCall(data);
           playRingTone();
-          toast.success(`Statutory Incoming Consultation: ${data.callerName}`, { duration: 15000 });
        }
-    });
+    };
 
-    socketRef.current.on('call_signal_received', async ({ signalData }) => {
+    const handleSignal = async (data) => {
+       const { signalData } = data;
        if (signalData.type === 'offer') {
           await handleOffer(signalData);
        } else if (signalData.type === 'answer') {
@@ -90,27 +95,34 @@ export default function TelemedicineHub({ caseId, targetUserId, isDoctor }) {
        } else if (signalData.candidate) {
           await peerConnection.current.addIceCandidate(new RTCIceCandidate(signalData));
        }
-    });
+    };
 
-    socketRef.current.on('call_disconnected', () => {
-       terminateCall();
-    });
+    const handleDisconnect = () => {
+       console.log('📡 [Telemed] Remote Signal Termination Detected');
+       terminateCall(false);
+    };
+
+    socket.on('call_incoming', handleIncoming);
+    socket.on('call_signal_received', handleSignal);
+    socket.on('call_disconnected', handleDisconnect);
 
     return () => {
-      socketRef.current.disconnect();
+      socket.off('call_incoming', handleIncoming);
+      socket.off('call_signal_received', handleSignal);
+      socket.off('call_disconnected', handleDisconnect);
       if (localStreamRef.current) {
         localStreamRef.current.getTracks().forEach(t => t.stop());
       }
       stopRingTone();
     };
-  }, [caseId]);
+  }, [socket, connected, caseId, targetUserId]);
 
   const initPeerConnection = () => {
     peerConnection.current = new RTCPeerConnection(ICE_SERVERS);
     
     peerConnection.current.onicecandidate = (event) => {
       if (event.candidate) {
-        socketRef.current.emit('call_signal', { targetUserId, signalData: event.candidate });
+        socket.emit('call_signal', { targetUserId: String(targetUserId), signalData: event.candidate });
       }
     };
 
@@ -120,6 +132,13 @@ export default function TelemedicineHub({ caseId, targetUserId, isDoctor }) {
   };
 
   const startCall = async () => {
+    const target = String(targetUserId);
+    console.log(`🚀 [Telemed] Statutory Signal Handshake Triggered. Target: ${target}`);
+    
+    if (target === 'undefined' || !target) {
+       return toast.error('Handshake Failure: Target Identity not yet inflated in Registry.');
+    }
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
       setLocalStream(stream);
@@ -132,11 +151,11 @@ export default function TelemedicineHub({ caseId, targetUserId, isDoctor }) {
       const offer = await peerConnection.current.createOffer();
       await peerConnection.current.setLocalDescription(offer);
 
-      socketRef.current.emit('call_initiate', { caseId, targetUserId });
-      socketRef.current.emit('call_signal', { targetUserId, signalData: offer });
+      socket.emit('call_initiate', { caseId, targetUserId: target });
+      socket.emit('call_signal', { targetUserId: target, signalData: offer });
       setCallActive(true);
     } catch (err) {
-      toast.error('Clinical Device Error: Camera/Mic blocked.');
+      toast.error('Clinical Device Error: Camera/Mic blocked or statutory hardware mismatch.');
     }
   };
 
@@ -155,7 +174,7 @@ export default function TelemedicineHub({ caseId, targetUserId, isDoctor }) {
       const answer = await peerConnection.current.createAnswer();
       await peerConnection.current.setLocalDescription(answer);
 
-      socketRef.current.emit('call_signal', { targetUserId, signalData: answer });
+      socket.emit('call_signal', { targetUserId: String(targetUserId), signalData: answer });
       setCallActive(true);
       setIncomingCall(null);
     } catch (err) {
@@ -164,7 +183,7 @@ export default function TelemedicineHub({ caseId, targetUserId, isDoctor }) {
     }
   };
 
-  const terminateCall = () => {
+  const terminateCall = (shouldEmit = true) => {
     stopRingTone();
     const wasAccepted = !!remoteStream;
 
@@ -177,14 +196,20 @@ export default function TelemedicineHub({ caseId, targetUserId, isDoctor }) {
       localStreamRef.current = null;
     }
     
-    // Notify registry of termination status
-    socketRef.current.emit('call_terminate', { targetUserId, caseId, wasAccepted });
+    // Industrial Loop Break: Only emit to registry if we are the originator
+    if (shouldEmit && socket && connected) {
+      socket.emit('call_terminate', { targetUserId: String(targetUserId), caseId, wasAccepted });
+    }
 
     setCallActive(false);
     setIncomingCall(null);
     setRemoteStream(null);
     setLocalStream(null);
-    toast('Clinical Consultation Concluded');
+    
+    // Forensic Toast: Avoid duplicates during the handshake termination
+    if (callActive || incomingCall) {
+       toast('Statutory Consultation Concluded', { id: 'termination-toast' });
+    }
   };
 
   useEffect(() => {

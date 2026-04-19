@@ -39,8 +39,9 @@ module.exports = (io) => {
   io.on('connection', (socket) => {
     console.log(`[Socket] User connected: ${socket.user._id}`);
     
-    // Join a personal room based on user ID for direct notifications
-    socket.join(socket.user._id);
+    // Join a personal room based on user ID for direct notifications (Force string for predictability)
+    const userIdString = socket.user._id.toString();
+    socket.join(userIdString);
     
     // If the user is a doctor, they can also join specialty rooms to receive broadcasting of new cases
     if (socket.user.roles.includes('doctor')) {
@@ -48,7 +49,7 @@ module.exports = (io) => {
       socket.on('join_specialty', (specialty) => {
         if (specialty) {
            socket.join(`specialty_${specialty}`);
-           console.log(`[Socket] Doctor ${socket.user._id} joined specialty_${specialty}`);
+           console.log(`[Socket] Doctor ${userIdString} joined specialty_${specialty}`);
         }
       });
     }
@@ -57,14 +58,14 @@ module.exports = (io) => {
     socket.on('join_conversation', (conversationId) => {
       if (conversationId) {
         socket.join(`conversation_${conversationId}`);
-        console.log(`[Socket] User ${socket.user._id} joined conversation room: ${conversationId}`);
+        console.log(`[Socket] User ${userIdString} joined conversation room: ${conversationId}`);
       }
     });
 
     socket.on('join_case', (caseId) => {
       if (caseId) {
         socket.join(`case_${caseId}`);
-        console.log(`[Socket] User ${socket.user._id} joined case room: ${caseId}`);
+        console.log(`[Socket] User ${userIdString} joined case room: ${caseId}`);
       }
     });
 
@@ -77,24 +78,27 @@ module.exports = (io) => {
     // --- Telemedicine Signaling (Phase 12) ---
     // Initiate clinical consultation (Doctor rings Patient)
     socket.on('call_initiate', ({ caseId, targetUserId }) => {
-      console.log(`[Telemed] Call Initiation: ${socket.user._id} -> ${targetUserId} (Case: ${caseId})`);
-      io.to(targetUserId).emit('call_incoming', { 
+      const target = String(targetUserId);
+      console.log(`[Telemed] Statutory Call Initiation Triggered: ${userIdString} -> ${target} (Case: ${caseId})`);
+      io.to(target).emit('call_incoming', { 
         caseId, 
-        callerId: socket.user._id, 
-        callerName: socket.user.fullName || 'Physician'
+        callerId: userIdString, 
+        callerName: socket.user.fullName || 'Clinical Specialist'
       });
     });
 
     // Relay WebRTC signals (Offers, Answers, ICE Candidates)
     socket.on('call_signal', ({ targetUserId, signalData }) => {
-      io.to(targetUserId).emit('call_signal_received', { 
+      const target = String(targetUserId);
+      io.to(target).emit('call_signal_received', { 
         senderId: socket.user._id, 
         signalData 
       });
     });
 
     socket.on('call_terminate', ({ targetUserId, caseId, wasAccepted }) => {
-      io.to(targetUserId).emit('call_disconnected');
+      const target = String(targetUserId);
+      io.to(target).emit('call_disconnected');
       
       // If the doctor hung up before an answer, it's a "Missed Call"
       if (socket.user.roles.includes('doctor') && !wasAccepted && caseId) {

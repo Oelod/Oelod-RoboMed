@@ -18,6 +18,7 @@ import NotFoundPage      from './pages/NotFoundPage';
 // Guards
 import ProtectedRoute    from './components/ProtectedRoute';
 import GlobalNotifications from './components/GlobalNotifications';
+import GlobalSignalReceiver from './components/GlobalSignalReceiver';
 import Navbar from './components/Navbar';
 import RestorationOverlay from './components/RestorationOverlay';
 
@@ -26,8 +27,9 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gray-950 flex flex-col">
-      <RestorationOverlay />
+      {/* <RestorationOverlay /> */}
       <GlobalNotifications />
+      <GlobalSignalReceiver />
       <Navbar />
       <div className="flex-1 overflow-auto">
         <Routes>

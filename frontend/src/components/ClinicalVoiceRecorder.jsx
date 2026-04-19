@@ -58,8 +58,9 @@ export default function ClinicalVoiceRecorder({ caseId, onProcessed }) {
       toast.success('Institutional Transcript Sealed.');
       if (onProcessed) onProcessed(data.data);
     } catch (err) {
+      const status = err.response?.status || 'ERR';
       const msg = err.response?.data?.message || err.response?.data?.error || 'Transcription Handshake Failed';
-      toast.error(`Institutional Error: ${msg}`);
+      toast.error(`Institutional Error [${status}]: ${msg}`);
       console.error('[Telemed] Transcription Failure:', err);
     } finally {
       setProcessing(false);
@@ -71,9 +72,9 @@ export default function ClinicalVoiceRecorder({ caseId, onProcessed }) {
   return (
     <div className="bg-gray-950 border border-gray-800 rounded-2xl p-6 relative overflow-hidden">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
-          <span className={`w-2 h-2 rounded-full ${recording ? 'bg-red-500 animate-ping' : 'bg-gray-700'}`}></span>
-          Clinical Voice Manifold
+        <h2 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
+          <span className={`w-2 h-2 rounded-full ${recording ? 'bg-red-500 animate-ping' : 'bg-brand-500'}`}></span>
+          Clinical Case Report (Audio Format)
         </h2>
         {recording && (
            <span className="font-mono text-brand-400 text-sm font-bold">{formatTime(timer)}</span>
@@ -88,8 +89,8 @@ export default function ClinicalVoiceRecorder({ caseId, onProcessed }) {
         >
           <div className="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">🎤</div>
           <div className="text-left">
-             <p className="text-white font-black text-sm uppercase tracking-tighter italic">Initialize Dictation</p>
-             <p className="text-gray-500 text-[10px] uppercase font-medium">Secondary Diagnostic Handshake</p>
+             <p className="text-white font-black text-sm uppercase tracking-tighter italic">Begin Statutory Reporting</p>
+             <p className="text-gray-500 text-[10px] uppercase font-medium">Capture Multi-Specialist Forensic Record</p>
           </div>
         </button>
       ) : (

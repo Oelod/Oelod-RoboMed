@@ -7,3 +7,4 @@ httpServer.listen(PORT, () => {
   console.log(`🚀 RoboMed backend running on http://localhost:${PORT}`);
   console.log(`📋 Health check: http://localhost:${PORT}/health`);
 });
+// --- Institutional Heartbeat: Registry Handshake Restored ---
