@@ -86,20 +86,31 @@ export function AuthProvider({ children }) {
 
   const login = useCallback(async (email, password) => {
     const res = await api.post('/auth/login', { email, password }, { withCredentials: true });
-    setToken(res.data.data.token);
-    setUser(res.data.data.user);
-    return res.data.data.user;
+    const { token: newToken, user: newUser } = res.data.data;
+    
+    // Industrial Force-Sync: Attach header immediately to seal the handshake
+    api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+    
+    setToken(newToken);
+    setUser(newUser);
+    return newUser;
   }, []);
 
   const register = useCallback(async (payload) => {
     const res = await api.post('/auth/register', payload, { withCredentials: true });
-    setToken(res.data.data.token);
-    setUser(res.data.data.user);
-    return res.data.data.user;
+    const { token: newToken, user: newUser } = res.data.data;
+
+    // Industrial Force-Sync: Attach header immediately 
+    api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+
+    setToken(newToken);
+    setUser(newUser);
+    return newUser;
   }, []);
 
   const logout = useCallback(async () => {
     try { await api.post('/auth/logout', {}, { withCredentials: true }); } catch { /* ignore */ }
+    delete api.defaults.headers.common['Authorization'];
     setToken(null);
     setUser(null);
   }, []);
@@ -108,15 +119,21 @@ export function AuthProvider({ children }) {
     await api.patch('/dashboard/switch-role', { role });
     // After DB processes activeRole shift, explicitly pull a fresh JWT down to the client instance
     const res = await api.post('/auth/refresh-token', {}, { withCredentials: true });
-    setToken(res.data.data.token);
-    setUser(res.data.data.user);
+    const { token: newToken, user: newUser } = res.data.data;
+    
+    api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+    setToken(newToken);
+    setUser(newUser);
   }, []);
 
   const refreshUser = useCallback(async () => {
     try {
       const res = await api.post('/auth/refresh-token', {}, { withCredentials: true });
-      setToken(res.data.data.token);
-      setUser(res.data.data.user);
+      const { token: newToken, user: newUser } = res.data.data;
+      
+      api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+      setToken(newToken);
+      setUser(newUser);
     } catch (e) { /* silent fail */ }
   }, []);
 

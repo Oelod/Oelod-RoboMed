@@ -15,6 +15,7 @@ const aiPredictionSchema = new mongoose.Schema({
   priority_level: { type: String, enum: ['LOW', 'MEDIUM', 'HIGH'] },
   recommended_specialty: String,
   modelVersion: String,
+  latency_ms: Number,
 }, { _id: false });
 
 const caseSchema = new mongoose.Schema(

@@ -15,7 +15,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !original._retry && !original.url.includes('/refresh-token') && !original.url.includes('/login')) {
       original._retry = true;
       try {
-        const res = await axios.post('/api/auth/refresh-token', {}, { withCredentials: true });
+        const res = await api.post('/auth/refresh-token', {});
         const newToken = res.data.data.token;
         api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
         original.headers['Authorization'] = `Bearer ${newToken}`;

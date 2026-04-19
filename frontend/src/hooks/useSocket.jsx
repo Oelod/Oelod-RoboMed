@@ -26,12 +26,13 @@ export function SocketProvider({ children }) {
     }
 
     // Industrial Discovery: Hardcoding origin for absolute signaling reliability in development
-    const socketUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const socketUrl = 'http://localhost:5000';
+    console.log(`📡 [SocketRegistry] Initiating Handshake with: ${socketUrl}`);
     
     socketRef.current = io(socketUrl, {
       auth: { token: localStorage.getItem('token') },
       reconnectionAttempts: 10,
-      transports: ['websocket', 'polling']
+      transports: ['websocket']
     });
 
     socketRef.current.on('connect', () => {

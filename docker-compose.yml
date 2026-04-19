@@ -1,41 +1,56 @@
 version: '3.8'
 
 services:
-  mongodb:
-    image: mongo:7.0-rc
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongodb_data:/data/db
-
-  backend:
-    build: ./backend
-    ports:
-      - "5000:5000"
-    environment:
-      - NODE_ENV=production
-      - MONGODB_URI=mongodb://mongodb/robomed
-      - JWT_SECRET=${JWT_SECRET}
-      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
-      - AI_SERVICE_URL=http://ai-service:5001
-    depends_on:
-      - mongodb
-      - ai-service
-
+  # Institutional AI Node
   ai-service:
-    build: ./ai-service
+    build: 
+      context: ./ai-service
+    container_name: robomed-ai-node
     ports:
       - "5001:5001"
     environment:
       - PORT=5001
       - FLASK_ENV=production
+    restart: always
 
+  # Institutional Persistence Registry (Redis)
+  redis:
+    image: redis:alpine
+    container_name: robomed-redis
+    ports:
+      - "6379:6379"
+    restart: always
+
+  # Institutional Clinical Registry (Backend)
+  backend:
+    build:
+      context: ./backend
+    container_name: robomed-backend
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./backend/.env
+    environment:
+      - NODE_ENV=production
+      - AI_SERVICE_URL=http://ai-service:5001
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - ai-service
+      - redis
+    restart: always
+
+  # Institutional Frontend Gateway (Nginx)
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+    container_name: robomed-frontend
     ports:
       - "80:80"
     depends_on:
       - backend
+    restart: always
 
-volumes:
-  mongodb_data:
+# Statutory Registry Networks (Default Bridge)
+networks:
+  default:
+    name: robomed-institutional-net

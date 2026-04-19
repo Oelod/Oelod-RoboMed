@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const { encrypt, decrypt } = require('../utils/cryptoField');
 
 const ROLES = ['patient', 'doctor', 'admin', 'lab', 'pharmacist'];
 
@@ -15,6 +16,8 @@ const userSchema = new mongoose.Schema(
     phoneNumber: {
       type: String,
       trim: true,
+      get: decrypt,
+      set: encrypt,
     },
     email: {
       type: String,
@@ -117,11 +120,13 @@ const userSchema = new mongoose.Schema(
   {
     timestamps: true,
     toJSON: {
+      getters: true,
       transform(doc, ret) {
         delete ret.password;  // Extra safety — never serialise password
         return ret;
       },
     },
+    toObject: { getters: true },
   }
 );
 

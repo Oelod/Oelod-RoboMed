@@ -11,6 +11,9 @@ const auditLogSchema = new mongoose.Schema(
     targetId:  { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     targetType:{ type: String, default: 'User' },
     metadata:  { type: mongoose.Schema.Types.Mixed, default: {} },
+    phiAccessed: { type: Boolean, default: false },
+    clientIp:    { type: String },
+    userAgent:   { type: String },
   },
   { timestamps: true }
 );

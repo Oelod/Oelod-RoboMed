@@ -47,24 +47,36 @@ class ModelRegistry:
         self.load_models()
 
     def load_models(self):
-        """Shadow Reloads clinical triage models from disk."""
+        """Institutional Atomic Shadow-Reload: Ensures absolute triage integrity."""
         try:
-            logger.info("Shadow Reloading clinical triage models...")
-            self.clf_specialty = joblib.load(os.path.join(self.model_dir, "symptom_model.pkl"))
-            self.clf_priority = joblib.load(os.path.join(self.model_dir, "priority_model.pkl"))
-            self.mlb = joblib.load(os.path.join(self.model_dir, "label_encoder.pkl"))
-            self.le_specialty = joblib.load(os.path.join(self.model_dir, "specialty_encoder.pkl"))
-            self.le_priority = joblib.load(os.path.join(self.model_dir, "priority_encoder.pkl"))
+            logger.info("Initializing high-fidelity triage load...")
+            
+            # Load into staging buffer to prevent mismatched predictions
+            new_clf_spec = joblib.load(os.path.join(self.model_dir, "symptom_model.pkl"))
+            new_clf_prio = joblib.load(os.path.join(self.model_dir, "priority_model.pkl"))
+            new_mlb      = joblib.load(os.path.join(self.model_dir, "label_encoder.pkl"))
+            new_le_spec  = joblib.load(os.path.join(self.model_dir, "specialty_encoder.pkl"))
+            new_le_prio  = joblib.load(os.path.join(self.model_dir, "priority_encoder.pkl"))
 
+            new_info = {"version": "1.0.0"}
             info_path = os.path.join(self.model_dir, "model_info.json")
             if os.path.exists(info_path):
                 with open(info_path) as f:
-                    self.model_info = json.load(f)
+                    new_info = json.load(f)
             
-            logger.info(f"[OK] Models live: v{self.model_info.get('version', '1.0.0')}")
+            # Industrial Atomic Handshake: Swapping references simultaneously
+            self.clf_specialty = new_clf_spec
+            self.clf_priority  = new_clf_prio
+            self.mlb           = new_mlb
+            self.le_specialty  = new_le_spec
+            self.le_priority   = new_le_prio
+            self.model_info    = new_info
+            self.last_reload   = time.time()
+            
+            logger.info(f"[OK] Atomic Registry Sealed: v{self.model_info.get('version', '1.0.0')}")
             return True
         except Exception as e:
-            logger.error(f"Critical Reload Failure: {str(e)}")
+            logger.error(f"Statutory Reload Rupture: {str(e)}")
             return False
 
 # Initialize the clinical registry

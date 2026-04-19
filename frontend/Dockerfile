@@ -1,4 +1,4 @@
-# --- Stage 1: Build ---
+# Step 1: Industrial Build Manifold
 FROM node:20-slim AS build
 
 WORKDIR /app
@@ -7,26 +7,18 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
-# Build the app
+# Copy source and build
 COPY . .
 RUN npm run build
 
-# --- Stage 2: Serve ---
-FROM nginx:alpine
+# Step 2: High-Fidelity Nginx Registry
+FROM nginx:stable-alpine
 
-# Copy build output to nginx
+# Copy built assets to Nginx html directory
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Copy custom nginx config if we had one (otherwise default works for SPA with minor tweaks)
-# For now, we'll use a basic SPA config
-RUN echo 'server { \
-    listen 80; \
-    location / { \
-        root /usr/share/nginx/html; \
-        index index.html index.htm; \
-        try_files $uri $uri/ /index.html; \
-    } \
-}' > /etc/nginx/conf.d/default.conf
+# Copy custom Nginx configuration to handle React Routing
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 

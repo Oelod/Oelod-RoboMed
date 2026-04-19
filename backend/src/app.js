@@ -110,12 +110,8 @@ app.use(globalErrorHandler);
 require('./sockets/index')(io);
 require('./events/socketListeners')(app);
 // ─── DB + Export ──────────────────────────────────────────────────────────────
-const startApp = async () => {
+const initializeStatutoryManifold = async () => {
   await connectDB();
 };
 
-if (process.env.NODE_ENV !== 'test') {
-  startApp();
-}
-
-module.exports = { app, httpServer };
+module.exports = { app, httpServer, initializeStatutoryManifold };

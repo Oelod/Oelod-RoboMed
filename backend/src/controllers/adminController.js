@@ -280,6 +280,15 @@ const getGovernanceHealth = async (req, res) => {
             updatedAt: 1,
             lastNote: { $arrayElemAt: ["$governanceNotes", -1] }
           }}
+        ],
+        aiPerformance: [
+          { $match: { "aiPrediction.latency_ms": { $ne: null } } },
+          { $group: {
+            _id: null,
+            avgLatency: { $avg: "$aiPrediction.latency_ms" },
+            maxLatency: { $max: "$aiPrediction.latency_ms" },
+            totalInferences: { $sum: 1 }
+          }}
         ]
       }
     }

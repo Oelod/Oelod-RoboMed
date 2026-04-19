@@ -177,6 +177,7 @@ const approveRole = async (adminId, targetUserId) => {
   const updated  = await userRepo.updateById(targetUserId, {
     roles: newRoles,
     activeRole: target.activeRole,
+    status: 'active', // Institutional Activation: Approve role = Verify Identify
     'roleRequest.status':     'approved',
     'roleRequest.reviewedAt': new Date(),
     'roleRequest.reviewedBy': adminId,
