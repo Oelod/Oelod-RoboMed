@@ -9,11 +9,11 @@ export default function DashboardLayout() {
   return (
     <div className="flex min-h-screen bg-gray-950">
       {/* Side Navigation Manifold */}
-      <SideNav />
+      <SideNav isOpen={isMobileMenuOpen} setIsOpen={setIsMobileMenuOpen} />
 
       {/* Main Content Hub */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <TopBar />
+        <TopBar onMenuClick={() => setIsMobileMenuOpen(true)} />
         
         <main className="flex-1 overflow-y-auto scrollbar-hide relative">
            {/* Internal Background Micro-Animations */}

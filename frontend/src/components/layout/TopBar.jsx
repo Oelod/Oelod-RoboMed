@@ -4,15 +4,29 @@ import { useNavigate } from 'react-router-dom';
 import NotificationDrawer from '../NotificationDrawer';
 import ProfileSettingsModal from '../ProfileSettingsModal';
 
-export default function TopBar() {
+export default function TopBar({ onMenuClick }) {
   const { user, switchRole } = useAuth();
   const navigate = useNavigate();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   return (
-    <header className="h-20 glass border-b border-white/5 px-8 flex items-center justify-between sticky top-0 z-40">
-      {/* Search / Context Field */}
-      <div className="flex-1 max-w-xl">
+    <header className="h-20 glass border-b border-white/5 px-4 sm:px-8 flex items-center justify-between sticky top-0 z-40">
+      {/* Mobile Toggle & Brand Node */}
+      <div className="flex items-center gap-4 lg:hidden">
+        <button 
+          onClick={onMenuClick}
+          className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 text-gray-400 hover:text-white transition-all"
+        >
+          <span className="text-xl">☰</span>
+        </button>
+        <div className="flex flex-col">
+          <span className="text-white font-black text-sm italic uppercase leading-none">OELOD</span>
+          <span className="text-brand-500 font-bold text-[8px] uppercase tracking-[0.2em]">RoboMed</span>
+        </div>
+      </div>
+
+      {/* Search / Context Field (Desktop Focus) */}
+      <div className="flex-1 max-w-xl hidden md:block">
          <div className="relative group">
             <input 
               type="text" 
