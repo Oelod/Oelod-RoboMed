@@ -39,7 +39,7 @@ export default function SideNav() {
           <Link
             key={idx}
             to={item.path}
-            className={`nav-item ${isActive(item.path) ? 'nav-item-active' : 'nav-item-inactive'}`}
+            className={`nav-item group ${isActive(item.path) ? 'nav-item-active' : 'nav-item-inactive'}`}
           >
             <span className="text-lg grayscale-0">{item.icon}</span>
             <span>{item.label}</span>
