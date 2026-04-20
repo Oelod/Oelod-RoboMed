@@ -110,8 +110,9 @@ graph TD
     A --> |Reading Traces| AuditDB
 ```
 
-### **5.1 Forensic Audit (HIPAA/GDPR Compliance)**
+### **5.1 Forensic Audit & Voice Privacy Gate**
 Every sensitive action character-perfectly triggers the `AuditLog.js` manifold:
+*   **Voice Reporting Privacy**: Statutory audio reports are character-perfectly restricted to the **Patient**, **Clinicians (Doctors)**, and **Level 3 Super Admins**. All other personnel are formally redacted from this stream.
 *   **PHI Accessed**: Every time clinical data is viewed, the `phiAccessed` flag is set.
 *   **Operator Metadata**: Client IP and User Agent are character-perfectly recorded.
 *   **Compliance Reports**: Admins can generate an industrial CSV report of all "Subject Identifiers" touched by a specific personnel member.
