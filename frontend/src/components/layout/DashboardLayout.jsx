@@ -25,26 +25,6 @@ export default function DashboardLayout() {
            </div>
         </main>
       </div>
-
-      {/* Mobile Trigger Hub (Visible only on small screens) */}
-      <div className="lg:hidden fixed bottom-6 right-6 z-50">
-          <button 
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="w-14 h-14 rounded-2xl bg-brand-600 text-white shadow-2xl shadow-brand-500/40 flex items-center justify-center text-2xl active:scale-90 transition-all border border-white/20"
-          >
-            {isMobileMenuOpen ? '✕' : '☰'}
-          </button>
-      </div>
-
-      {/* Mobile Menu Overlay */}
-      {isMobileMenuOpen && (
-         <div className="fixed inset-0 z-[100] lg:hidden animate-in fade-in duration-300">
-            <div className="absolute inset-0 bg-black/90 backdrop-blur-md" onClick={() => setIsMobileMenuOpen(false)}></div>
-            <div className="absolute left-0 top-0 bottom-0 w-80 sidebar-gradient border-r border-white/10 animate-in slide-in-from-left duration-300">
-               <SideNav />
-            </div>
-         </div>
-      )}
     </div>
   );
 }
