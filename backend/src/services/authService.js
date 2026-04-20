@@ -38,7 +38,13 @@ const register = async (userData) => {
     profilePicture: profilePicture || '',
   });
 
-  const tokenPayload = { _id: user._id, email: user.email, roles: user.roles, activeRole: user.activeRole, adminLevel: user.adminLevel };
+  const tokenPayload = { 
+    _id: user._id.toString(), 
+    email: user.email, 
+    roles: [...user.roles], 
+    activeRole: user.activeRole, 
+    adminLevel: user.adminLevel || 0 
+  };
   const accessToken  = generateAccessToken(tokenPayload);
   const refreshToken = generateRefreshToken({ _id: user._id });
 
@@ -74,7 +80,14 @@ const login = async ({ email, password }) => {
     throw err;
   }
 
-  const tokenPayload = { _id: user._id, email: user.email, roles: user.roles, activeRole: user.activeRole, specialization: user.specialization, adminLevel: user.adminLevel };
+  const tokenPayload = { 
+    _id: user._id.toString(), 
+    email: user.email, 
+    roles: [...user.roles], 
+    activeRole: user.activeRole, 
+    specialization: [...user.specialization], 
+    adminLevel: user.adminLevel || 0 
+  };
   const accessToken  = generateAccessToken(tokenPayload);
   const refreshToken = generateRefreshToken({ _id: user._id });
 
@@ -127,7 +140,14 @@ const refreshToken = async (token) => {
   existingToken.revoked = true;
   await existingToken.save();
 
-  const tokenPayload = { _id: user._id, email: user.email, roles: user.roles, activeRole: user.activeRole, specialization: user.specialization, adminLevel: user.adminLevel };
+  const tokenPayload = { 
+    _id: user._id.toString(), 
+    email: user.email, 
+    roles: [...user.roles], 
+    activeRole: user.activeRole, 
+    specialization: [...user.specialization], 
+    adminLevel: user.adminLevel || 0 
+  };
   const newAccessToken  = generateAccessToken(tokenPayload);
   const newRefreshToken = generateRefreshToken({ _id: user._id });
 
