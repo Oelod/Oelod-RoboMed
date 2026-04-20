@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import SideNav from './SideNav';
 import TopBar from './TopBar';
+import { Outlet } from 'react-router-dom';
 
-export default function DashboardLayout({ children }) {
+export default function DashboardLayout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
@@ -20,7 +21,7 @@ export default function DashboardLayout({ children }) {
            <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-500/5 blur-[100px] rounded-full -ml-48 -mb-48 pointer-events-none"></div>
 
            <div className="max-w-[1600px] mx-auto w-full animate-slide-in">
-              {children}
+              <Outlet />
            </div>
         </main>
       </div>

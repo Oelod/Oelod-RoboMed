@@ -21,7 +21,6 @@ import GlobalNotifications from './components/GlobalNotifications';
 import GlobalSignalReceiver from './components/GlobalSignalReceiver';
 import RestorationOverlay from './components/RestorationOverlay';
 import DashboardLayout from './components/layout/DashboardLayout';
-import { Outlet } from 'react-router-dom';
 
 export default function App() {
   const { user } = useAuth();
@@ -39,7 +38,7 @@ export default function App() {
           <Route path="/reset-password/:token" element={<AuthPage mode="reset" />} />
 
           {/* Sovereign Authenticated Manifolds */}
-          <Route element={<ProtectedRoute roles={['patient', 'doctor', 'admin', 'lab', 'pharmacist']}><DashboardLayout><Outlet /></DashboardLayout></ProtectedRoute>}>
+          <Route element={<ProtectedRoute roles={['patient', 'doctor', 'admin', 'lab', 'pharmacist']}><DashboardLayout /></ProtectedRoute>}>
             <Route path="/dashboard" element={
               user?.activeRole === 'doctor' ? <DoctorDashboard /> :
               user?.activeRole === 'admin'  ? <AdminDashboard />  :
