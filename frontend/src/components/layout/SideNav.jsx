@@ -10,12 +10,12 @@ export default function SideNav({ isOpen, setIsOpen }) {
 
   // Role-based Navigation Config
   const navItems = [
-    { label: 'Platform Hub', path: '/dashboard', icon: '💎', roles: ['patient', 'doctor', 'admin', 'lab', 'pharmacist'] },
-    { label: 'Patient Registry', path: '/search', icon: '👤', roles: ['doctor', 'admin'] },
-    { label: 'Create Case', path: '/cases/new', icon: '➕', roles: ['patient'] },
-    { label: 'Diagnostic Lab', path: '/lab', icon: '🔬', roles: ['lab', 'admin'] },
+    { label: 'Medical Dashboard', path: '/dashboard', icon: '💎', roles: ['patient', 'doctor', 'admin', 'lab', 'pharmacist'] },
+    { label: 'Patient Directory', path: '/search', icon: '👤', roles: ['doctor', 'admin'] },
+    { label: 'Open Medical Case', path: '/cases/new', icon: '➕', roles: ['patient'] },
+    { label: 'Diagnostic Laboratory', path: '/lab', icon: '🔬', roles: ['lab', 'admin'] },
     { label: 'Pharmacy Unit', path: '/pharmacy', icon: '💊', roles: ['pharmacist', 'admin'] },
-    { label: 'Institutional Reports', path: '/admin/reports', icon: '📊', roles: ['admin'] },
+    { label: 'Clinical Analytics', path: '/admin/reports', icon: '📊', roles: ['admin'] },
   ];
 
   const filteredItems = navItems.filter(item => item.roles.includes(user?.activeRole));
@@ -73,23 +73,23 @@ export default function SideNav({ isOpen, setIsOpen }) {
           ))}
         </nav>
 
-        {/* Institutional Footer */}
+        {/* Clinical Footer */}
         <div className="p-6 border-t border-white/5 space-y-4">
           <button 
              onClick={logout}
              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-red-500 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-all duration-300 group"
           >
             <span className="text-xl group-hover:rotate-12 transition-transform">⏻</span>
-            <span>Log Out System</span>
+            <span>Sign Out</span>
           </button>
 
           <div className="bg-white/5 rounded-2xl p-4 border border-white/5">
               <div className="flex items-center gap-3 mb-2">
                   <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">Registry Status: Live</span>
+                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">System Status: Online</span>
               </div>
               <p className="text-[9px] text-gray-600 font-medium uppercase tracking-tighter leading-relaxed">
-                Institutional Nodes Synchronized. PHI Transmission Encrypted.
+                Patient Records Synchronized. Secure Data Transmission Active.
               </p>
           </div>
         </div>

@@ -254,7 +254,7 @@ export default function CaseDetailPage() {
       await fetchCase();
       setShowFlagModal(false);
       setFlagReason('');
-      alert('Case flagged for governance review.');
+      alert('Case flagged for official review.');
     } catch (err) {
       alert(err.response?.data?.message || 'Flagging failed');
     } finally {
@@ -286,9 +286,9 @@ export default function CaseDetailPage() {
       await assignDoctor(caseId, assignForm);
       await fetchCase();
       setShowAssignModal(false);
-      alert('Case successfully pushed to selected clinician.');
+      alert('Case successfully transferred to selected clinician.');
     } catch (err) {
-      alert(err.response?.data?.message || 'Re-assignment failed');
+      alert(err.response?.data?.message || 'Transfer failed');
     } finally {
       setActionLoading(false);
     }
@@ -296,7 +296,7 @@ export default function CaseDetailPage() {
 
   const submitReport = async () => {
     if (!reportForm.reason || reportForm.description.length < 20) {
-       return alert('Institutional Requirement: Please select a reason and provide at least 20 characters of clinical detail.');
+       return alert('Requirement: Please select a reason and provide at least 20 characters of detail.');
     }
     setActionLoading(true);
     try {
@@ -305,7 +305,7 @@ export default function CaseDetailPage() {
           targetDoctor: medicalCase.doctor._id,
           ...reportForm
        });
-       toast.success('Clinical conduct report formally logged. Institutional oversight initiated.');
+       toast.success('Conduct report successfully filed. Professional review initiated.');
        setShowReportModal(false);
        setReportForm({ reason: '', description: '' });
     } catch (err) {
@@ -382,13 +382,13 @@ export default function CaseDetailPage() {
           )}
           {user?.activeRole === 'admin' && (
             <button className="btn-secondary border-brand-500/30 text-brand-400 hover:bg-brand-500/10 px-4 text-[10px] uppercase font-black tracking-widest" onClick={() => setShowAssignModal(true)}>
-              📥 Push Matrix
+              📥 Transfer Case
             </button>
           )}
 
           {isTargetOfficeAdmin && medicalCase?.status === 'escalated' && (
              <button className="btn-primary !bg-red-600 !text-white border-red-500 hover:bg-red-500 px-6 text-[10px] uppercase font-black tracking-widest shadow-xl shadow-red-500/40 animate-pulse ring-2 ring-red-500/50" onClick={() => setShowResolveModal(true)}>
-               🖋️ Issue Ruling
+               🖋️ Admin Resolution
              </button>
           )}
 
@@ -435,7 +435,7 @@ export default function CaseDetailPage() {
           {medicalCase.governanceNotes?.length > 0 && (
             <div className="bg-gradient-to-br from-red-900/20 to-gray-900 border border-red-500/20 rounded-2xl p-6 shadow-xl shadow-red-900/5">
                <h2 className="text-sm font-black text-red-400 uppercase tracking-widest mb-6 flex items-center gap-2">
-                  <span className="animate-pulse text-lg">⚖️</span> Institutional Governance Intelligence
+                  <span className="animate-pulse text-lg">⚖️</span> Official Administration Notes
                </h2>
                <div className="space-y-6">
                   {medicalCase.governanceNotes.map((note, idx) => (
@@ -447,7 +447,7 @@ export default function CaseDetailPage() {
                           <span className="text-[10px] font-mono text-gray-500">{new Date(note.timestamp).toLocaleString()}</span>
                        </div>
                        <p className="text-gray-200 font-medium italic text-sm">"{note.note}"</p>
-                       <p className="text-[10px] text-gray-600 font-bold uppercase mt-3">Personnel ID: {note.actorId?._id?.slice(-8) || 'SYSTEM_NODE'}</p>
+                       <p className="text-[10px] text-gray-600 font-bold uppercase mt-3">Staff ID: {note.actorId?._id?.slice(-8) || 'SYSTEM'}</p>
                     </div>
                   ))}
                </div>
@@ -655,18 +655,18 @@ export default function CaseDetailPage() {
                     <p className="text-sm text-gray-500">{new Date(event.timestamp).toLocaleString()}</p>
                       {event.note && <p className="text-sm text-gray-400 mt-1 italic">"{event.note}"</p>}
                       
-                      {/* Statutory Audio Terminal (Prominent Enclosure) */}
+                      {/* Official Audio Record */}
                       {event.event && event.event.toLowerCase().replace(/_/g, ' ').includes('voice note processed') && 
                        (user?.activeRole === 'doctor' || String(user?._id) === String(medicalCase.patient?._id) || user?.adminLevel === 3) && (
                         <div className="mt-4 p-6 bg-gray-950 border-2 border-brand-500 rounded-[2rem] flex flex-col gap-4 shadow-[0_0_50px_rgba(var(--brand-500-rgb),0.1)] relative overflow-hidden group">
-                           {/* Forensic Signal Badge */}
-                           <div className="absolute top-0 right-0 bg-brand-500 text-black text-[7px] font-black px-4 py-1 rounded-bl-xl tracking-[0.2em] uppercase">Statutory Audio Record</div>
+                           {/* Audio Signal Badge */}
+                           <div className="absolute top-0 right-0 bg-brand-500 text-black text-[7px] font-black px-4 py-1 rounded-bl-xl tracking-[0.2em] uppercase">Official Clinical Audio</div>
                            
                            <div className="flex items-center gap-4">
                               <div className="w-12 h-12 rounded-full bg-brand-500/10 flex items-center justify-center text-brand-400 text-xl animate-pulse">🎙️</div>
                               <div className="flex-1">
-                                <p className="text-[10px] font-black text-white uppercase tracking-[0.3em] italic">Physician Case Dictation</p>
-                                <p className="text-[8px] text-gray-500 font-bold uppercase tracking-widest mt-0.5">High-Fidelity Forensic Ingestion · {event.metadata?.provider || 'AI-NODE'}</p>
+                                <p className="text-[10px] font-black text-white uppercase tracking-[0.3em] italic">Physician Voice Summary</p>
+                                <p className="text-[8px] text-gray-500 font-bold uppercase tracking-widest mt-0.5">Official Audio Analysis · {event.metadata?.provider || 'SYSTEM'}</p>
                               </div>
                            </div>
 
@@ -677,13 +677,13 @@ export default function CaseDetailPage() {
                              </audio>
                            ) : (
                              <div className="p-3 bg-red-950/20 border border-red-500/40 rounded-xl text-center">
-                                <p className="text-[10px] font-black text-red-400 uppercase tracking-widest animate-pulse">Registry Rupture: Audio Stream Not Found</p>
+                                <p className="text-[10px] font-black text-red-400 uppercase tracking-widest animate-pulse">Audio Recording Missing</p>
                              </div>
                            )}
                            
                            <div className="flex justify-between items-center px-2">
-                             <span className="text-[8px] font-black text-brand-500/50 uppercase tracking-widest">Digital Signature: {event.metadata?.audioUrl ? 'Verified' : 'Ruptured'}</span>
-                             <span className="text-[8px] font-black text-gray-600 uppercase tracking-widest leading-none">ID: {event.metadata?.publicId?.slice(-12) || 'Registry Seal'}</span>
+                             <span className="text-[8px] font-black text-brand-500/50 uppercase tracking-widest">Digital Signature: {event.metadata?.audioUrl ? 'Verified' : 'Error'}</span>
+                             <span className="text-[8px] font-black text-gray-600 uppercase tracking-widest leading-none">ID: {event.metadata?.publicId?.slice(-12) || 'Official Approval'}</span>
                            </div>
                         </div>
                       )}

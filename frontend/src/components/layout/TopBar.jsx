@@ -30,7 +30,7 @@ export default function TopBar({ onMenuClick }) {
          <div className="relative group">
             <input 
               type="text" 
-              placeholder="Search clinical registry..." 
+              placeholder="Search patient directory..." 
               className="w-full bg-white/5 border border-white/5 rounded-xl px-12 py-2.5 text-sm text-white placeholder-gray-500 focus:bg-white/10 focus:border-brand-500/50 outline-none transition-all"
             />
             <span className="absolute left-4 top-1/2 -translate-y-1/2 grayscale opacity-50 group-focus-within:grayscale-0 group-focus-within:opacity-100 transition-all">🔍</span>
@@ -39,10 +39,10 @@ export default function TopBar({ onMenuClick }) {
 
       {/* Identity & Actions Hub */}
       <div className="flex items-center gap-8">
-        {/* Role Matrix Switcher */}
+        {/* Role Switcher */}
         {user?.roles && user.roles.length > 1 && (
            <div className="hidden xl:flex items-center gap-3">
-              <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Active Matrix:</span>
+              <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Switch Role:</span>
               <select 
                 value={user.activeRole} 
                 onChange={(e) => switchRole(e.target.value)}

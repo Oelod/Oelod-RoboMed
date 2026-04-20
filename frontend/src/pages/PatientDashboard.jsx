@@ -21,10 +21,10 @@ export default function PatientDashboard() {
      setBackupStatus(null);
      try {
         await cryptoService.backupIdentity(user._id, backupPhrase);
-        setBackupStatus({ success: true, message: 'Institutional Identity character-perfectly sealed in Escrow.' });
+        setBackupStatus({ success: true, message: 'Account security key securely backed up.' });
         setBackupPhrase('');
      } catch (err) {
-        setBackupStatus({ success: false, message: 'Identity Handshake Failed: Registry connection interrupted.' });
+        setBackupStatus({ success: false, message: 'Security Handshake Failed: System connection interrupted.' });
      } finally {
         setIsBackingUp(false);
      }
@@ -52,56 +52,56 @@ export default function PatientDashboard() {
   const reports = reportsData?.reports || [];
 
   return (
-    <div className="min-h-screen bg-gray-950 p-6">
+    <div className="min-h-screen bg-transparent p-6">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-10 mb-12 pb-10 border-b border-gray-900">
+        <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-10 mb-12 pb-10 border-b border-white/5">
           <div>
             <h1 className="text-3xl sm:text-4xl font-black text-white italic tracking-tighter uppercase leading-tight">
               Welcome back, <br className="sm:hidden"/> {user?.fullName?.replace(/^Dr\.\s+/i, '').split(' ')[0]} 👋
             </h1>
-            <p className="text-gray-500 text-xs sm:text-sm font-medium mt-3 italic">Institutional PID: <span className="text-gray-300 font-bold">{user?.hospitalId}</span> · Clinical Profile</p>
+            <p className="text-gray-500 text-xs sm:text-sm font-medium mt-3 italic">Patient ID: <span className="text-gray-300 font-bold">{user?.hospitalId}</span> · Healthcare Profile</p>
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full xl:w-auto">
              <div className="w-full sm:w-80">
-                <SearchBar placeholder="Search your records..." />
+                <SearchBar placeholder="Search your history..." />
              </div>
-             <Link to="/cases/new" id="new-case-btn" className="btn-primary w-full sm:w-auto !px-8 py-3.5 text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-brand-600/20 active:scale-95 transition-all">+ Open New Case Node</Link>
+             <Link to="/cases/new" className="btn-primary w-full sm:w-auto !px-8 py-3.5 text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-brand-600/20 text-center">+ Start New Consultation</Link>
           </div>
         </div>
 
         {/* Stats row */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-12">
-          <StatCard label="Total Case Nodes"  value={stats.totalCases  ?? 0} color="brand" />
-          <StatCard label="Active Pipeline"   value={stats.openCases   ?? 0} color="warning" />
-          <StatCard label="Closed Archives" value={stats.closedCases ?? 0} color="success" />
+          <StatCard label="Total Medical Records"  value={stats.totalCases  ?? 0} color="brand" />
+          <StatCard label="Active Consultations"   value={stats.openCases   ?? 0} color="warning" />
+          <StatCard label="Resolved Cases" value={stats.closedCases ?? 0} color="success" />
         </div>
 
         {/* Case list */}
         <div className="card !p-4 sm:!p-8">
-          <h2 className="text-lg font-black text-white uppercase italic tracking-tighter mb-8 bg-gray-950/50 p-4 rounded-xl border border-gray-800 inline-block">📋 My Clinical Portfolio</h2>
+          <h2 className="text-lg font-black text-white uppercase italic tracking-tighter mb-8 bg-white/5 p-4 rounded-xl border border-white/5 inline-block">📋 My Medical History</h2>
           {cases.length === 0 ? (
-            <div className="py-20 text-center bg-gray-950/50 rounded-[3rem] border border-gray-900">
+            <div className="py-20 text-center bg-white/5 rounded-[3rem] border border-white/5">
                <div className="text-5xl mb-6 opacity-30">🏜️</div>
-               <p className="text-gray-500 text-sm italic font-medium"> No clinical nodes detected in your portfolio. <br/> <Link to="/cases/new" className="text-brand-400 font-bold underline mt-4 inline-block">Initialize your first case node →</Link></p>
+               <p className="text-gray-500 text-sm italic font-medium"> No clinical records found in your profile. <br/> <Link to="/cases/new" className="text-brand-400 font-bold underline mt-4 inline-block">Start your first consultation →</Link></p>
             </div>
           ) : (
             <ul className="space-y-4">
               {cases.map((c) => (
-                <li key={c._id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 p-6 rounded-2xl bg-gray-900 border border-gray-800 hover:border-brand-500/40 hover:bg-gray-850 transition-all group">
+                <li key={c._id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 p-6 rounded-2xl bg-white/5 border border-white/5 hover:border-brand-500/40 hover:bg-white/10 transition-all group">
                   <div>
                     <p className="font-black text-white text-xl italic tracking-tighter group-hover:text-brand-400 transition-colors uppercase leading-none">{c.caseCode}</p>
                     <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mt-2.5 opacity-60">
-                      {c.assignedSpecialty || 'Institutional Screening'} 
+                      {c.assignedSpecialty || 'General Screening'} 
                       {c.doctor && <span className="text-brand-500 ml-2 font-bold italic">· Dr. {c.doctor.fullName}</span>}
                     </p>
                   </div>
-                  <div className="flex items-center justify-between sm:justify-end gap-4 border-t sm:border-t-0 border-gray-800/50 pt-6 sm:pt-0">
+                  <div className="flex items-center justify-between sm:justify-end gap-4 border-t sm:border-t-0 border-white/5 pt-6 sm:pt-0">
                     <div className="flex gap-2">
                        <PriorityBadge priority={c.priority} />
                        <StatusBadge status={c.status} />
                     </div>
-                    <Link to={`/cases/${c._id}`} className="text-white text-[10px] font-black uppercase tracking-widest px-6 py-2.5 bg-gray-800 rounded-xl hover:bg-brand-600 transition-all shadow-lg active:scale-95">View Node →</Link>
+                    <Link to={`/cases/${c._id}`} className="text-white text-[10px] font-black uppercase tracking-widest px-6 py-2.5 bg-white/10 rounded-xl hover:bg-brand-600 transition-all shadow-lg active:scale-95">View Record →</Link>
                   </div>
                 </li>
               ))}
@@ -109,29 +109,29 @@ export default function PatientDashboard() {
           )}
         </div>
 
-        {/* Misconduct Oversight Section */}
+        {/* Advocacy Section */}
         {reports.length > 0 && (
           <div className="card mt-12 !p-4 sm:!p-8 border-t-4 border-t-brand-600">
-            <h2 className="text-lg font-black text-white uppercase italic tracking-tighter mb-8 bg-gray-900/50 p-4 rounded-xl border border-gray-800 inline-block">⚖️ Misconduct Oversight Hub</h2>
+            <h2 className="text-lg font-black text-white uppercase italic tracking-tighter mb-8 bg-white/5 p-4 rounded-xl border border-white/5 inline-block">⚖️ Patient Advocacy Center</h2>
             <div className="space-y-4">
               {reports.map((r) => (
-                <div key={r._id} className="p-6 rounded-2xl bg-gray-900 border border-gray-800">
+                <div key={r._id} className="p-6 rounded-2xl bg-white/5 border border-white/5">
                    <div className="flex justify-between items-start mb-4">
                       <div>
-                         <p className="text-white font-black uppercase tracking-widest text-xs mb-1">Target: Dr. {r.targetDoctor?.fullName}</p>
-                         <p className="text-gray-500 text-[10px] font-medium italic">Handled by: {r.escalationTarget || 'General Administration'}</p>
+                         <p className="text-white font-black uppercase tracking-widest text-xs mb-1">Clinic Participant: Dr. {r.targetDoctor?.fullName}</p>
+                         <p className="text-gray-500 text-[10px] font-medium italic">Handled by: {r.escalationTarget || 'System Administration'}</p>
                       </div>
                       <StatusBadge status={r.status} />
                    </div>
                    
-                   <p className="text-gray-300 text-sm mb-6 pb-6 border-b border-gray-800/50">
-                      <span className="text-brand-400 font-bold uppercase text-[10px] block mb-2 tracking-widest">Allegation:</span>
+                   <p className="text-gray-300 text-sm mb-6 pb-6 border-b border-white/5">
+                      <span className="text-brand-400 font-bold uppercase text-[10px] block mb-2 tracking-widest">Report Detail:</span>
                       "{r.description || r.reason}"
                    </p>
-
+ 
                    {r.resolution?.note && (
                      <div className="p-4 rounded-xl bg-brand-900/10 border border-brand-500/20">
-                        <p className="text-brand-400 font-black uppercase text-[10px] mb-2 tracking-widest leading-none">Statutory Review & Feedback:</p>
+                        <p className="text-brand-400 font-black uppercase text-[10px] mb-2 tracking-widest leading-none">Official Feedback:</p>
                         <p className="text-gray-200 text-sm italic font-medium">"{r.resolution.note}"</p>
                         <p className="text-gray-500 text-[9px] uppercase font-black mt-4">Resolved on: {new Date(r.resolution.resolvedAt).toLocaleDateString()}</p>
                      </div>
@@ -142,23 +142,23 @@ export default function PatientDashboard() {
           </div>
         )}
 
-        {/* ── IDENTITY ESCROW MANIFOLD ──────────────────────────────────────── */}
+        {/* Security Section */}
         <div className="card mt-12 !p-4 sm:!p-8 overflow-hidden relative">
            <div className="absolute top-0 right-0 w-32 h-32 bg-brand-500/5 rounded-full -translate-y-16 translate-x-16 border border-brand-500/10"></div>
            
            <h2 className="text-lg font-black text-white uppercase italic tracking-tighter mb-4 flex items-center gap-3">
-             <span className="w-8 h-8 rounded-lg bg-gray-900 border border-gray-800 flex items-center justify-center text-sm not-italic">🔑</span>
-             Identity Escrow Handshake
+             <span className="w-8 h-8 rounded-lg bg-gray-950 border border-white/5 flex items-center justify-center text-sm not-italic">🔑</span>
+             Account Security Backup
            </h2>
            <p className="text-gray-500 text-[11px] mb-8 font-medium max-w-xl leading-relaxed">
-             Initialize an industrial-grade backup of your cryptographic identity. This allows you to character-perfectly restore your access on new devices using a statutory recovery phrase.
+             Create a secure backup of your clinical identity. This allows you to safely restore your access on new devices using your security phrase.
            </p>
-
+ 
            <form onSubmit={handleIdentityBackup} className="max-w-md space-y-4">
               <div className="relative">
                  <input 
                    type="password" 
-                   placeholder="Enter Statutory Recovery Phrase..." 
+                   placeholder="Enter Security Recovery Phrase..." 
                    className="input !py-4 pr-12"
                    value={backupPhrase}
                    onChange={(e) => setBackupPhrase(e.target.value)}
@@ -172,19 +172,19 @@ export default function PatientDashboard() {
                 className="btn-primary !px-8 !py-4 text-[10px] font-black uppercase tracking-widest shadow-xl disabled:opacity-50"
                 disabled={isBackingUp || !backupPhrase}
               >
-                {isBackingUp ? 'Sealing Manifold…' : 'Seal Identity in Escrow →'}
+                {isBackingUp ? 'Securing Account…' : 'Secure My Identity Now →'}
               </button>
-
+ 
               {backupStatus && (
                 <div className={`mt-4 p-4 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all animate-in slide-in-from-top-2 ${backupStatus.success ? 'bg-brand-900/20 border-brand-500/30 text-brand-400' : 'bg-red-900/20 border-red-500/30 text-red-400'}`}>
                    {backupStatus.success ? '✓' : '🚨'} {backupStatus.message}
                 </div>
               )}
            </form>
-
-           <div className="mt-8 pt-8 border-t border-gray-900 flex items-center gap-3">
-              <span className="text-[9px] font-black text-gray-600 uppercase tracking-[0.2em]">Institutional Security Status:</span>
-              <span className="px-2 py-0.5 rounded bg-gray-900 border border-gray-800 text-gray-500 text-[8px] font-black uppercase">IDENTITY {user?.publicKey ? 'SYNCHRONIZED' : 'LOCAL-ONLY'}</span>
+ 
+           <div className="mt-8 pt-8 border-t border-white/5 flex items-center gap-3">
+              <span className="text-[9px] font-black text-gray-600 uppercase tracking-[0.2em]">Data Security Status:</span>
+              <span className="px-2 py-0.5 rounded bg-gray-950 border border-white/5 text-gray-500 text-[8px] font-black uppercase">IDENTITY {user?.publicKey ? 'ENCRYPTED & SYNCED' : 'LOCAL-ONLY'}</span>
            </div>
         </div>
       </div>
@@ -202,7 +202,7 @@ const StatCard = ({ label, value, color }) => (
     </div>
     <div>
       <p className="text-2xl font-bold text-white">{value}</p>
-      <p className="text-gray-400 text-sm">{label}</p>
+      <p className="text-gray-400 text-xs uppercase tracking-widest font-black">{label}</p>
     </div>
   </div>
 );
