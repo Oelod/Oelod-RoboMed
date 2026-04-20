@@ -19,54 +19,57 @@ import NotFoundPage      from './pages/NotFoundPage';
 import ProtectedRoute    from './components/ProtectedRoute';
 import GlobalNotifications from './components/GlobalNotifications';
 import GlobalSignalReceiver from './components/GlobalSignalReceiver';
-import Navbar from './components/Navbar';
 import RestorationOverlay from './components/RestorationOverlay';
+import DashboardLayout from './components/layout/DashboardLayout';
+import { Outlet } from 'react-router-dom';
 
 export default function App() {
   const { user } = useAuth();
 
   return (
     <div className="min-h-screen bg-gray-950 flex flex-col">
-      {/* <RestorationOverlay /> */}
       <GlobalNotifications />
       <GlobalSignalReceiver />
-      <Navbar />
       <div className="flex-1 overflow-auto">
         <Routes>
-        {/* Public */}
-      <Route path="/login"    element={<AuthPage mode="login" />} />
-      <Route path="/register" element={<AuthPage mode="register" />} />
-      <Route path="/forgot-password" element={<AuthPage mode="forgot" />} />
-      <Route path="/reset-password/:token" element={<AuthPage mode="reset" />} />
+          {/* Public Manifolds */}
+          <Route path="/login"    element={<AuthPage mode="login" />} />
+          <Route path="/register" element={<AuthPage mode="register" />} />
+          <Route path="/forgot-password" element={<AuthPage mode="forgot" />} />
+          <Route path="/reset-password/:token" element={<AuthPage mode="reset" />} />
 
-      {/* Patient */}
-      <Route path="/dashboard" element={
-        <ProtectedRoute roles={['patient', 'doctor', 'admin', 'lab', 'pharmacist']}>
-          {user?.activeRole === 'doctor' ? <DoctorDashboard /> :
-           user?.activeRole === 'admin'  ? <AdminDashboard />  :
-           user?.activeRole === 'lab'    ? <LabDashboard />    :
-           user?.activeRole === 'pharmacist' ? <PharmacyDashboard /> :
-                                           <PatientDashboard />}
-        </ProtectedRoute>
-      } />
-      <Route path="/admin"      element={<ProtectedRoute roles={['admin']}><AdminDashboard /></ProtectedRoute>} />
-      <Route path="/lab"        element={<ProtectedRoute roles={['lab', 'admin']}><LabDashboard /></ProtectedRoute>} />
-      <Route path="/pharmacy"   element={<ProtectedRoute roles={['pharmacist', 'admin']}><PharmacyDashboard /></ProtectedRoute>} />
-      <Route path="/admin/reports" element={<ProtectedRoute roles={['admin']}><AdminReportsPage /></ProtectedRoute>} />
-      <Route path="/cases/new" element={
-        <ProtectedRoute roles={['patient']}><NewCasePage /></ProtectedRoute>
-      } />
-      <Route path="/cases/:caseId" element={
-        <ProtectedRoute roles={['patient', 'doctor', 'admin']}><CaseDetailPage /></ProtectedRoute>
-      } />
-      <Route path="/search" element={
-        <ProtectedRoute roles={['patient', 'doctor', 'admin']}><SearchPage /></ProtectedRoute>
-      } />
+          {/* Sovereign Authenticated Manifolds */}
+          <Route element={<ProtectedRoute roles={['patient', 'doctor', 'admin', 'lab', 'pharmacist']}><DashboardLayout><Outlet /></DashboardLayout></ProtectedRoute>}>
+            <Route path="/dashboard" element={
+              user?.activeRole === 'doctor' ? <DoctorDashboard /> :
+              user?.activeRole === 'admin'  ? <AdminDashboard />  :
+              user?.activeRole === 'lab'    ? <LabDashboard />    :
+              user?.activeRole === 'pharmacist' ? <PharmacyDashboard /> :
+                                              <PatientDashboard />
+            } />
+            
+            <Route path="/admin"      element={<ProtectedRoute roles={['admin']}><AdminDashboard /></ProtectedRoute>} />
+            <Route path="/lab"        element={<ProtectedRoute roles={['lab', 'admin']}><LabDashboard /></ProtectedRoute>} />
+            <Route path="/pharmacy"   element={<ProtectedRoute roles={['pharmacist', 'admin']}><PharmacyDashboard /></ProtectedRoute>} />
+            <Route path="/admin/reports" element={<ProtectedRoute roles={['admin']}><AdminReportsPage /></ProtectedRoute>} />
+            
+            <Route path="/cases/new" element={
+              <ProtectedRoute roles={['patient']}><NewCasePage /></ProtectedRoute>
+            } />
+            
+            <Route path="/cases/:caseId" element={
+              <ProtectedRoute roles={['patient', 'doctor', 'admin']}><CaseDetailPage /></ProtectedRoute>
+            } />
+            
+            <Route path="/search" element={
+              <ProtectedRoute roles={['patient', 'doctor', 'admin']}><SearchPage /></ProtectedRoute>
+            } />
+          </Route>
 
-      {/* Default redirect */}
-      <Route path="/"  element={<Navigate to={user ? '/dashboard' : '/login'} replace />} />
-      <Route path="*"  element={<NotFoundPage />} />
-      </Routes>
+          {/* Terminal Redirects */}
+          <Route path="/"  element={<Navigate to={user ? '/dashboard' : '/login'} replace />} />
+          <Route path="*"  element={<NotFoundPage />} />
+        </Routes>
       </div>
     </div>
   );
