@@ -179,7 +179,7 @@ main {
   }
 
   .nav-item-active {
-    @apply bg-brand-500/10 text-brand-400 border border-brand-500/20 shadow-[0_0_20px_rgba(var(--brand-500),0.1)];
+    @apply bg-brand-500/10 text-brand-500 border border-brand-500/20 shadow-[0_0_20px_rgba(99,102,241,0.1)];
   }
 
   .nav-item-inactive {
