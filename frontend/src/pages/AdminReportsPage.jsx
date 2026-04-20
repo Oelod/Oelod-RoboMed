@@ -17,7 +17,7 @@ export default function AdminReportsPage() {
       const res = await getAllReports();
       setReports(res.data.reports);
     } catch (err) {
-      toast.error('Failed to load governance registry');
+      toast.error('Failed to load report list');
     } finally {
       setLoading(false);
     }
@@ -31,7 +31,7 @@ export default function AdminReportsPage() {
     setProcessingId(showResolveModal._id);
     try {
       await updateReportStatus(showResolveModal._id, resolveForm);
-      toast.success('Governance record character-perfectly updated.');
+      toast.success('Report updated successfully.');
       setShowResolveModal(null);
       fetchReports();
     } catch (err) {
@@ -41,14 +41,14 @@ export default function AdminReportsPage() {
     }
   };
 
-  if (loading) return <div className="p-8 text-center text-gray-500 font-bold uppercase tracking-widest animate-pulse">Syncing Governance Datastream...</div>;
+  if (loading) return <div className="p-8 text-center text-gray-500 font-bold uppercase tracking-widest animate-pulse">Syncing Reports...</div>;
 
   return (
     <div className="max-w-6xl mx-auto py-8 px-4">
       <div className="mb-12 flex flex-col md:flex-row justify-between items-start gap-6">
          <div>
-            <h1 className="text-4xl font-black text-white italic tracking-tighter uppercase mb-2">Institutional Misconduct Registry</h1>
-            <p className="text-gray-500 text-sm font-medium italic">High-fidelity oversight manifold for clinical conduct and patient safety allegations.</p>
+            <h1 className="text-4xl font-black text-white italic tracking-tighter uppercase mb-2">Clinical Misconduct Reports</h1>
+            <p className="text-gray-500 text-sm font-medium italic">Management center for reviewing staff conduct and patient safety reports.</p>
          </div>
          <button 
            onClick={() => navigate('/dashboard')}
@@ -121,7 +121,7 @@ export default function AdminReportsPage() {
 
                {report.adminNotes?.length > 0 && (
                   <div className="px-8 py-4 bg-gray-950/20 border-t border-gray-800">
-                     <span className="text-[9px] font-black text-gray-600 uppercase tracking-widest block mb-2">Internal Governance Logs</span>
+                     <span className="text-[9px] font-black text-gray-600 uppercase tracking-widest block mb-2">Internal Management Logs</span>
                      {report.adminNotes.map((n, i) => (
                         <p key={i} className="text-[11px] text-gray-400 italic mb-1 border-l border-gray-800 pl-3">"{n.note}"</p>
                      ))}
@@ -132,12 +132,12 @@ export default function AdminReportsPage() {
         )}
       </div>
 
-      {/* Governance Management Modal */}
+      {/* Management Modal */}
       {showResolveModal && (
          <div className="fixed inset-0 z-[60] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
             <div className="bg-gray-900 border border-brand-500/20 rounded-[2.5rem] p-8 w-full max-w-2xl shadow-2xl shadow-brand-900/20">
                <h2 className="text-2xl font-black text-white italic tracking-tighter uppercase mb-6 flex items-center gap-3">
-                 Manage Governance Record
+                 Manage Report Details
                </h2>
                
                <div className="grid sm:grid-cols-2 gap-6 mb-6">
@@ -175,7 +175,7 @@ export default function AdminReportsPage() {
                      <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest block mb-2">Internal Note (Private)</label>
                      <textarea 
                         className="w-full bg-gray-800 border border-gray-700 rounded-2xl px-4 py-3 text-sm text-white focus:border-brand-500 outline-none transition-all h-24 resize-none"
-                        placeholder="Add industrial internal note..."
+                        placeholder="Add internal administrative note..."
                         value={resolveForm.adminNote}
                         onChange={(e) => setResolveForm(prev => ({ ...prev, adminNote: e.target.value }))}
                      />
@@ -192,7 +192,7 @@ export default function AdminReportsPage() {
                </div>
 
                <div className="flex gap-4 mt-8">
-                  <button className="flex-1 btn-secondary" onClick={() => setShowResolveModal(null)} disabled={processingId}>Close Manifold</button>
+                  <button className="flex-1 btn-secondary" onClick={() => setShowResolveModal(null)} disabled={processingId}>Cancel</button>
                   <button 
                     disabled={processingId}
                     className="flex-1 bg-brand-600 hover:bg-brand-500 text-white font-black text-[10px] uppercase tracking-widest py-4 rounded-2xl transition-all" 

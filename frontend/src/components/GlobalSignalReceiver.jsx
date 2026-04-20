@@ -56,7 +56,6 @@ export default function GlobalSignalReceiver() {
     if (!socket || !connected) return;
 
     const handleIncoming = (data) => {
-       console.log('📞 [GlobalRegistry] Incoming Consult:', data);
        setIncomingCall(data);
        playRingTone();
        toast.success(`Statutory Consult: ${data.callerName}`, { 

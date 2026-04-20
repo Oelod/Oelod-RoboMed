@@ -302,7 +302,7 @@ export default function AdminDashboard() {
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                         <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]"></span>
                      </span>
-                     <h4 className="text-[10px] font-black text-red-500 uppercase tracking-[0.4em] italic">Critical Institutional Alerts</h4>
+                     <h4 className="text-[10px] font-black text-red-500 uppercase tracking-[0.4em] italic">Critical System Alerts</h4>
                   </div>
                   {pinnedAlerts.map(alert => (
                      <div key={alert._id} className="bg-red-500/10 border border-red-500/20 p-6 rounded-[2.5rem] flex justify-between items-center group hover:bg-red-500/15 transition-all shadow-xl shadow-red-500/5">
@@ -327,9 +327,9 @@ export default function AdminDashboard() {
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-10 mb-16 relative Governance-Header">
           <div>
             <h1 className="text-3xl font-bold text-white tracking-tight flex items-center gap-3">
-               Governance Board ⚖️
+               Administrative Oversight ⚖️
             </h1>
-            <p className="text-gray-500 mt-1">Institutional infrastructure and personnel oversight console.</p>
+            <p className="text-gray-500 mt-1">Management center for clinical staff and patient records.</p>
           </div>
           
           <div className="flex bg-gray-900 p-1 rounded-xl border border-gray-800 no-print flex-wrap">
@@ -361,30 +361,30 @@ export default function AdminDashboard() {
         {/* Stats Row - Admin/Super Admin Only */}
         {currentUser?.adminLevel > 1 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12 animate-in slide-in-from-top-4 duration-500 no-print">
-             <AdminStatCard label="Total Cases" value={statsData?.cases?.total?.[0]?.count || 0} icon="📝" />
-             <AdminStatCard label="Efficiency Index" value={`${Math.round((statsData?.cases?.avgConfidence?.[0]?.avg || 0) * 100)}%`} icon="⚡" />
-             <AdminStatCard label="Open Cases" value={statsData?.cases?.byStatus?.find(s => s._id === 'open')?.count || 0} icon="🔓" />
-             <AdminStatCard label="Closed Cases" value={statsData?.cases?.byStatus?.find(s => s._id === 'closed')?.count || 0} icon="✅" />
+             <AdminStatCard label="System Records" value={statsData?.cases?.total?.[0]?.count || 0} icon="📝" />
+             <AdminStatCard label="Performance Metrics" value={`${Math.round((statsData?.cases?.avgConfidence?.[0]?.avg || 0) * 100)}%`} icon="⚡" />
+             <AdminStatCard label="Active Consultations" value={statsData?.cases?.byStatus?.find(s => s._id === 'open')?.count || 0} icon="🔓" />
+             <AdminStatCard label="Resolved Records" value={statsData?.cases?.byStatus?.find(s => s._id === 'closed')?.count || 0} icon="✅" />
           </div>
         )}
 
         {/* Search Matrix */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12 no-print">
            <div className="card !p-4 sm:!p-5">
-              <p className="text-[9px] sm:text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2 sm:mb-3">Clinical Search</p>
+              <p className="text-[9px] sm:text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2 sm:mb-3">Patient Inquiry</p>
               <SearchBar placeholder="Symptoms or Diseases..." />
            </div>
            <div className="card !p-4 sm:!p-5">
-              <p className="text-[9px] sm:text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2 sm:mb-3">Record Locator</p>
+              <p className="text-[9px] sm:text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2 sm:mb-3">File Search</p>
               <SearchBar placeholder="Patient PID or Case ID..." />
            </div>
            <div className="card !p-4 sm:!p-5 md:col-span-2 lg:col-span-1">
-              <p className="text-[9px] sm:text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2 sm:mb-3">Security Audit Filter</p>
+              <p className="text-[9px] sm:text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2 sm:mb-3">Security Logs</p>
               <div className="relative">
                   <input 
                     type="text" 
                     className="input pr-10" 
-                    placeholder="Filter logs by protocol or operator..." 
+                    placeholder="Search logs by staff or action..." 
                     value={auditSearchTerm}
                     onChange={(e) => setAuditSearchTerm(e.target.value)}
                   />
@@ -396,7 +396,7 @@ export default function AdminDashboard() {
         {/* Dynamic Table Zone */}
         <div className="card !p-0 overflow-visible border-gray-800">
            <div className="px-8 py-5 border-b border-gray-800 bg-gray-900/50 flex flex-col md:flex-row justify-between items-center gap-6">
-              <h2 className="text-lg font-bold text-white capitalize">{activeTab} Datastream</h2>
+              <h2 className="text-lg font-bold text-white capitalize">{activeTab} Monitor</h2>
               <div className="flex gap-3 no-print">
                  <button onClick={activeTab === 'personnel' ? handleExportUsers : handleExportLogs} className="btn-secondary !py-2 !px-4 text-[10px] uppercase font-bold tracking-widest">⬇ Export CSV</button>
                  <button onClick={() => window.print()} className="btn-secondary !py-2 !px-4 text-[10px] uppercase font-bold tracking-widest">📄 Generate PDF</button>
@@ -601,7 +601,7 @@ export default function AdminDashboard() {
                    <div>
                       <h3 className="text-sm font-black text-blue-400 uppercase tracking-widest mb-4 flex items-center gap-2">
                          <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
-                         Active Clinical Pipeline
+                         Current Consultations
                       </h3>
                       <div className="bg-gray-950 border border-gray-800 rounded-2xl overflow-hidden">
                         <table className="w-full text-left">
@@ -616,7 +616,7 @@ export default function AdminDashboard() {
                            </thead>
                            <tbody className="divide-y divide-gray-800">
                                {allCasesData?.cases?.filter(c => c.status !== 'closed').length === 0 ? (
-                                  <tr><td colSpan="5" className="px-6 py-10 text-center text-gray-600 italic text-sm">No active cases in pipeline.</td></tr>
+                                  <tr><td colSpan="5" className="px-6 py-10 text-center text-gray-600 italic text-sm">No active consultations in pipeline.</td></tr>
                                ) : (
                                   allCasesData?.cases?.filter(c => c.status !== 'closed').map(c => (
                                      <tr key={c._id} className="hover:bg-gray-900 transition-colors group">
@@ -645,7 +645,7 @@ export default function AdminDashboard() {
                                              onClick={() => window.location.href=`/cases/${c._id}`}
                                              className="text-[10px] font-black uppercase text-gray-500 hover:text-white transition-colors"
                                            >
-                                             Inspect →
+                                             Review →
                                            </button>
                                         </td>
                                      </tr>
@@ -660,12 +660,12 @@ export default function AdminDashboard() {
                     <div className="space-y-6 pt-8 border-t border-gray-900 mt-12">
                         <h3 className="text-sm font-black text-red-500 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
                            <span className="w-2 h-2 bg-red-600 rounded-full animate-ping"></span>
-                           Institutional Flag & Governance Registry
+                           System Alerts & Management
                         </h3>
                         <div className="grid gap-4">
                            {allCasesData?.cases?.filter(c => c.status === 'flagged' || c.status === 'escalated' || c.status === 'resolved').length === 0 ? (
                               <div className="p-12 text-center bg-gray-950 border border-gray-800/50 rounded-[2rem]">
-                                 <p className="text-gray-600 italic text-sm">No institutional flags currently active in the clinical pipeline.</p>
+                                 <p className="text-gray-600 italic text-sm">No institutional alerts currently active in the clinical pipeline.</p>
                               </div>
                            ) : (
                               allCasesData?.cases?.filter(c => c.status === 'flagged' || c.status === 'escalated' || c.status === 'resolved').map(c => (
@@ -692,7 +692,7 @@ export default function AdminDashboard() {
                                       onClick={() => window.location.href=`/cases/${c._id}`}
                                       className={`btn-secondary !py-2 !px-6 text-[10px] font-black uppercase tracking-widest group-hover:bg-white group-hover:text-black transition-all ${c.status === 'resolved' ? '!bg-brand-600 !text-white' : ''}`}
                                     >
-                                      {c.status === 'resolved' ? 'Finalize Re-assign →' : 'Inspect →'}
+                                      {c.status === 'resolved' ? 'Finalize Re-assign →' : 'Review →'}
                                     </button>
                                  </div>
                               ))
@@ -704,7 +704,7 @@ export default function AdminDashboard() {
                    <div>
                       <h3 className="text-sm font-black text-green-500 uppercase tracking-widest mb-4 flex items-center gap-2">
                          <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                         Historical Archive
+                         Resolved Records Archive
                       </h3>
                       <div className="bg-gray-950 border border-gray-800 rounded-2xl overflow-hidden opacity-80">
                         <table className="w-full text-left">

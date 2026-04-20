@@ -57,7 +57,7 @@ export default function PharmacyDashboard() {
   if (loading && tab === 'queue' && queue.length === 0) return (
     <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center p-10">
        <div className="w-16 h-16 border-4 border-brand-500/20 border-t-brand-500 rounded-full animate-spin mb-6"></div>
-       <p className="text-[10px] font-black uppercase text-gray-500 tracking-[0.5em] animate-pulse">Initializing Pharmaceutical Terminal...</p>
+       <p className="text-[10px] font-black uppercase text-gray-500 tracking-[0.5em] animate-pulse">Setting up Pharmacy Workspace...</p>
     </div>
   );
 
@@ -65,12 +65,12 @@ export default function PharmacyDashboard() {
     <div className="min-h-screen bg-gray-950 p-6 lg:p-12 selection:bg-brand-500/30">
       <div className="max-w-7xl mx-auto">
         
-        {/* Institutional Header */}
+        {/* Pharmacy Header */}
         <div className="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-10 mb-10 sm:mb-16 pb-12 border-b border-gray-900">
            <div>
               <div className="flex items-center gap-3 mb-4">
                  <span className="w-3 h-3 bg-brand-500 rounded-full shadow-[0_0_15px_rgba(var(--brand-500),0.5)]"></span>
-                 <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.4em]">Medication Control Unit</span>
+                 <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.4em]">Medication Management</span>
               </div>
               <h1 className="text-4xl sm:text-5xl font-black text-white italic uppercase tracking-tighter">Pharmacy Console</h1>
               <p className="text-gray-500 mt-2 text-xs sm:text-sm font-medium">Pharmacist: <span className="text-gray-300 font-bold">{user.fullName}</span> · Station: Primary Dispensary</p>
@@ -110,7 +110,7 @@ export default function PharmacyDashboard() {
                    <div className="flex flex-col xl:flex-row justify-between gap-10 mb-10 pb-10 border-b border-gray-800/60 relative z-10">
                       <div className="flex flex-wrap gap-16">
                          <div className="min-w-[240px]">
-                           <span className="text-[10px] text-gray-600 font-black uppercase mb-3 block tracking-widest leading-none">Institutional Subject</span>
+                           <span className="text-[10px] text-gray-600 font-black uppercase mb-3 block tracking-widest leading-none">Patient Identity</span>
                            <h3 className="text-3xl font-black text-white italic uppercase tracking-tighter group-hover:text-brand-400 transition-colors">{rx.caseId?.patient?.fullName || 'N/A'}</h3>
                            <span className="text-[10px] text-gray-500 font-mono block mt-2 uppercase tracking-widest">PID: {rx.caseId?._id?.slice(-12).toUpperCase()}</span>
                          </div>
@@ -127,7 +127,7 @@ export default function PharmacyDashboard() {
                           disabled={processing}
                           className="btn-primary w-full xl:w-auto px-12 py-5 text-[10px] uppercase tracking-[0.2em] font-black shadow-2xl shadow-brand-900/20 active:scale-95 transition-all"
                         >
-                          {processing ? 'Processing Module...' : '✔ Verify & Dispense'}
+                          {processing ? 'Dispensing...' : '✔ Verify & Dispense'}
                         </button>
                       </div>
                    </div>
@@ -157,11 +157,11 @@ export default function PharmacyDashboard() {
                                   <button 
                                     onClick={() => handleItemUpdate(rx._id, index, 'dispensed')}
                                     className="flex-1 py-3 bg-brand-500 text-black text-[9px] font-black uppercase rounded-xl hover:bg-white transition-all"
-                                  >Dispense Unit</button>
+                                  >Dispense Medication</button>
                                   <button 
                                     onClick={() => handleItemUpdate(rx._id, index, 'external')}
                                     className="px-4 py-3 bg-gray-800 text-gray-400 text-[9px] font-black uppercase rounded-xl hover:bg-orange-500 hover:text-white transition-all"
-                                  >Source Out</button>
+                                  >External Fulfillment</button>
                                </div>
                             ) : (
                                <div className="pt-6 border-t border-gray-900 flex items-center gap-3">

@@ -46,7 +46,7 @@ export default function AuthPage({ mode = 'login' }) {
         await login(form.email, form.password);
       } else if (isForgot) {
         const res = await api.post('/auth/forgot-password', { email: form.email });
-        alert(`Institutional Handshake: If an account exists, instructions were broadcast. [Recovery Token: ${res.data.data.token}]`);
+        alert(`System Message: If an account exists, instructions were sent. [Recovery Token: ${res.data.data.token}]`);
         // Navigate for testing purposes if token is visible
       } else {
         // ... registration logic ...
@@ -88,10 +88,10 @@ export default function AuthPage({ mode = 'login' }) {
             </div>
           </div>
           <h1 className="text-3xl font-black text-white tracking-widest uppercase italic leading-none">OELOD</h1>
-          <p className="text-brand-500 font-bold text-[10px] uppercase tracking-[0.3em] mt-2">RoboMed System</p>
+          <p className="text-brand-500 font-bold text-[10px] uppercase tracking-[0.3em] mt-2">Healthcare Platform</p>
           <div className="w-12 h-0.5 bg-brand-500/30 mx-auto mt-6"></div>
           <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mt-6 opacity-40">
-            {isLogin ? 'Secure Access Terminal' : isForgot ? 'Recovery Manifold' : 'Institutional Onboarding'}
+            {isLogin ? 'System Login' : isForgot ? 'Password Recovery' : 'User Registration'}
           </p>
         </div>
 
@@ -107,7 +107,7 @@ export default function AuthPage({ mode = 'login' }) {
                 ) : (
                   <div className="flex flex-col items-center gap-1 opacity-40 group-hover:opacity-100 transition-opacity">
                     <span className="text-xl">📸</span>
-                    <span className="text-[8px] font-black uppercase text-gray-500">Identity Bio-Img</span>
+                    <span className="text-[8px] font-black uppercase text-gray-500">Profile Photo</span>
                   </div>
                 )}
                 <div className="absolute inset-0 bg-brand-600/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
@@ -150,7 +150,7 @@ export default function AuthPage({ mode = 'login' }) {
           <div className={`grid ${isLogin ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'} gap-6`}>
             {!isLogin && (
               <div className="md:col-span-2">
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Institutional Full Name</label>
+                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Full Legal Name</label>
                 <input name="fullName" type="text" placeholder="Johnathan Doe"
                   className="input py-3" value={form.fullName} onChange={handleChange} required={!isLogin} />
               </div>
@@ -210,20 +210,20 @@ export default function AuthPage({ mode = 'login' }) {
           </div>
 
           <button id="auth-submit" type="submit" className="btn-primary w-full py-4 text-xs font-black uppercase tracking-[0.2em] shadow-xl shadow-brand-600/20" disabled={loading}>
-            {loading ? 'Processing Node…' : isLogin ? 'Authenticate →' : 'Deploy Identity →'}
+            {loading ? 'Processing...' : isLogin ? 'Sign In →' : 'Register Account →'}
           </button>
         </form>
 
         <p className="text-center text-[10px] font-black uppercase tracking-widest text-gray-500 mt-8">
           {isLogin ? (
             <>
-              New to the platform? <a href="/register" className="text-brand-400 hover:text-brand-300 transition-colors border-b border-brand-400/30 pb-0.5">Begin Induction</a>
+              New to RoboMed? <a href="/register" className="text-brand-400 hover:text-brand-300 transition-colors border-b border-brand-400/30 pb-0.5">Register Here</a>
               <br/><br/>
-              <a href="/forgot-password" size="sm" className="text-gray-600 hover:text-gray-400 lowercase italic">Lost access manifold? Initialize Recovery →</a>
+              <a href="/forgot-password" size="sm" className="text-gray-600 hover:text-gray-400 lowercase italic">Forgot password? Reset access →</a>
             </>
           ) : (
             <a href="/login" className="text-brand-400 hover:text-brand-300 transition-colors border-b border-brand-400/30 pb-0.5">
-              {isForgot ? 'Return to Authentication Terminal' : 'Sign in to Terminal'}
+              {isForgot ? 'Return to Login' : 'Already have an account? Sign In'}
             </a>
           )}
         </p>

@@ -27,7 +27,6 @@ export function SocketProvider({ children }) {
 
     // Industrial Discovery: Hardcoding origin for absolute signaling reliability in development
     const socketUrl = 'http://localhost:5000';
-    console.log(`📡 [SocketRegistry] Initiating Handshake with: ${socketUrl}`);
     
     socketRef.current = io(socketUrl, {
       auth: { token: localStorage.getItem('token') },
@@ -36,12 +35,10 @@ export function SocketProvider({ children }) {
     });
 
     socketRef.current.on('connect', () => {
-      console.log('🚀 [SocketRegistry] Institutional Handshake Established:', socketRef.current.id);
       setConnected(true);
     });
 
     socketRef.current.on('disconnect', () => {
-      console.warn('⚠️ [SocketRegistry] Institutional Signal Lost');
       setConnected(false);
     });
 

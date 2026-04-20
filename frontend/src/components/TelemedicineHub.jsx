@@ -56,7 +56,7 @@ export default function TelemedicineHub({ caseId, targetUserId, isDoctor }) {
         gainNode.gain.exponentialRampToValueAtTime(0.01, now + 1);
       }, 2000);
       ringToneRef.current.interval = interval;
-    } catch (e) { console.warn('Audio handshake failed'); }
+    } catch (e) { /* Audio handshake handled silently */ }
   };
 
   const stopRingTone = () => {
@@ -72,8 +72,6 @@ export default function TelemedicineHub({ caseId, targetUserId, isDoctor }) {
     if (!socket || !connected) return;
 
     const handleIncoming = (data) => {
-       console.log('📞 [Telemed] Incoming Handshake:', data);
-       
        // Statutory Global Notification
        toast.success(`Institutional Consultation Request from ${data.callerName}. Please navigate to Case Reference ${data.caseId.slice(-8).toUpperCase()} to accept.`, { 
          duration: 10000,
@@ -98,7 +96,6 @@ export default function TelemedicineHub({ caseId, targetUserId, isDoctor }) {
     };
 
     const handleDisconnect = () => {
-       console.log('📡 [Telemed] Remote Signal Termination Detected');
        terminateCall(false);
     };
 
@@ -133,7 +130,6 @@ export default function TelemedicineHub({ caseId, targetUserId, isDoctor }) {
 
   const startCall = async () => {
     const target = String(targetUserId);
-    console.log(`🚀 [Telemed] Statutory Signal Handshake Triggered. Target: ${target}`);
     
     if (target === 'undefined' || !target) {
        return toast.error('Handshake Failure: Target Identity not yet inflated in Registry.');

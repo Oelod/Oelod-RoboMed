@@ -37,9 +37,9 @@ export default function NewCasePage() {
       <div className="card !p-6 sm:!p-10 border-brand-500/20 shadow-2xl relative overflow-hidden group">
         <div className="absolute top-0 right-0 w-32 h-32 bg-brand-500/5 rounded-bl-[4rem] group-hover:bg-brand-500/10 transition-all"></div>
         
-        <h1 className="text-2xl sm:text-3xl font-black text-white italic tracking-tighter uppercase mb-3">Initialize Clinical Node</h1>
+        <h1 className="text-2xl sm:text-3xl font-black text-white italic tracking-tighter uppercase mb-3">Start New Consultation</h1>
         <p className="text-gray-500 text-sm italic font-medium mb-10 leading-relaxed">
-          Detail institutional metrics below. Triage AI will perform real-time diagnostic mapping and specialist routing across the clinical matrix.
+          Provide clinical details below. Our Triage AI will analyze your symptoms to provide real-time assessment and specialist recommendations.
         </p>
 
         {error && (
@@ -50,7 +50,7 @@ export default function NewCasePage() {
 
         <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8 relative z-10">
           <div>
-            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Clinical Symptoms (Comma-Separated) <span className="text-brand-500">*</span></label>
+            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Symptoms (Comma-Separated) <span className="text-brand-500">*</span></label>
             <input
               type="text"
               className="input w-full !py-4"
@@ -59,14 +59,14 @@ export default function NewCasePage() {
               onChange={(e) => setSymptomsText(e.target.value)}
               required
             />
-            <p className="text-[9px] text-gray-600 font-bold uppercase mt-2 tracking-tighter">Enter high-fidelity symptoms for precise discovery intelligence mapping.</p>
+            <p className="text-[9px] text-gray-600 font-bold uppercase mt-2 tracking-tighter">List your symptoms clearly to help our AI provide a more accurate assessment.</p>
           </div>
 
           <div>
-            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Extended Clinical Observations (Optional)</label>
+            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Additional Details (Optional)</label>
             <textarea
               className="input w-full min-h-[160px] py-4 resize-none italic font-medium"
-              placeholder="Detail onset duration, institutional history, and secondary patterns..."
+              placeholder="Provide details such as when your symptoms started, your medical history, or any patterns you've noticed..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
@@ -78,7 +78,7 @@ export default function NewCasePage() {
               className="btn-primary w-full sm:w-auto px-10 py-4 text-xs font-black uppercase tracking-[0.2em] shadow-2xl shadow-brand-600/30 active:scale-95 transition-all"
               disabled={loading || !symptomsText.trim()}
             >
-              {loading ? 'Analyzing Matrix...' : 'Deploy Case Node →'}
+              {loading ? 'Analyzing Symptoms...' : 'Submit Consultation →'}
             </button>
             <button
               type="button"
@@ -86,7 +86,7 @@ export default function NewCasePage() {
               onClick={() => navigate('/dashboard')}
               disabled={loading}
             >
-              Abort Induction
+              Cancel
             </button>
           </div>
         </form>

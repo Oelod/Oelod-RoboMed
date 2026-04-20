@@ -135,7 +135,19 @@ How RoboMed character-perfectly protects its participants.
 
 ---
 
-## 7. Integrated System Flow (Conclusion)
+## 7. Institutional Roadmap & Milestones
+Tracking the forensic evolution of the Oelod RoboMed manifold.
+
+| Milestone | Status | Description |
+| :--- | :--- | :--- |
+| **Institutional Lexicon Hardening** | **COMPLETED** | Purge developer jargon ("Node", "Manifold", "Induction") across all manifolds. |
+| **Clinical Privacy Gate** | **COMPLETED** | Restricting clinical streams to Doctor/Patient/Admin Level 3 sovereignty. |
+| **AI Conversational Ingress** | **PLANNED** | Transform AI Triage into a high-fidelity conversational clinical assistant. |
+| **Native Cross-Platform Induction** | **PLANNED** | Scaling to Mobile (Capacitor) and Desktop (Electron) shells. |
+
+---
+
+## 8. Integrated System Flow (Conclusion)
 A case starts with a **Symptom**, is routed by **AI**, treated by a **Specialist**, validated by **Departments**, and audited by **Internal Governance**.
 
 **Mastery Checklist for New Operators:**

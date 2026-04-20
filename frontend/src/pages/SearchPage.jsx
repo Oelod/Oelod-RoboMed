@@ -56,8 +56,8 @@ export default function SearchPage() {
         {/* Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 mb-16">
           <div className="max-w-xl">
-            <h1 className="text-4xl font-black text-white italic uppercase tracking-tighter mb-4">Discovery Intelligence</h1>
-            <p className="text-gray-500 text-sm italic">Querying institutional medical history and clinical patterns across the platform.</p>
+            <h1 className="text-4xl font-black text-white italic uppercase tracking-tighter mb-4">Record Search</h1>
+            <p className="text-gray-500 text-sm italic">Search medical history and clinical records across the platform.</p>
           </div>
           <div className="w-full md:w-96">
             <SearchBar placeholder="Symptoms, IDs, or Practitioner Names..." />
@@ -67,7 +67,7 @@ export default function SearchPage() {
         {/* Filter Matrix */}
         <div className="flex flex-wrap gap-10 mb-12 pb-12 border-b border-gray-900">
            <div className="space-y-4">
-              <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest">Pipeline Status</p>
+              <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest">Status</p>
               <div className="flex gap-2">
                  {['open', 'assigned', 'closed', 'flagged'].map(s => (
                    <FilterBadge key={s} label={s} active={filters.status === s} onClick={() => updateFilters('status', s)} />
@@ -76,7 +76,7 @@ export default function SearchPage() {
            </div>
 
            <div className="space-y-4">
-              <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest">Clinical Priority</p>
+              <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest">Priority</p>
               <div className="flex gap-2">
                  {['low', 'medium', 'high', 'critical'].map(p => (
                    <FilterBadge key={p} label={p} active={filters.priority === p} onClick={() => updateFilters('priority', p)} />
@@ -99,21 +99,21 @@ export default function SearchPage() {
           {!queryStr ? (
             <div className="py-32 text-center opacity-30 select-none">
                <div className="text-6xl mb-6">👁️‍🗨️</div>
-               <p className="text-lg font-black text-white italic uppercase tracking-tighter">Enter criteria to begin Discovery</p>
+               <p className="text-lg font-black text-white italic uppercase tracking-tighter">Enter criteria to begin searching</p>
             </div>
           ) : (caseResults.length === 0 && userResults.length === 0 && !isLoading) ? (
             <div className="py-32 text-center bg-gray-900/20 border border-gray-800/50 rounded-[3rem]">
                <div className="text-4xl mb-4">🏜️</div>
-               <p className="text-gray-500 italic font-medium">No archived nodes match this intelligence matrix.</p>
+               <p className="text-gray-500 italic font-medium">No records found matching your search criteria.</p>
             </div>
           ) : (
             <div className="space-y-16">
               {/* --- Sector 1: Identified Profiles --- */}
-              {userResults.length > 0 && (
+               {userResults.length > 0 && (
                 <div className="space-y-8">
                   <div className="flex justify-between items-center">
                     <h2 className="text-xs font-black text-orange-500 uppercase tracking-[0.3em]">
-                       Verified Institutional Profiles ({userResults.length})
+                       Staff & Patient Profiles ({userResults.length})
                     </h2>
                     <div className="h-px bg-orange-500/20 flex-1 ml-6"></div>
                   </div>
@@ -138,11 +138,11 @@ export default function SearchPage() {
                 </div>
               )}
 
-              {/* --- Sector 2: Clinical Records --- */}
+               {/* --- Sector 2: Clinical Records --- */}
               <div className="space-y-8">
                 <div className="flex justify-between items-center">
                   <h2 className="text-xs font-black text-brand-400 uppercase tracking-[0.3em]">
-                    {isLoading ? 'Scanning Metrics...' : `Clinical History Nodes Identified (${caseResults.length})`}
+                    {isLoading ? 'Searching...' : `Clinical Records Found (${caseResults.length})`}
                   </h2>
                   <div className="h-px bg-gray-900 flex-1 ml-6"></div>
                 </div>

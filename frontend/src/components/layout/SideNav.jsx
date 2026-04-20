@@ -13,16 +13,16 @@ export default function SideNav({ isOpen, setIsOpen }) {
     { label: 'Medical Dashboard', path: '/dashboard', icon: '💎', roles: ['patient', 'doctor', 'admin', 'lab', 'pharmacist'] },
     { label: 'Patient Directory', path: '/search', icon: '👤', roles: ['doctor', 'admin'] },
     { label: 'Open Medical Case', path: '/cases/new', icon: '➕', roles: ['patient'] },
-    { label: 'Diagnostic Laboratory', path: '/lab', icon: '🔬', roles: ['lab', 'admin'] },
-    { label: 'Pharmacy Unit', path: '/pharmacy', icon: '💊', roles: ['pharmacist', 'admin'] },
-    { label: 'Clinical Analytics', path: '/admin/reports', icon: '📊', roles: ['admin'] },
+    { label: 'Laboratory', path: '/lab', icon: '🔬', roles: ['lab', 'admin'] },
+    { label: 'Pharmacy', path: '/pharmacy', icon: '💊', roles: ['pharmacist', 'admin'] },
+    { label: 'Reports & Analytics', path: '/admin/reports', icon: '📊', roles: ['admin'] },
   ];
 
   const filteredItems = navItems.filter(item => item.roles.includes(user?.activeRole));
 
   return (
     <>
-      {/* Mobile Overlay Manifold */}
+      {/* Mobile Menu Overlay */}
       {isOpen && (
         <div 
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] lg:hidden animate-fade-in"
@@ -35,7 +35,7 @@ export default function SideNav({ isOpen, setIsOpen }) {
         lg:translate-x-0 lg:static lg:block
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
-        {/* Brand Inception & Close Control */}
+        {/* Logo & Controls */}
         <div className="p-8 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 rounded-2xl bg-gray-900 border border-brand-500/30 flex items-center justify-center p-2 shadow-2xl shadow-brand-500/10">
@@ -55,7 +55,7 @@ export default function SideNav({ isOpen, setIsOpen }) {
           </button>
         </div>
 
-        {/* Nav Stream */}
+        {/* Navigation Menu */}
         <nav className="flex-1 px-4 py-4 space-y-2 overflow-y-auto scrollbar-hide">
           {filteredItems.map((item, idx) => (
             <Link
@@ -73,7 +73,7 @@ export default function SideNav({ isOpen, setIsOpen }) {
           ))}
         </nav>
 
-        {/* Clinical Footer */}
+        {/* User Controls */}
         <div className="p-6 border-t border-white/5 space-y-4">
           <button 
              onClick={logout}

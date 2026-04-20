@@ -11,7 +11,7 @@ export default function TopBar({ onMenuClick }) {
 
   return (
     <header className="h-20 glass border-b border-white/5 px-4 sm:px-8 flex items-center justify-between sticky top-0 z-40">
-      {/* Mobile Toggle & Brand Node */}
+      {/* Mobile Menu */}
       <div className="flex items-center gap-4 lg:hidden">
         <button 
           onClick={onMenuClick}
@@ -37,7 +37,7 @@ export default function TopBar({ onMenuClick }) {
          </div>
       </div>
 
-      {/* Identity & Actions Hub */}
+      {/* User Actions */}
       <div className="flex items-center gap-8">
         {/* Role Switcher */}
         {user?.roles && user.roles.length > 1 && (
@@ -58,7 +58,7 @@ export default function TopBar({ onMenuClick }) {
         <div className="flex items-center gap-6">
           <NotificationDrawer />
           
-          {/* User Manifold */}
+          {/* User Profile */}
           <div className="flex items-center gap-4 border-l border-white/5 pl-8">
             <div className="text-right hidden sm:flex flex-col">
               <span className="text-white font-black text-sm italic uppercase tracking-tighter leading-none">{user?.fullName}</span>

@@ -30,7 +30,7 @@ export default function ProfileSettingsModal({ isOpen, onClose }) {
 
     try {
       await api.patch('/auth/profile-picture', formData);
-      toast.success('Bio-Metric Avatar Updated');
+      toast.success('Profile Picture Updated');
       await refreshUser();
     } catch (err) {
       toast.error('Avatar Update Failed');
@@ -42,7 +42,7 @@ export default function ProfileSettingsModal({ isOpen, onClose }) {
     setLoading(true);
     try {
       await api.patch('/auth/profile', form);
-      toast.success('Professional Profile Synchronized');
+      toast.success('Profile Details Updated');
       await refreshUser();
       onClose();
     } catch (err) {
@@ -60,7 +60,7 @@ export default function ProfileSettingsModal({ isOpen, onClose }) {
             className="absolute top-8 right-8 text-gray-500 hover:text-white transition-colors"
           >✕</button>
 
-          <h2 className="text-2xl font-black text-white italic uppercase tracking-tighter mb-8">Personnel Profile Node</h2>
+          <h2 className="text-2xl font-black text-white italic uppercase tracking-tighter mb-8">Profile Settings</h2>
 
           <div className="flex flex-col items-center mb-10">
              <div 
@@ -73,16 +73,16 @@ export default function ProfileSettingsModal({ isOpen, onClose }) {
                   <span className="text-3xl font-black text-brand-400 uppercase italic">{user?.fullName?.charAt(0)}</span>
                 )}
                 <div className="absolute inset-0 bg-brand-600/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                   <span className="text-[10px] font-black text-white uppercase">Re-Scan</span>
+                   <span className="text-[10px] font-black text-white uppercase">Change</span>
                 </div>
              </div>
              <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
-             <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest mt-3 italic">Identity Matrix Hash: {user?._id?.slice(-8)}</p>
+             <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest mt-3 italic">User ID: {user?._id?.slice(-8)}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
              <div>
-                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Institutional Full Name</label>
+                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Full Name</label>
                 <input 
                   name="fullName" 
                   className="input py-3" 
@@ -92,7 +92,7 @@ export default function ProfileSettingsModal({ isOpen, onClose }) {
                 />
              </div>
              <div>
-                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Direct Contact Node (Phone)</label>
+                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Phone Number</label>
                 <input 
                   name="phoneNumber" 
                   className="input py-3" 
@@ -105,7 +105,7 @@ export default function ProfileSettingsModal({ isOpen, onClose }) {
              <div className="pt-4 flex gap-4">
                 <button type="button" onClick={onClose} className="btn-secondary flex-1 py-4 text-[10px] font-black uppercase tracking-widest">Cancel</button>
                 <button type="submit" disabled={loading} className="btn-primary flex-1 py-4 text-[10px] font-black uppercase tracking-widest shadow-xl shadow-brand-600/20">
-                   {loading ? 'Synchronizing...' : 'Apply Changes'}
+                   {loading ? 'Saving...' : 'Apply Changes'}
                 </button>
              </div>
           </form>

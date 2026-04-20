@@ -46,7 +46,7 @@ export default function DoctorDashboard() {
           <div className="card !p-4 sm:!p-6">
             <h2 className="text-lg font-black text-white uppercase italic tracking-tighter mb-6">📌 My Assigned Cases</h2>
             {assignedCases.length === 0 ? (
-              <p className="text-gray-500 text-sm italic text-center py-12 bg-gray-950/50 rounded-2xl border border-gray-900 leading-relaxed">Institutional node alert: <br/> No active clinical assignments detected.</p>
+              <p className="text-gray-500 text-sm italic text-center py-12 bg-gray-950/50 rounded-2xl border border-gray-900 leading-relaxed">Clinical workspace notice: <br/> No active clinical records found in your queue.</p>
             ) : (
               <ul className="space-y-4">
                 {assignedCases.map((c) => (
@@ -59,7 +59,7 @@ export default function DoctorDashboard() {
                       <span className={`badge ${c.priority === 'high' ? 'badge-high' : c.priority === 'medium' ? 'badge-medium' : 'badge-low'}`}>
                         {c.priority?.toUpperCase()}
                       </span>
-                      <Link to={`/cases/${c._id}`} className="btn-primary !px-6 py-2 py-2.5 text-[10px] uppercase font-black tracking-widest">Manage Node â†’</Link>
+                      <Link to={`/cases/${c._id}`} className="btn-primary !px-6 py-2 py-2.5 text-[10px] uppercase font-black tracking-widest">Manage Case →</Link>
                     </div>
                   </li>
                 ))}
@@ -71,10 +71,10 @@ export default function DoctorDashboard() {
           <div className="card !p-4 sm:!p-6 border-gray-800/50">
             <h2 className="text-lg font-black text-white uppercase italic tracking-tighter mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               🔓 Available Case Queue
-              <span className="text-[10px] font-black text-gray-600 uppercase tracking-[0.3em] font-normal">Matching specialty matrix</span>
+              <span className="text-[10px] font-black text-gray-600 uppercase tracking-[0.3em] font-normal">Relevant to your specialization</span>
             </h2>
             {openCases.length === 0 ? (
-              <p className="text-gray-500 text-sm italic text-center py-12 bg-gray-950/50 rounded-2xl border border-gray-900">No unassigned clinical nodes found.</p>
+              <p className="text-gray-500 text-sm italic text-center py-12 bg-gray-950/50 rounded-2xl border border-gray-900">No unassigned clinical cases found.</p>
             ) : (
               <ul id="case-queue-list" className="space-y-4">
                 {openCases.map((c) => (

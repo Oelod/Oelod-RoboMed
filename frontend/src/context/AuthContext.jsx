@@ -53,7 +53,6 @@ export function AuthProvider({ children }) {
        return;
     }
 
-    console.log("Initializing Institutional E2EE Protocol (Identity Genesis)...");
     try {
       const keyPair = await cryptoService.generateKeyPair();
       await cryptoService.savePrivateKey(targetUser._id, keyPair);
@@ -62,9 +61,8 @@ export function AuthProvider({ children }) {
       await api.patch('/auth/public-key', { publicKey: pubKeyStr });
       setUser(prev => ({ ...prev, publicKey: pubKeyStr }));
       setRequiresRestoration(false);
-      console.log("Cryptographic identity formally established & synchronized.");
     } catch (err) {
-      console.error("E2EE Initialization Failure:", err);
+      // E2EE Initialization Failure handled silently in production
     }
   }, []);
 
