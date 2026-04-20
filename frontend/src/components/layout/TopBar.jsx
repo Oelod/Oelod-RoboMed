@@ -5,14 +5,9 @@ import NotificationDrawer from '../NotificationDrawer';
 import ProfileSettingsModal from '../ProfileSettingsModal';
 
 export default function TopBar() {
-  const { user, logout, switchRole } = useAuth();
+  const { user, switchRole } = useAuth();
   const navigate = useNavigate();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-
-  const handleLogout = async () => {
-    await logout();
-    navigate('/login');
-  };
 
   return (
     <header className="h-20 glass border-b border-white/5 px-8 flex items-center justify-between sticky top-0 z-40">
@@ -73,14 +68,6 @@ export default function TopBar() {
                   </div>
                </div>
             </div>
-
-            <button 
-              onClick={handleLogout}
-              className="text-gray-600 hover:text-red-500 transition-all"
-              title="Terminal Shutdown"
-            >
-              <span className="text-xl">⏻</span>
-            </button>
           </div>
         </div>
       </div>

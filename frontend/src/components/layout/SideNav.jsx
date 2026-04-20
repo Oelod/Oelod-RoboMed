@@ -3,7 +3,7 @@ import { useAuth } from '../../hooks/useAuth';
 import logo from '../../assets/logo.png';
 
 export default function SideNav() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const location = useLocation();
 
   const isActive = (path) => location.pathname === path;
@@ -51,7 +51,15 @@ export default function SideNav() {
       </nav>
 
       {/* Institutional Footer */}
-      <div className="p-6 border-t border-white/5">
+      <div className="p-6 border-t border-white/5 space-y-4">
+        <button 
+           onClick={logout}
+           className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-red-500 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-all duration-300 group"
+        >
+          <span className="text-xl group-hover:rotate-12 transition-transform">⏻</span>
+          <span>Log Out System</span>
+        </button>
+
         <div className="bg-white/5 rounded-2xl p-4 border border-white/5">
             <div className="flex items-center gap-3 mb-2">
                 <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
