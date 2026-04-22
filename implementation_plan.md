@@ -684,3 +684,48 @@ When a clinical dataset becomes available:
 4. All Phase 3 tests still apply — raise accuracy threshold to ≥ 90% in `evaluate.py`
 5. Consider upgrading classifier to `GradientBoostingClassifier` or a lightweight BERT model for free-text symptom input
 6. No changes required to Flask API, Node.js integration, or frontend
+
+---
+
+## 8. Institutional Operational Audit & Simple User Guide
+> **Relatable Version** · **For Patients, Doctors, and Staff**
+
+This section explains every part of the RoboMed platform in simple words. We have removed the technical jargon so that all participants can understand exactly how to use the system.
+
+### **8.1 Global Navigation & Entry (The Front Desk)**
+It works just like a front desk at a real hospital.
+*   **Login**: If you already have an account, enter your details here to get in.
+*   **Register**: If you are new, fill in your name and choose your role (Patient, Doctor, etc.) to create your permanent record.
+*   **"Initialize Access"**: This simply means **"Log Me in."**
+
+### **8.2 For Patients (The Patient Dashboard)**
+Your personal health home where you manage your care.
+*   **"+ Start New Consultation"**: The main button to talk to the AI and find a doctor.
+*   **"My Medical History"**: A list of all your visits. Click **"View Record"** to see notes or chat with your doctor.
+*   **"Account Security Backup"**: Enter a secret phrase to make sure you can always get back into your account if you lose your phone.
+*   **O.V.R. Intake**: When starting a case, chat with the AI about your symptoms. Once finished, click **"Proceed to Specialist"** to see a human doctor.
+
+### **8.3 For Doctors (The Clinical Workspace)**
+Designed for fast and accurate patient management.
+*   **"My Assigned Cases"**: Your current patient "To-Do" list. Click **"Manage Case"** to start working.
+*   **"Available Case Queue"**: New patients waiting for a doctor. Click **"View & Accept"** to take on a new case.
+*   **"Search Bar"**: Find any patient or record instantly.
+
+### **8.4 The Clinical Command Center (Managing a Patient)**
+The main page where you talk to patients, view tests, and issue treatments.
+*   **"Flag Case"**: Used by doctors or admins to pause a case if something is wrong.
+*   **"Issue RX"**: Opens the form to write **Prescriptions**.
+*   **"Request Lab"**: Used when the doctor needs a **Blood Test** or X-ray.
+*   **"Safe Closure"**: Only clicked when treatment is finished. It saves the final summary and closes the file.
+*   **"Verify Resident Findings"**: Doctors click this to confirm they agree with the AI's first report.
+*   **"Telemedicine & Chat"**: Use the **"Start Call"** button for video visits or the chat box for messaging.
+*   **Voice Recorder**: Doctors can "talk" their notes, and the system types them out for the record.
+
+### **8.5 Back Office Staff (Lab & Pharmacy)**
+Specialized workspaces for staff running the underlying hospital services.
+*   **Lab Dashboard**: Technicians see a list of tests and use **"Submit Results"** to upload finding reports.
+*   **Pharmacy Dashboard**: Pharmacists see a list of medicine orders. They click **"Verify & Dispense"** to confirm you received your medicine.
+
+---
+
+**Protocol Note:** Every button click and action is recorded in the system's "Security Trace" (Audit Log) to ensure 100% legal and clinical safety.
