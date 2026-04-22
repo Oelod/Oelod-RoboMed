@@ -17,6 +17,9 @@
     "cloudinary": "^2.4.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
+    "csv-parse": "^6.2.1",
+    "csv-parser": "^3.2.0",
+    "csv-writer": "^1.6.0",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-async-errors": "^3.1.1",
@@ -54,5 +57,13 @@
     "testEnvironmentOptions": {
       "MONGOMS_DOWNLOAD_DIR": "./.mongoms"
     }
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "src/ai-experiment/data-vault/*",
+      "*.log",
+      "temp/*",
+      "data/*"
+    ]
   }
 }

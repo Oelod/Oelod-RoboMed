@@ -22,9 +22,29 @@ const updateReport = async (req, res) => {
   return res_.success(res, { report }, 'Institutional governance record updated.');
 };
 
+const exportVolumetricData = async (req, res) => {
+  const data = await reportService.getVolumetricData(req.query);
+  const csv = await require('../utils/reportGenerator').generateCaseVolumeReport(data);
+  
+  res.header('Content-Type', 'text/csv');
+  res.attachment(`RoboMed_Volumetric_Report_${new Date().toISOString().slice(0,10)}.csv`);
+  return res.send(csv);
+};
+
+const exportSpecialtyWorkload = async (req, res) => {
+  const data = await reportService.getSpecialtyWorkload();
+  const csv = await require('../utils/reportGenerator').generateSpecialtyWorkloadReport(data);
+  
+  res.header('Content-Type', 'text/csv');
+  res.attachment(`RoboMed_Workload_Report_${new Date().toISOString().slice(0,10)}.csv`);
+  return res.send(csv);
+};
+
 module.exports = {
   submitReport,
   getAllReports,
   getMyReports,
-  updateReport
+  updateReport,
+  exportVolumetricData,
+  exportSpecialtyWorkload
 };

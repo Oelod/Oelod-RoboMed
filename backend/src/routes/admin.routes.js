@@ -29,5 +29,6 @@ router.post('/ingest/doctors',           ingestionCtrl.ingestDoctors);
 router.get('/escalated-matters',         ctrl.getEscalatedCases);
 router.patch('/users/:userId/office',    ctrl.updateOffice);
 router.get('/governance-health',         ctrl.getGovernanceHealth);
+router.get('/export-research-vault',     ctrl.exportResearchData);
 
 module.exports = router;

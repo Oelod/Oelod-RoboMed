@@ -85,8 +85,33 @@ const updateReportStatus = async (adminId, reportId, payload) => {
   return report;
 };
 
+const getVolumetricData = async (filters = {}) => {
+  const query = {};
+  if (filters.status) query.status = filters.status;
+  if (filters.priority) query.priority = filters.priority;
+  if (filters.specialty) query.assignedSpecialty = filters.specialty;
+  
+  if (filters.start && filters.end) {
+    query.createdAt = { $gte: new Date(filters.start), $lte: new Date(filters.end) };
+  }
+
+  return await Case.find(query)
+    .populate('patient', 'email')
+    .populate('doctor', 'fullName')
+    .sort('-createdAt');
+};
+
+const getSpecialtyWorkload = async () => {
+    return await Case.aggregate([
+        { $group: { _id: '$assignedSpecialty', count: { $sum: 1 } } },
+        { $sort: { count: -1 } }
+    ]);
+};
+
 module.exports = {
   createReport,
   getReports,
-  updateReportStatus
+  updateReportStatus,
+  getVolumetricData,
+  getSpecialtyWorkload
 };

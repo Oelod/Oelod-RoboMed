@@ -1,5 +1,5 @@
 # Oelod RoboMed: Institutional Architectural Masterplan
-> **Status:** Senior Developer Authorized · **Revision:** 2026.04.19 · **Classification:** Sovereign Document
+> **Status:** Senior Developer Authorized · **Revision:** 2026.04.21 · **Classification:** Sovereign Document
 
 This masterplan provides a character-perfect "Forensic Audit" and Operational Guide for the Oelod RoboMed clinical manifold. It is designed to enable total mastery of the system's industrial logic.
 
@@ -35,12 +35,12 @@ graph LR
     Audit --> M
 ```
 
-### **Core Infrastructure Manifolds:**
-1.  **JWT Sovereignty**: The system uses **One-Time-Token Rotation (OTTR)** via `RefreshToken.js`. Every session handshake character-perfectly refreshes the access token, preventing clinical session hijacking.
-2.  **Redis Persistence**:
-    *   **Throttling**: `rate-limit-redis` character-perfectly prevents "DDoS Ingestion" at the API gate.
-    *   **Presence**: The `online_users` set character-perfectly tracks clinical availability in real-time.
-3.  **Atomic AI Swap**: The AI Node (Python) uses a staged buffer. New models are loaded into RAM before the global reference is character-perfectly swapped, ensuring zero-latency triage during updates.
+### **Core Infrastructure Components:**
+1.  **Secure Login Logic**: The system uses a **Continuous Protection Sequence**. Every time you use the app, your security key is automatically updated to prevent unauthorized access to medical records.
+2.  **High-Speed Traffic Control**:
+    *   **Throttling**: The system automatically blocks robotic or malicious spam to keep the server fast for real patients.
+    *   **Live Status**: We track which doctors and patients are online in real-time to ensure instant communication.
+3.  **Seamless AI Updates**: When we update the AI's medical knowledge, it happens in the background. The system swaps in the "New Brain" without ever having to turn off the service.
 
 ---
 
@@ -142,12 +142,44 @@ Tracking the forensic evolution of the Oelod RoboMed manifold.
 | :--- | :--- | :--- |
 | **Institutional Lexicon Hardening** | **COMPLETED** | Purge developer jargon ("Node", "Manifold", "Induction") across all manifolds. |
 | **Clinical Privacy Gate** | **COMPLETED** | Restricting clinical streams to Doctor/Patient/Admin Level 3 sovereignty. |
-| **AI Conversational Ingress** | **PLANNED** | Transform AI Triage into a high-fidelity conversational clinical assistant. |
+| **AI Conversational Ingress** | **COMPLETED** | Transform AI Triage into a high-fidelity conversational clinical assistant. |
+| **Generative Clinical Triage** | **COMPLETED** | Empowering O.V.R. with a Hybrid Gemini + Trained Model manifold. |
 | **Native Cross-Platform Induction** | **PLANNED** | Scaling to Mobile (Capacitor) and Desktop (Electron) shells. |
 
 ---
 
-## 8. Integrated System Flow (Conclusion)
+## 9. The O.V.R. Brain: High-Level Dialogue & Doctor Matching
+The Oelod Virtual Resident (O.V.R.) has been upgraded to a **Hybrid Intelligent System**. This means it talks like a human but thinks like a scientific machine.
+
+### **9.1 How the AI Logic Works**
+1.  **The Conversation Brain (Google Gemini 2.0)**:
+    *   This part handles the "Greeting" and "Friendly Talk." 
+    *   It listens with empathy, answers general questions, and makes the patient feel comfortable before the check-up begins.
+2.  **The Medical Brain (Custom-Trained Intelligence)**:
+    *   While you are chatting, this "Silent Brain" is constantly looking for medical symptoms. 
+    *   It uses the hospital's training data to mathematically calculate which doctor you need to see. It doesn't "guess"—it uses statistics to ensure you get matched with the right specialist.
+
+### **9.2 The "Clinical Gravity" Rule (Smart Timing)**
+To make sure patients don't spend too long chatting and get to see a doctor quickly, we have implemented the following rules:
+*   **The Polite Transition**: After 5 messages, the AI will naturally start guiding the conversation toward your health.
+*   **The Hard Switch**: If you haven't mentioned a symptom within 8 messages, the AI will politely pause the general chat and insist on starting your clinical check-in. This ensures no patient is ever "stuck" chatting while they need medical help.
+
+---
+
+## 11. The Institutional Research Vault (Automatic Archiving)
+We have established a **Private Research Vault** that automatically collects clinical data for future hospital study and AI improvement.
+
+### **11.1 How Data is Saved**
+*   **Automatic Archiving**: Every time a doctor closes a case and writes a summary, the system automatically saves a copy of the case details to the Vault.
+*   **Zero Patient Identity**: The system specifically **removes** names, phone numbers, and addresses. It only saves the Symptoms, the Diagnosis, Age, and Gender. This makes the data 100% safe and private for medical research.
+
+### **11.2 Access & Export**
+*   **Super Admin Only**: This vault is locked. Only the **Top Level Administrator (Super Admin)** can see this data.
+*   **One-Click Export**: The Super Admin can download this entire dataset as a file (CSV) to hand to government authorities or use to train the AI to be even smarter.
+
+---
+
+## 10. Integrated System Flow (Conclusion)
 A case starts with a **Symptom**, is routed by **AI**, treated by a **Specialist**, validated by **Departments**, and audited by **Internal Governance**.
 
 **Mastery Checklist for New Operators:**

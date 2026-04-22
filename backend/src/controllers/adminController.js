@@ -1,6 +1,7 @@
 const authService    = require('../services/authService');
 const userRepo       = require('../repositories/userRepository');
 const AuditLog       = require('../models/AuditLog');
+const AnonymizedCase = require('../models/AnonymizedCase');
 const res_           = require('../utils/apiResponse');
 const { generateCSV } = require('../utils/csvExport');
 
@@ -357,9 +358,37 @@ const downloadGovernanceReport = async (req, res) => {
   return res.send(csv);
 };
 
+/**
+ * GET /api/admin/reports/research-vault
+ * Exports the entire Anonymized Research Vault for clinical study.
+ * Access Level: Super Admin (L3)
+ */
+const exportResearchData = async (req, res) => {
+  if (req.user.adminLevel < 3) return res_.forbidden(res, 'Super Admin required for extraction of the Research Vault.');
+
+  const researchData = await AnonymizedCase.find().sort('-capturedAt');
+
+  const fields = [
+    { label: 'Capture Date', key: 'capturedAt' },
+    { label: 'Patient Age', key: 'age' },
+    { label: 'Gender', key: 'gender' },
+    { label: 'Symptoms Detected', key: 'symptoms' },
+    { label: 'Clinical Description', key: 'description' },
+    { label: 'Final Diagnosis', key: 'diagnosis' },
+    { label: 'Assigned Specialty', key: 'specialty' },
+    { label: 'Case Priority', key: 'priority' }
+  ];
+
+  const csv = generateCSV(researchData, fields);
+  
+  res.setHeader('Content-Type', 'text/csv');
+  res.setHeader('Content-Disposition', 'attachment; filename=RoboMed_Anonymized_Research_Vault.csv');
+  return res.send(csv);
+};
+
 module.exports = { 
   getUsers, getUserById, approveRole, rejectRole, updateRoles,
   suspendUser, activateUser, getStats, getAuditLog, getComplianceReport,
   getEscalatedCases, updateOffice, getGovernanceHealth, migrateData,
-  downloadGovernanceReport
+  downloadGovernanceReport, exportResearchData
 };

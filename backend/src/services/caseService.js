@@ -30,25 +30,26 @@ const getCases = async ({ userId, activeRole, specialization, status, search, pa
   const skip   = (page - 1) * limit;
   let filter   = {};
 
-  const User = require('../models/User');
-  const user = await User.findById(userId);
-
+  // role-based scaffolding
   if (activeRole === 'patient') {
     filter.patient = userId;
   } else if (activeRole === 'doctor') {
-    // Verified check
+    const User = require('../models/User');
+    const user = await User.findById(userId);
+    
     if (user?.status === 'pending') {
-      // Pending doctors only see cases they were ALREADY assigned to (unlikely but safe)
-      // and NOT the open queue
       filter.doctor = userId;
     } else {
+      // Logic: Assigned to me OR (Open AND matches my specialty)
+      const specArray = Array.isArray(specialization) ? specialization : (specialization ? [specialization] : user?.specialization || []);
       filter.$or = [
         { doctor: userId },
-        { status: 'open', assignedSpecialty: { $in: Array.isArray(specialization) ? specialization : [specialization] } },
+        { status: 'open', assignedSpecialty: { $in: specArray } },
       ];
     }
+  } else if (activeRole === 'admin') {
+    // Admins see everything by default
   }
-  // admin: no filter → sees all
 
   if (status) filter.status = status;
   if (search) filter.$text = { $search: search };
@@ -72,11 +73,17 @@ const getCaseById = async (caseId, userId, activeRole) => {
   if (!c) { const e = new Error('Case not found'); e.statusCode = 404; throw e; }
 
   // Access control
-  if (activeRole === 'patient' && c.patient._id.toString() !== userId.toString()) {
-    const e = new Error('Forbidden: You are not allowed to access this case'); e.statusCode = 403; throw e;
+  if (activeRole === 'patient') {
+    const patientId = c.patient?._id || c.patient;
+    if (!patientId || patientId.toString() !== userId.toString()) {
+      const e = new Error('Forbidden: You are not allowed to access this clinical record'); 
+      e.statusCode = 403; 
+      throw e;
+    }
   }
   
   if (activeRole === 'doctor') {
+    const doctorId = c.doctor?._id || c.doctor;
     // 1. Doctor is assigned to THIS case
     const isAssigned = c.doctor && c.doctor._id.toString() === userId.toString();
     // 2. Case is open in doctor's queue (visibility for acceptance)

@@ -13,6 +13,7 @@ import LabDashboard      from './pages/LabDashboard';
 import PharmacyDashboard from './pages/PharmacyDashboard';
 import AdminReportsPage from './pages/AdminReportsPage';
 import NotFoundPage      from './pages/NotFoundPage';
+import AiSandbox         from './ai-playground/AiSandbox';
 
 // Guards
 // Guards
@@ -36,6 +37,7 @@ export default function App() {
           <Route path="/register" element={<AuthPage mode="register" />} />
           <Route path="/forgot-password" element={<AuthPage mode="forgot" />} />
           <Route path="/reset-password/:token" element={<AuthPage mode="reset" />} />
+          <Route path="/ai-playground" element={<AiSandbox />} />
 
           {/* Sovereign Authenticated Manifolds */}
           <Route element={<ProtectedRoute roles={['patient', 'doctor', 'admin', 'lab', 'pharmacist']}><DashboardLayout /></ProtectedRoute>}>

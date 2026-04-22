@@ -1,0 +1,360 @@
+[
+  {
+    "timestamp": "2026-04-20T21:56:53.225Z",
+    "userName": "[DE-IDENTIFIED]",
+    "symptoms": [
+      "palpitations",
+      "fever"
+    ],
+    "focus": null,
+    "specialty": null,
+    "history": [
+      {
+        "role": "patient",
+        "text": "I'm feeling a bit tired, how are you?"
+      },
+      {
+        "role": "patient",
+        "text": "Nice weather we're having."
+      },
+      {
+        "role": "patient",
+        "text": "I have a fever and my heart is pounding."
+      },
+      {
+        "role": "patient",
+        "text": "I've had the fever for 5 days."
+      }
+    ],
+    "clerkshipData": {
+      "additionalNotes": "I've had the fever for 5 days."
+    }
+  },
+  {
+    "timestamp": "2026-04-20T22:18:54.881Z",
+    "userName": "[DE-IDENTIFIED]",
+    "symptoms": [
+      "headache",
+      "dizzy"
+    ],
+    "focus": "Hypertension",
+    "history": [
+      {
+        "role": "patient",
+        "text": "How is the weather?"
+      },
+      {
+        "role": "patient",
+        "text": "What is your philosophy on health?"
+      },
+      {
+        "role": "patient",
+        "text": "yes"
+      },
+      {
+        "role": "patient",
+        "text": "okay. I am a bit dizzy and feeling headache"
+      }
+    ],
+    "clerkshipData": {
+      "additionalNotes": "okay. I am a bit dizzy and feeling headache"
+    }
+  },
+  {
+    "timestamp": "2026-04-21T00:11:14.276Z",
+    "userName": "[DE-IDENTIFIED]",
+    "symptoms": [
+      "diabetic_neuropathy",
+      "anxiety",
+      "dyspnea",
+      "migraine",
+      "gastralgia",
+      "brachial_radiation",
+      "palpitations",
+      "angina",
+      "paresthesia"
+    ],
+    "focus": "Cardiology",
+    "specialty": null,
+    "history": [
+      {
+        "role": "patient",
+        "text": "Thank you. I am having hard in breathing"
+      },
+      {
+        "role": "patient",
+        "text": "It is chest pain"
+      },
+      {
+        "role": "patient",
+        "text": "It started 1 month ago"
+      },
+      {
+        "role": "patient",
+        "text": "The chest pain is very severe and hard"
+      }
+    ],
+    "clerkshipData": {
+      "additionalNotes": "The chest pain is very severe and hard"
+    }
+  },
+  {
+    "timestamp": "2026-04-21T01:14:38.408Z",
+    "userName": "[DE-IDENTIFIED]",
+    "symptoms": [],
+    "focus": null,
+    "specialty": null,
+    "history": [
+      {
+        "role": "patient",
+        "text": "I am very fine"
+      },
+      {
+        "role": "patient",
+        "text": "I am hungry"
+      },
+      {
+        "role": "patient",
+        "text": "chest pain"
+      },
+      {
+        "role": "patient",
+        "text": "It started 2 weeks ago"
+      },
+      {
+        "role": "patient",
+        "text": "having heard breathing too"
+      }
+    ],
+    "clerkshipData": {
+      "additionalNotes": "having heard breathing too"
+    }
+  },
+  {
+    "timestamp": "2026-04-21T02:33:08.777Z",
+    "userName": "[DE-IDENTIFIED]",
+    "symptoms": [
+      "good",
+      "evening",
+      "having",
+      "storng",
+      "headache"
+    ],
+    "focus": "Psoriasis",
+    "history": [
+      {
+        "role": "patient",
+        "text": "Good evening, OVR"
+      },
+      {
+        "role": "patient",
+        "text": "I am a having a storng headache"
+      }
+    ],
+    "clerkshipData": {
+      "additionalNotes": "I am a having a storng headache"
+    }
+  },
+  {
+    "timestamp": "2026-04-21T04:53:19.999Z",
+    "userName": "[DE-IDENTIFIED]",
+    "symptoms": [
+      "okay",
+      "broke",
+      "legs",
+      "been",
+      "paining",
+      "lethargy",
+      "blurry_vision",
+      "chronic_fatigue",
+      "insomnia"
+    ],
+    "focus": "Orthopedics",
+    "specialty": "Cardiology",
+    "history": [
+      {
+        "role": "patient",
+        "text": "Okay. I broke my legs, and it has been paining me"
+      },
+      {
+        "role": "patient",
+        "text": "Not really"
+      },
+      {
+        "role": "patient",
+        "text": "yes, small"
+      },
+      {
+        "role": "patient",
+        "text": "no"
+      }
+    ],
+    "clerkshipData": {
+      "radiating": false,
+      "shortnessOfBreath": true,
+      "sweating": false
+    }
+  },
+  {
+    "timestamp": "2026-04-21T05:01:53.716Z",
+    "userName": "[DE-IDENTIFIED]",
+    "symptoms": [
+      "feeling",
+      "very",
+      "dizzy",
+      "head",
+      "aches",
+      "time"
+    ],
+    "focus": "General Medicine",
+    "specialty": "ENT",
+    "history": [
+      {
+        "role": "patient",
+        "text": "I am feeling very dizzy, and my head aches big time"
+      },
+      {
+        "role": "patient",
+        "text": "just having dry throat"
+      }
+    ],
+    "clerkshipData": {
+      "additionalNotes": "just having dry throat"
+    }
+  },
+  {
+    "timestamp": "2026-04-21T05:27:07.207Z",
+    "userName": "[DE-IDENTIFIED]",
+    "symptoms": [
+      "feeling",
+      "very",
+      "feverish",
+      "since",
+      "last",
+      "week",
+      "body",
+      "with",
+      "head",
+      "aching",
+      "lethargy",
+      "chronic_fatigue",
+      "hyperthermia",
+      "myalgia",
+      "syncope"
+    ],
+    "focus": "Orthopedics",
+    "specialty": "Orthopedics",
+    "history": [
+      {
+        "role": "patient",
+        "text": "I am feeling very feverish since last week. And my body is very hot, with my head aching"
+      },
+      {
+        "role": "patient",
+        "text": "for like 7 days now"
+      },
+      {
+        "role": "patient",
+        "text": "my body is hot inside, but cold outside"
+      }
+    ],
+    "clerkshipData": {
+      "duration": false,
+      "additionalNotes": "my body is hot inside, but cold outside"
+    }
+  },
+  {
+    "timestamp": "2026-04-21T05:32:40.226Z",
+    "userName": "[DE-IDENTIFIED]",
+    "symptoms": [
+      "having",
+      "strong",
+      "fever",
+      "throat",
+      "dried",
+      "head",
+      "aches"
+    ],
+    "focus": "General Medicine",
+    "specialty": "General Medicine",
+    "history": [
+      {
+        "role": "patient",
+        "text": "I am having a strong fever. My throat is dried, and my head aches"
+      },
+      {
+        "role": "patient",
+        "text": "Its is making me tired"
+      }
+    ],
+    "clerkshipData": {
+      "additionalNotes": "Its is making me tired"
+    }
+  },
+  {
+    "timestamp": "2026-04-21T13:56:30.306Z",
+    "userName": "[DE-IDENTIFIED]",
+    "symptoms": [
+      "having",
+      "skin",
+      "ratches",
+      "feeling",
+      "very",
+      "feverish",
+      "lethargy",
+      "chronic_fatigue",
+      "diabetic_neuropathy",
+      "syncope",
+      "vertigo",
+      "paresthesia"
+    ],
+    "focus": "Orthopedics",
+    "specialty": "Orthopedics",
+    "clerkshipData": {
+      "duration": false,
+      "additionalNotes": "I feel dizzy and tired"
+    }
+  },
+  {
+    "timestamp": "2026-04-21T14:02:27.969Z",
+    "userName": "[DE-IDENTIFIED]",
+    "symptoms": [
+      "what",
+      "your",
+      "name"
+    ],
+    "focus": "General Medicine",
+    "specialty": "General Medicine",
+    "clerkshipData": {
+      "additionalNotes": "i said, what is your name"
+    }
+  },
+  {
+    "timestamp": "2026-04-21T15:13:14.023Z",
+    "userName": "[DE-IDENTIFIED]",
+    "symptoms": [
+      "angina",
+      "hyperthermia",
+      "palpitations",
+      "paresthesia",
+      "dyspnea",
+      "anxiety",
+      "gastralgia",
+      "lethargy",
+      "diabetic_neuropathy",
+      "migraine",
+      "brachial_radiation",
+      "copd",
+      "polyuria",
+      "chronic_fatigue",
+      "hypertension"
+    ],
+    "focus": "General Medicine",
+    "specialty": "Cardiology",
+    "clerkshipData": {
+      "undefined": "Alright..... I am feeling feverish and a very severe chest pain",
+      "radiating": false,
+      "shortnessOfBreath": true
+    }
+  }
+]

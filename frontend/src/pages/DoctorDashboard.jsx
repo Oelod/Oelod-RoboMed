@@ -1,11 +1,39 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
 import api from '../api/axiosInstance';
 import { useAuth } from '../hooks/useAuth';
 import SearchBar from '../components/SearchBar';
+import { toast } from 'react-hot-toast';
+import { io } from 'socket.io-client';
 
 export default function DoctorDashboard() {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
+  
+  // High-Fidelity Signal Receiver
+  useEffect(() => {
+    const socket = io(import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000');
+    
+    // Join the departmental manifold
+    if (user?.specialization) {
+      socket.emit('join_specialty', `specialty_${user.specialization}`);
+    }
+
+    socket.on('case_update', (data) => {
+       if (data.type === 'RESIDENT_CLERKSHIP_SEALED') {
+          toast.success(`🆘 NEW CLINICAL ENTRY: ${data.message}`, {
+             duration: 8000,
+             position: 'top-right',
+             style: { background: '#1e1b4b', color: '#818cf8', border: '1px solid #4338ca', fontWeight: 'bold' }
+          });
+          queryClient.invalidateQueries(['doctor-all-cases']);
+          queryClient.invalidateQueries(['dashboard-summary']);
+       }
+    });
+
+    return () => socket.disconnect();
+  }, [user, queryClient]);
   const { data: summary } = useQuery({
     queryKey: ['dashboard-summary'],
     queryFn: () => api.get('/dashboard/summary').then((r) => r.data.data),

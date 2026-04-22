@@ -435,7 +435,7 @@ export default function CaseDetailPage() {
           {medicalCase.governanceNotes?.length > 0 && (
             <div className="bg-gradient-to-br from-red-900/20 to-gray-900 border border-red-500/20 rounded-2xl p-6 shadow-xl shadow-red-900/5">
                <h2 className="text-sm font-black text-red-400 uppercase tracking-widest mb-6 flex items-center gap-2">
-                  <span className="animate-pulse text-lg">⚖️</span> Official Administration Notes
+                  <span className="animate-pulse text-lg">⚖️</span> Official Medical Notes
                </h2>
                <div className="space-y-6">
                   {medicalCase.governanceNotes.map((note, idx) => (
@@ -470,11 +470,78 @@ export default function CaseDetailPage() {
                 </div>
               </div>
               <div>
-                <h3 className="text-sm font-medium text-gray-500 mb-1">Description</h3>
+                <h3 className="text-sm font-medium text-gray-500 mb-1">Description (Raw)</h3>
                 <p className="text-gray-300 whitespace-pre-wrap">{medicalCase.description || 'No additional description provided.'}</p>
               </div>
             </div>
           </div>
+
+          {medicalCase.residentClerkship && (
+            <div className="bg-gradient-to-br from-brand-900/10 to-gray-900 border border-brand-500/30 rounded-2xl p-8 relative overflow-hidden shadow-2xl shadow-brand-900/5">
+               <div className="absolute top-0 right-0 p-4 opacity-5">🏛️</div>
+               <div className="flex items-center justify-between mb-8">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-brand-500/10 flex items-center justify-center text-brand-400 text-xl border border-brand-500/20">📋</div>
+                    <div>
+                      <h2 className="text-xl font-black text-white italic uppercase tracking-tighter">Medical Report (Virtual Resident)</h2>
+                      <p className="text-[10px] text-brand-500 font-bold uppercase tracking-widest leading-none mt-1">Clinical Summary & Observations</p>
+                    </div>
+                  </div>
+                  {isAssignedToMe && medicalCase.status !== 'closed' && (
+                    <button 
+                      className="px-6 py-2 bg-brand-600 text-black text-[10px] font-black uppercase rounded-full hover:bg-white hover:text-black transition-all shadow-lg shadow-brand-500/10"
+                      onClick={() => alert('Clinical Concurrence Recorded: O.V.R. findings have been verified by Attending.')}
+                    >
+                      Verify Resident Findings ✓
+                    </button>
+                  )}
+               </div>
+
+               {medicalCase.residentClerkship.assessment.confidenceLevel.toLowerCase().includes('low') && (
+                 <div className="mb-8 p-4 bg-red-500/10 border border-red-500/30 rounded-2xl flex items-center gap-4 animate-pulse">
+                    <span className="text-xl">⚠️</span>
+                    <p className="text-[10px] font-black text-red-400 uppercase tracking-widest">Medical Note: Specialist review recommended for this case.</p>
+                 </div>
+               )}
+
+               <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                  <div className="space-y-6">
+                     <div>
+                        <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3">Initial Assessment</h4>
+                        <div className="p-4 bg-gray-950 border border-gray-800 rounded-2xl">
+                           <p className="text-sm font-bold text-white mb-1 uppercase italic">{medicalCase.residentClerkship.assessment.primaryFocus}</p>
+                           <p className="text-[10px] text-brand-400 font-black uppercase tracking-widest mb-3">Confidence: {medicalCase.residentClerkship.assessment.confidenceLevel}</p>
+                           <p className="text-[12px] text-gray-400 leading-relaxed italic">"{medicalCase.residentClerkship.patientExplanation}"</p>
+                        </div>
+                     </div>
+                     <div>
+                        <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3">Patient Medical History</h4>
+                        <div className="flex flex-wrap gap-2 text-[10px]">
+                            {medicalCase.residentClerkship.history.map((h, i) => (
+                              <span key={i} className="px-3 py-1 bg-gray-800/50 border border-gray-800 text-gray-400 font-bold uppercase rounded-lg">{h}</span>
+                            ))}
+                        </div>
+                     </div>
+                  </div>
+
+                  <div className="space-y-6">
+                     <div>
+                        <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3">Resident's Internal Note</h4>
+                        <div className="p-5 bg-brand-500/5 border border-brand-500/10 rounded-2xl">
+                           <p className="text-xs text-brand-300 leading-relaxed font-medium">"{medicalCase.residentClerkship.residentNote}"</p>
+                        </div>
+                     </div>
+                     <div className="flex flex-col gap-2">
+                        <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Official Verification</h4>
+                        <div className="flex justify-between items-center bg-gray-950 px-4 py-2 rounded-xl border border-gray-800">
+                           <span className="text-[8px] font-mono text-gray-600">SEALED_{new Date(medicalCase.residentClerkship.sealedAt).getTime()}</span>
+                           <span className="text-[8px] font-black text-green-500 uppercase">Verified</span>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+          )}
 
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
             <h2 className="text-lg font-semibold text-white mb-4 flex items-center justify-between">
@@ -499,7 +566,6 @@ export default function CaseDetailPage() {
             ) : <p className="text-gray-500 text-sm italic">No records attached.</p>}
           </div>
 
-          {/* Pharmacological & Laboratory Zone */}
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
             <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
               <span className="text-brand-400">🔬</span> Laboratory & Tests
@@ -568,9 +634,8 @@ export default function CaseDetailPage() {
             <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
               <span className="text-brand-400">💊</span> Active Prescriptions
             </h2>
-            {prescriptions.filter(rx => rx.isActive).length === 0 ? (
               <div className="p-8 border-2 border-dashed border-gray-800 rounded-2xl text-center text-gray-500 text-sm font-bold uppercase tracking-widest">
-                No Pharamacological Instructions
+                No active medication orders
               </div>
             ) : (
               <div className="grid gap-6">
@@ -709,6 +774,51 @@ export default function CaseDetailPage() {
             {/* Real-time Chat Panel */}
           {medicalCase.doctor && (
             <ChatPanel caseId={caseId} status={medicalCase.status} />
+          )}
+
+          {medicalCase.residentClerkship && (
+            <div className="bg-gradient-to-br from-indigo-950/40 to-gray-900 border border-indigo-500/30 rounded-[2.5rem] p-8 shadow-2xl shadow-indigo-900/10 relative overflow-hidden group">
+               <div className="absolute -top-10 -right-10 w-40 h-40 bg-indigo-500/5 rounded-full blur-3xl group-hover:bg-indigo-500/10 transition-all"></div>
+               
+               <div className="flex items-center gap-4 mb-8">
+                  <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-2xl border border-indigo-500/20 shadow-inner">👨‍⚕️</div>
+                  <div>
+                    <h2 className="text-xl font-black text-white italic tracking-tighter uppercase leading-none">O.V.R. Clerkship</h2>
+                    <p className="text-[10px] text-indigo-400 font-bold uppercase tracking-[0.2em] mt-1 italic">Institutional Entry #{medicalCase._id.slice(-6)}</p>
+                  </div>
+               </div>
+
+               <div className="space-y-8">
+                  <div>
+                    <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3 italic">Clinical Findings</h3>
+                    <div className="space-y-2">
+                       {Object.entries(medicalCase.residentClerkship.findings || {}).map(([key, val], idx) => (
+                         <div key={idx} className="flex justify-between items-center py-2 border-b border-white/5">
+                            <span className="text-xs text-gray-400 font-medium capitalize">{key.replace(/([A-Z])/g, ' $1')}</span>
+                            <span className="text-xs text-white font-bold">{val === true ? 'Yes' : val === false ? 'No' : val}</span>
+                         </div>
+                       ))}
+                    </div>
+                  </div>
+
+                  <div className="p-6 bg-indigo-500/5 rounded-3xl border border-indigo-500/10">
+                    <h3 className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-3 italic">Professional Assessment</h3>
+                    <p className="text-sm text-gray-300 font-medium leading-relaxed italic">"{medicalCase.residentClerkship.assessment?.primaryFocus}: {medicalCase.residentClerkship.residentNote}"</p>
+                  </div>
+
+                  <div className="pt-4 border-t border-white/5">
+                    <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4 italic">Patient Explanation</h3>
+                    <div className="p-6 bg-gray-950/50 rounded-3xl border border-white/5">
+                      <p className="text-xs text-gray-400 font-medium leading-relaxed">{medicalCase.residentClerkship.patientExplanation}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between items-center opacity-40 grayscale hover:grayscale-0 transition-all cursor-default">
+                     <span className="text-[8px] font-black text-gray-500 uppercase tracking-widest leading-none italic">Sealed by Oelod Resident Protocol 01-B</span>
+                     <span className="text-[8px] font-black text-gray-500 uppercase tracking-widest leading-none">Status: VERIFIED</span>
+                  </div>
+               </div>
+            </div>
           )}
 
           {medicalCase.aiPrediction && (

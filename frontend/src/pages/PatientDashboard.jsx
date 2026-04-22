@@ -24,7 +24,7 @@ export default function PatientDashboard() {
         setBackupStatus({ success: true, message: 'Account security key securely backed up.' });
         setBackupPhrase('');
      } catch (err) {
-        setBackupStatus({ success: false, message: 'Security Handshake Failed: System connection interrupted.' });
+        setBackupStatus({ success: false, message: 'Secure connection failed: System interrupted.' });
      } finally {
         setIsBackingUp(false);
      }
@@ -118,7 +118,7 @@ export default function PatientDashboard() {
                 <div key={r._id} className="p-6 rounded-2xl bg-white/5 border border-white/5">
                    <div className="flex justify-between items-start mb-4">
                       <div>
-                         <p className="text-white font-black uppercase tracking-widest text-xs mb-1">Clinic Participant: Dr. {r.targetDoctor?.fullName}</p>
+                         <p className="text-white font-black uppercase tracking-widest text-xs mb-1">Doctor: Dr. {r.targetDoctor?.fullName}</p>
                          <p className="text-gray-500 text-[10px] font-medium italic">Handled by: {r.escalationTarget || 'System Administration'}</p>
                       </div>
                       <StatusBadge status={r.status} />
@@ -131,7 +131,7 @@ export default function PatientDashboard() {
  
                    {r.resolution?.note && (
                      <div className="p-4 rounded-xl bg-brand-900/10 border border-brand-500/20">
-                        <p className="text-brand-400 font-black uppercase text-[10px] mb-2 tracking-widest leading-none">Official Feedback:</p>
+                        <p className="text-brand-400 font-black uppercase text-[10px] mb-2 tracking-widest leading-none">Result:</p>
                         <p className="text-gray-200 text-sm italic font-medium">"{r.resolution.note}"</p>
                         <p className="text-gray-500 text-[9px] uppercase font-black mt-4">Resolved on: {new Date(r.resolution.resolvedAt).toLocaleDateString()}</p>
                      </div>

@@ -10,14 +10,23 @@ const labRequestSchema = new mongoose.Schema(
       enum: ['routine', 'urgent', 'stat'],
       default: 'routine',
     },
-    notes: { type: String, default: '' },
+    notes: { 
+      type: String, 
+      default: '',
+      set: v => require('../utils/crypto').encrypt(v),
+      get: v => require('../utils/crypto').decrypt(v)
+    },
     status: {
       type: String,
       enum: ['pending', 'completed', 'cancelled'],
       default: 'pending',
     },
   },
-  { timestamps: true }
+  { 
+    timestamps: true,
+    toJSON: { getters: true },
+    toObject: { getters: true }
+  }
 );
 
 const LabRequest = mongoose.model('LabRequest', labRequestSchema);

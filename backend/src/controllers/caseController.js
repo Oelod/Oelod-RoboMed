@@ -1,5 +1,8 @@
 const caseService = require('../services/caseService');
 const res_        = require('../utils/apiResponse');
+const User        = require('../models/User');
+const AnonymizedCase = require('../models/AnonymizedCase');
+const Case        = require('../models/Case');
 
 // POST /api/cases
 const createCase = async (req, res) => {
@@ -41,9 +44,11 @@ const getCaseById = async (req, res) => {
     actorId: req.user._id,
     action: 'PHI_ACCESS',
     targetId: c._id,
+    targetType: 'Case',
+    phiAccessed: true,
     metadata: {
       userId: req.user._id,
-      patientId: c.patient,
+      patientId: c.patient?._id || c.patient,
       accessRole: req.user.activeRole
     }
   });
@@ -62,6 +67,24 @@ const acceptCase = async (req, res) => {
 const closeCase = async (req, res) => {
   if (req.user.activeRole !== 'doctor') return res_.forbidden(res, 'Only doctors can close cases');
   const c = await caseService.closeCase(req.params.caseId, req.user._id, req.body.summary);
+  
+  // --- Institutional Research Vault Handshake (Automatic Anonymization) ---
+  try {
+     const patient = await User.findById(c.patient);
+     await AnonymizedCase.create({
+        age: patient.age || 0,
+        gender: patient.gender || 'unknown',
+        description: c.description,
+        symptoms: c.symptoms,
+        diagnosis: req.body.summary, // The doctor's final summary acts as the diagnosis
+        specialty: c.assignedSpecialty,
+        priority: c.priority
+     });
+     console.log(`[ResearchVault] Case ${c._id} successfully archived for clinical study.`);
+  } catch (err) {
+     console.error('[ResearchVault] Failed to archive anonymized case:', err.message);
+  }
+
   return res_.success(res, { case: c }, 'Case closed successfully');
 };
 

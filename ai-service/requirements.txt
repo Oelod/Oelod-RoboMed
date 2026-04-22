@@ -11,3 +11,6 @@ python-dotenv
 SpeechRecognition
 google-cloud-speech
 pydub
+sentence-transformers
+torch
+google-generativeai

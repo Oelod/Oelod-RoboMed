@@ -86,7 +86,8 @@ const login = async ({ email, password }) => {
     roles: [...user.roles], 
     activeRole: user.activeRole, 
     specialization: [...user.specialization], 
-    adminLevel: user.adminLevel || 0 
+    adminLevel: user.adminLevel || 0,
+    mustChangePassword: user.mustChangePassword
   };
   const accessToken  = generateAccessToken(tokenPayload);
   const refreshToken = generateRefreshToken({ _id: user._id });
@@ -308,9 +309,35 @@ const resetPassword = async (token, newPassword) => {
   user.password = newPassword;
   user.passwordResetToken = undefined;
   user.passwordResetExpires = undefined;
+  user.mustChangePassword = false; // Reset flag if it was set
   await user.save();
 
   await AuditLog.create({ actorId: user._id, action: 'password_reset', targetId: user._id });
+  return user;
+};
+
+const changePassword = async (userId, oldPassword, newPassword) => {
+  const user = await userRepo.findById(userId, true);
+  if (!user) throw new Error('Identity not found');
+
+  const isMatch = await user.comparePassword(oldPassword);
+  if (!isMatch) {
+    const err = new Error('Verification Failure: Incorrect current password.');
+    err.statusCode = 401;
+    throw err;
+  }
+
+  user.password = newPassword;
+  user.mustChangePassword = false; // Primary target reached: Clearing the rotation requirement
+  await user.save();
+
+  await AuditLog.create({ 
+    actorId: userId, 
+    action: 'password_change', 
+    targetId: userId,
+    note: 'Mandatory rotation character-perfectly completed'
+  });
+
   return user;
 };
 
@@ -337,6 +364,7 @@ module.exports = {
   registerPublicKey,
   forgotPassword, 
   resetPassword,
+  changePassword,
   backupIdentity,
   restoreIdentity
 };

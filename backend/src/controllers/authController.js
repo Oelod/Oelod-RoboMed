@@ -117,6 +117,16 @@ const resetPassword = async (req, res) => {
   return res_.success(res, null, 'Clinical manifold character-perfectly resealed with new credentials.');
 };
 
+const changePassword = async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+  if (!oldPassword || !newPassword) {
+    return res_.error(res, 'Institutional Error: Both current and new credentials are required.', 400);
+  }
+
+  await authService.changePassword(req.user._id, oldPassword, newPassword);
+  return res_.success(res, null, 'Institutional password character-perfectly rotated. Mandatory security flag cleared.');
+};
+
 const backupIdentity = async (req, res) => {
   const escrow = await authService.backupIdentity(req.user._id, req.body);
   return res_.success(res, { escrow }, 'Institutional identity backup character-perfectly sealed.');
@@ -140,6 +150,7 @@ module.exports = {
   getPublicKey,
   forgotPassword,
   resetPassword,
+  changePassword,
   backupIdentity,
   restoreIdentity
 };

@@ -18,6 +18,16 @@ const aiPredictionSchema = new mongoose.Schema({
   latency_ms: Number,
 }, { _id: false });
 
+const residentClerkshipSchema = new mongoose.Schema({
+  title: String,
+  history: [String],
+  findings: mongoose.Schema.Types.Mixed,
+  assessment: mongoose.Schema.Types.Mixed,
+  residentNote: String,
+  patientExplanation: String,
+  sealedAt: { type: Date, default: Date.now }
+}, { _id: false });
+
 const caseSchema = new mongoose.Schema(
   {
     caseCode: { type: String, unique: true },
@@ -26,7 +36,12 @@ const caseSchema = new mongoose.Schema(
     doctor: { type: mongoose.Schema.Types.ObjectId, ref: 'User', index: true },
 
     symptoms: { type: [String], required: [true, 'At least one symptom is required'] },
-    description: { type: String, default: '' },
+    description: { 
+      type: String, 
+      default: '',
+      set: v => require('../utils/cryptoField').encrypt(v),
+      get: v => require('../utils/cryptoField').decrypt(v)
+    },
 
     attachments: [{
       fileUrl: String,
@@ -43,6 +58,7 @@ const caseSchema = new mongoose.Schema(
     }],
 
     aiPrediction: { type: aiPredictionSchema, default: null },
+    residentClerkship: { type: residentClerkshipSchema, default: null },
 
     // Priority stored as lowercase for consistency with DB; AI returns uppercase
     priority: {
@@ -73,7 +89,11 @@ const caseSchema = new mongoose.Schema(
 
     timeline: [timelineEventSchema],
   },
-  { timestamps: true }
+  { 
+    timestamps: true,
+    toJSON: { getters: true },
+    toObject: { getters: true }
+  }
 );
 
 // ── Auto-generate caseCode before first save ──────────────────────────────────

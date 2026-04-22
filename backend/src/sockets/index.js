@@ -42,8 +42,13 @@ module.exports = (io) => {
     socket.join(userIdString);
     
     if (socket.user.roles.includes('doctor')) {
-      socket.on('join_specialty', (specialty) => {
-        if (specialty) socket.join(`specialty_${specialty}`);
+      socket.on('join_specialty', (specialtyData) => {
+        if (!specialtyData) return;
+        const specs = Array.isArray(specialtyData) ? specialtyData : [specialtyData];
+        specs.forEach(s => {
+          const room = s.startsWith('specialty_') ? s : `specialty_${s}`;
+          socket.join(room);
+        });
       });
     }
 

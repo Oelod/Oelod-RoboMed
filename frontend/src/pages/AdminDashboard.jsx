@@ -45,7 +45,7 @@ const AdminStatCard = ({ label, value, icon }) => (
 );
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState('personnel'); // 'personnel' | 'patients' | 'cases' | 'reports' | 'logs' | 'search' | 'migration' | 'policies' | 'audit' | 'office' | 'health'
+  const [activeTab, setActiveTab] = useState('personnel'); // 'personnel' | 'patients' | 'cases' | 'reports' | 'logs' | 'search' | 'migration' | 'policies' | 'audit' | 'office' | 'health' | 'research'
   const [migrationFile, setMigrationFile] = useState(null);
   const [migrationType, setMigrationType] = useState('patients'); // 'patients' | 'doctors'
   const [migrationStatus, setMigrationStatus] = useState(null);
@@ -167,28 +167,33 @@ export default function AdminDashboard() {
     }
   };
 
+  const [defaultPassword, setDefaultPassword] = useState('Welcome2RoboMed!');
+
   const handleMigration = async (e) => {
     e.preventDefault();
     if (!migrationFile) return;
 
-    const reader = new FileReader();
-    reader.onload = async (event) => {
-      try {
-        const payload = JSON.parse(event.target.result);
-        setMigrationStatus('Processing Migration...');
-        const endpoint = `/admin/ingest/${migrationType}`;
-        const res = await api.post(endpoint, { [migrationType]: payload });
-        const results = res.data.data.results;
-        setMigrationStatus({
-          summary: `Migration Complete: ${results.success} Success, ${results.failed} Failed`,
-          errors: results.errors || []
-        });
-        refetchUsers();
-      } catch (err) {
-        setMigrationStatus('Migration Failed: ' + (err.response?.data?.message || 'Invalid JSON format or endpoint error'));
-      }
-    };
-    reader.readAsText(migrationFile);
+    const formData = new FormData();
+    formData.append('file', migrationFile);
+    formData.append('defaultPassword', defaultPassword);
+
+    setMigrationStatus('📡 Initiating Statutory Migration Stream...');
+    try {
+      const endpoint = `/ingestion/${migrationType}`;
+      const res = await api.post(endpoint, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      
+      const stats = res.data.data.stats;
+      setMigrationStatus({
+        summary: `Migration Protocol Finalized: ${stats.successful} Successful, ${stats.failed} Failed / Skipped`,
+        total: stats.total,
+        timestamp: new Date().toLocaleString()
+      });
+      refetchUsers();
+    } catch (err) {
+      setMigrationStatus('❌ Migration Protocol Ruptured: ' + (err.response?.data?.message || 'Handshake Failure'));
+    }
   };
 
   const handleDownloadMasterAudit = async () => {
@@ -204,6 +209,22 @@ export default function AdminDashboard() {
     } catch (err) {
       console.error('Audit download failed:', err);
       alert('Institutional clearance failure: Unable to generate master audit manifest.');
+    }
+  };
+
+  const handleDownloadResearchVault = async () => {
+    try {
+      const response = await api.get('/admin/export-research-vault', { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'RoboMed_Anonymized_Research_Vault.csv');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (err) {
+      console.error('Research export failed:', err);
+      alert('Authority Clearance Error: Unable to extract the Anonymized Research Vault.');
     }
   };
 
@@ -325,15 +346,20 @@ export default function AdminDashboard() {
             )}
 
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-10 mb-16 relative Governance-Header">
-          <div>
-            <h1 className="text-3xl font-bold text-white tracking-tight flex items-center gap-3">
-               Administrative Oversight ⚖️
-            </h1>
-            <p className="text-gray-500 mt-1">Management center for clinical staff and patient records.</p>
+          <div className="flex items-center gap-6">
+            <div className="w-32 h-16 flex items-center justify-center p-1">
+               <img src="/oelod_logo_official.png" className="max-w-full max-h-full object-contain" alt="Oelod Official" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-white tracking-tight flex items-center gap-3">
+                 Administrative Oversight ⚖️
+              </h1>
+              <p className="text-gray-500 mt-1">Management center for clinical staff and patient records.</p>
+            </div>
           </div>
           
           <div className="flex bg-gray-900 p-1 rounded-xl border border-gray-800 no-print flex-wrap">
-             {['personnel', 'patients', 'cases', 'reports', 'logs', 'search', 'migration', 'policies', 'audit', ...(currentUser?.assignedOffice ? ['office'] : []), ...(currentUser?.adminLevel === 3 ? ['health'] : [])]
+             {['personnel', 'patients', 'cases', 'reports', 'logs', 'search', 'migration', 'policies', 'audit', ...(currentUser?.assignedOffice ? ['office'] : []), ...(currentUser?.adminLevel === 3 ? ['health', 'research'] : [])]
               .filter(t => {
                 if (currentUser?.adminLevel === 1) {
                   return ['personnel', 'patients', 'search', 'office', 'reports'].includes(t);
@@ -352,7 +378,7 @@ export default function AdminDashboard() {
                  }}
                  className={`px-6 py-2 rounded-lg text-xs font-semibold uppercase tracking-widest transition-all ${activeTab === t ? 'bg-gray-800 text-white border border-gray-700 shadow-sm' : 'text-gray-500 hover:text-gray-300'}`}
                >
-                 {t === 'cases' ? 'archive' : t === 'policies' ? 'manifest' : t === 'office' ? 'Department' : t === 'health' ? 'Health' : t === 'audit' ? 'Audit' : t}
+                 {t === 'cases' ? 'archive' : t === 'policies' ? 'manifest' : t === 'office' ? 'Department' : t === 'health' ? 'Health' : t === 'audit' ? 'Audit' : t === 'research' ? 'Vault' : t}
                </button>
              ))}
           </div>
@@ -596,153 +622,167 @@ export default function AdminDashboard() {
                    </tbody>
                 </table>
               ) : activeTab === 'cases' ? (
-                <div className="space-y-12 p-8">
-                   {/* Open Cases Table */}
-                   <div>
-                      <h3 className="text-sm font-black text-blue-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                         <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
-                         Current Consultations
-                      </h3>
-                      <div className="bg-gray-950 border border-gray-800 rounded-2xl overflow-hidden">
-                        <table className="w-full text-left">
-                           <thead className="bg-gray-800/50">
-                               <tr>
-                                  <th className="px-6 py-3 text-[10px] font-black uppercase text-gray-500">Case ID</th>
-                                  <th className="px-6 py-3 text-[10px] font-black uppercase text-gray-500">Patient</th>
-                                  <th className="px-6 py-3 text-[10px] font-black uppercase text-gray-500">Specialty</th>
-                                  <th className="px-6 py-3 text-[10px] font-black uppercase text-gray-500">Status</th>
-                                  <th className="px-6 py-3 text-right"></th>
-                               </tr>
-                           </thead>
-                           <tbody className="divide-y divide-gray-800">
-                               {allCasesData?.cases?.filter(c => c.status !== 'closed').length === 0 ? (
-                                  <tr><td colSpan="5" className="px-6 py-10 text-center text-gray-600 italic text-sm">No active consultations in pipeline.</td></tr>
-                               ) : (
-                                  allCasesData?.cases?.filter(c => c.status !== 'closed').map(c => (
-                                     <tr key={c._id} className="hover:bg-gray-900 transition-colors group">
-                                        <td className="px-6 py-4 font-bold text-white text-sm">{c.caseCode}</td>
-                                        <td className="px-6 py-4 text-xs text-gray-400">{c.patient?.fullName || 'N/A'}</td>
-                                        <td className="px-6 py-4 text-[10px] font-black uppercase text-brand-400">{c.assignedSpecialty || 'General'}</td>
-                                        <td className="px-6 py-4">
-                                           <div className="flex flex-col gap-1">
-                                              <span className={`px-2 py-0.5 text-[10px] font-black uppercase rounded border w-fit ${
-                                                c.status === 'resolved' ? 'bg-green-600/20 text-green-400 border-green-500/20 animate-pulse' :
-                                                c.status === 'flagged' ? 'bg-red-500/10 text-red-500 border-red-500/20' :
-                                                c.status === 'escalated' ? 'bg-orange-500/10 text-orange-400 border-orange-500/20' :
-                                                'bg-blue-500/10 text-blue-400 border-blue-500/20'
-                                              }`}>
-                                                {c.status}
-                                              </span>
-                                              {(c.status === 'flagged' || c.status === 'escalated' || c.status === 'resolved') && c.governanceNotes?.length > 0 && (
-                                                <span className="text-[9px] text-gray-500 italic truncate max-w-[150px]">
-                                                  Reason: {c.governanceNotes[c.governanceNotes.length - 1].note}
-                                                </span>
-                                              )}
-                                           </div>
-                                        </td>
-                                        <td className="px-6 py-4 text-right">
-                                           <button 
-                                             onClick={() => window.location.href=`/cases/${c._id}`}
-                                             className="text-[10px] font-black uppercase text-gray-500 hover:text-white transition-colors"
-                                           >
-                                             Review →
-                                           </button>
-                                        </td>
-                                     </tr>
-                                  ))
-                               )}
-                           </tbody>
-                        </table>
-                      </div>
-                   </div>
-
-                    {/* Governance Flag Intelligence Registry */}
-                    <div className="space-y-6 pt-8 border-t border-gray-900 mt-12">
-                        <h3 className="text-sm font-black text-red-500 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-                           <span className="w-2 h-2 bg-red-600 rounded-full animate-ping"></span>
-                           System Alerts & Management
-                        </h3>
-                        <div className="grid gap-4">
-                           {allCasesData?.cases?.filter(c => c.status === 'flagged' || c.status === 'escalated' || c.status === 'resolved').length === 0 ? (
-                              <div className="p-12 text-center bg-gray-950 border border-gray-800/50 rounded-[2rem]">
-                                 <p className="text-gray-600 italic text-sm">No institutional alerts currently active in the clinical pipeline.</p>
-                              </div>
-                           ) : (
-                              allCasesData?.cases?.filter(c => c.status === 'flagged' || c.status === 'escalated' || c.status === 'resolved').map(c => (
-                                 <div key={c._id} className="bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-red-500/30 transition-all group flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                                    <div className="flex-1">
-                                       <div className="flex items-center gap-3 mb-2">
-                                          <span className="text-xs font-black text-white uppercase tracking-tighter">{c.caseCode}</span>
-                                          <span className={`text-[10px] px-2 py-0.5 rounded font-black uppercase ${
-                                             c.status === 'resolved' ? 'bg-green-600 text-white animate-pulse' : 
-                                             c.status === 'escalated' ? 'bg-orange-500/10 text-orange-400' : 
-                                             'bg-red-500/10 text-red-500'
-                                          }`}>
-                                             {c.status === 'resolved' ? 'Settled - Manual Re-assignment Required' : c.status}
-                                          </span>
-                                       </div>
-                                       <p className="text-sm font-medium text-gray-300 italic">
-                                          "{c.governanceNotes?.[c.governanceNotes.length - 1]?.note || 'No reason documented.'}"
-                                       </p>
-                                       <p className="text-[9px] text-gray-600 font-bold uppercase mt-3 tracking-widest">
-                                          Final Settlement: {c.governanceNotes?.[c.governanceNotes.length - 1]?.office || 'Institutional'} · {new Date(c.governanceNotes?.[c.governanceNotes.length - 1]?.timestamp).toLocaleString()}
-                                       </p>
-                                    </div>
-                                    <button 
-                                      onClick={() => window.location.href=`/cases/${c._id}`}
-                                      className={`btn-secondary !py-2 !px-6 text-[10px] font-black uppercase tracking-widest group-hover:bg-white group-hover:text-black transition-all ${c.status === 'resolved' ? '!bg-brand-600 !text-white' : ''}`}
-                                    >
-                                      {c.status === 'resolved' ? 'Finalize Re-assign →' : 'Review →'}
-                                    </button>
-                                 </div>
-                              ))
-                           )}
-                        </div>
+                 <div className="space-y-12 p-8">
+                    {!allCasesData ? (
+                       <div className="p-32 text-center">
+                          <div className="w-16 h-16 border-4 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+                          <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] animate-pulse">📡 Securely connecting to medical records...</p>
+                       </div>
+                    ) : (
+                    <>
+                    {/* Open Cases Table */}
+                    <div>
+                       <h3 className="text-sm font-black text-blue-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                          <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
+                          Current Consultations
+                       </h3>
+                       <div className="bg-gray-950 border border-gray-800 rounded-2xl overflow-hidden">
+                         <table className="w-full text-left">
+                            <thead className="bg-gray-800/50">
+                                <tr>
+                                   <th className="px-6 py-3 text-[10px] font-black uppercase text-gray-500">Case ID</th>
+                                   <th className="px-6 py-3 text-[10px] font-black uppercase text-gray-500">Patient</th>
+                                   <th className="px-6 py-3 text-[10px] font-black uppercase text-gray-500">Specialty</th>
+                                   <th className="px-6 py-3 text-[10px] font-black uppercase text-gray-500">Status</th>
+                                   <th className="px-6 py-3 text-right"></th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-800">
+                                {(allCasesData?.cases?.filter(c => c.status !== 'closed') || []).length === 0 ? (
+                                   <tr><td colSpan="5" className="px-6 py-10 text-center text-gray-600 italic text-sm">No active cases found in the system.</td></tr>
+                                ) : (
+                                   allCasesData.cases.filter(c => c.status !== 'closed').map(c => (
+                                      <tr key={c._id} className="hover:bg-gray-900 transition-colors group">
+                                         <td className="px-6 py-4 font-bold text-white text-sm">{c.caseCode}</td>
+                                         <td className="px-6 py-4 text-xs text-gray-400">{c.patient?.fullName || 'N/A'}</td>
+                                         <td className="px-6 py-4 text-[10px] font-black uppercase text-brand-400">{c.assignedSpecialty || 'General'}</td>
+                                         <td className="px-6 py-4">
+                                            <div className="flex flex-col gap-1">
+                                               <span className={`px-2 py-0.5 text-[10px] font-black uppercase rounded border w-fit ${
+                                                 c.status === 'resolved' ? 'bg-green-600/20 text-green-400 border-green-500/20 animate-pulse' :
+                                                 c.status === 'flagged' ? 'bg-red-500/10 text-red-500 border-red-500/20' :
+                                                 c.status === 'escalated' ? 'bg-orange-500/10 text-orange-400 border-orange-500/20' :
+                                                 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+                                               }`}>
+                                                 {c.status}
+                                               </span>
+                                               {c.residentClerkship && (
+                                                  <span className="px-2 py-0.5 mt-1 text-[9px] font-black uppercase rounded bg-brand-500 text-black border border-brand-400 shadow-lg shadow-brand-900/40 w-fit">
+                                                     Resident Prepared 📋
+                                                  </span>
+                                               )}
+                                               {(c.status === 'flagged' || c.status === 'escalated' || c.status === 'resolved') && c.governanceNotes?.length > 0 && (
+                                                 <span className="text-[9px] text-gray-500 italic truncate max-w-[150px]">
+                                                   Reason: {c.governanceNotes[c.governanceNotes.length - 1].note}
+                                                 </span>
+                                               )}
+                                            </div>
+                                         </td>
+                                         <td className="px-6 py-4 text-right">
+                                            <button 
+                                              onClick={() => window.location.href=`/cases/${c._id}`}
+                                              className="text-[10px] font-black uppercase text-gray-500 hover:text-white transition-colors"
+                                            >
+                                              Review →
+                                            </button>
+                                         </td>
+                                      </tr>
+                                   ))
+                                )}
+                            </tbody>
+                         </table>
+                       </div>
                     </div>
 
-                   {/* Closed Cases Table */}
-                   <div>
-                      <h3 className="text-sm font-black text-green-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-                         <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                         Resolved Records Archive
-                      </h3>
-                      <div className="bg-gray-950 border border-gray-800 rounded-2xl overflow-hidden opacity-80">
-                        <table className="w-full text-left">
-                           <thead className="bg-gray-800/50">
-                               <tr>
-                                  <th className="px-6 py-3 text-[10px] font-black uppercase text-gray-500">Case ID</th>
-                                  <th className="px-6 py-3 text-[10px] font-black uppercase text-gray-500">Patient</th>
-                                  <th className="px-6 py-3 text-[10px] font-black uppercase text-gray-500">Lead Doctor</th>
-                                  <th className="px-6 py-3 text-[10px] font-black uppercase text-gray-500">Closed Date</th>
-                                  <th className="px-6 py-3 text-right"></th>
-                               </tr>
-                           </thead>
-                           <tbody className="divide-y divide-gray-800">
-                               {allCasesData?.cases?.filter(c => c.status === 'closed').length === 0 ? (
-                                  <tr><td colSpan="5" className="px-6 py-10 text-center text-gray-600 italic text-sm">No records in historical archive.</td></tr>
-                               ) : (
-                                  allCasesData?.cases?.filter(c => c.status === 'closed').map(c => (
-                                     <tr key={c._id} className="hover:bg-gray-900 transition-colors group">
-                                        <td className="px-6 py-4 font-bold text-gray-400 text-sm">{c.caseCode}</td>
-                                        <td className="px-6 py-4 text-xs text-gray-500">{c.patient?.fullName || 'N/A'}</td>
-                                        <td className="px-6 py-4 text-xs text-gray-500">Dr. {c.doctor?.fullName || 'Root'}</td>
-                                        <td className="px-6 py-4 text-[10px] font-black uppercase text-gray-600 font-mono">{new Date(c.updatedAt).toLocaleDateString()}</td>
-                                        <td className="px-6 py-4 text-right">
-                                           <button 
-                                             onClick={() => window.location.href=`/cases/${c._id}`}
-                                             className="text-[10px] font-black uppercase text-gray-500 hover:text-white transition-colors"
-                                           >
-                                             Review →
-                                           </button>
-                                        </td>
-                                     </tr>
-                                  ))
-                               )}
-                           </tbody>
-                        </table>
-                      </div>
-                   </div>
-                </div>
+                     {/* Governance Flag Intelligence Registry */}
+                     <div className="space-y-6 pt-8 border-t border-gray-900 mt-12">
+                         <h3 className="text-sm font-black text-red-500 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                            <span className="w-2 h-2 bg-red-600 rounded-full animate-ping"></span>
+                            System Alerts & Management
+                         </h3>
+                         <div className="grid gap-4">
+                            {(allCasesData?.cases?.filter(c => c.status === 'flagged' || c.status === 'escalated' || c.status === 'resolved') || []).length === 0 ? (
+                               <div className="p-12 text-center bg-gray-950 border border-gray-800/50 rounded-[2rem]">
+                                  <p className="text-gray-600 italic text-sm">No system alerts found.</p>
+                               </div>
+                            ) : (
+                               allCasesData.cases.filter(c => c.status === 'flagged' || c.status === 'escalated' || c.status === 'resolved').map(c => (
+                                  <div key={c._id} className="bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-red-500/30 transition-all group flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                                     <div className="flex-1">
+                                        <div className="flex items-center gap-3 mb-2">
+                                           <span className="text-xs font-black text-white uppercase tracking-tighter">{c.caseCode}</span>
+                                           <span className={`text-[10px] px-2 py-0.5 rounded font-black uppercase ${
+                                              c.status === 'resolved' ? 'bg-green-600 text-white animate-pulse' : 
+                                              c.status === 'escalated' ? 'bg-orange-500/10 text-orange-400' : 
+                                              'bg-red-500/10 text-red-500'
+                                           }`}>
+                                              {c.status === 'resolved' ? 'Settled - Manual Re-assignment Required' : c.status}
+                                           </span>
+                                        </div>
+                                        <p className="text-sm font-medium text-gray-300 italic">
+                                           "{c.governanceNotes?.[c.governanceNotes.length - 1]?.note || 'No reason documented.'}"
+                                        </p>
+                                        <p className="text-[9px] text-gray-600 font-bold uppercase mt-3 tracking-widest">
+                                           Final Settlement: {c.governanceNotes?.[c.governanceNotes.length - 1]?.office || 'Institutional'} · {new Date(c.governanceNotes?.[c.governanceNotes.length - 1]?.timestamp).toLocaleString()}
+                                        </p>
+                                     </div>
+                                     <button 
+                                       onClick={() => window.location.href=`/cases/${c._id}`}
+                                       className={`btn-secondary !py-2 !px-6 text-[10px] font-black uppercase tracking-widest group-hover:bg-white group-hover:text-black transition-all ${c.status === 'resolved' ? '!bg-brand-600 !text-white' : ''}`}
+                                     >
+                                       {c.status === 'resolved' ? 'Finalize Re-assign →' : 'Review →'}
+                                     </button>
+                                  </div>
+                               ))
+                            )}
+                         </div>
+                     </div>
+
+                    {/* Closed Cases Table */}
+                    <div>
+                       <h3 className="text-sm font-black text-green-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                          <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                          Resolved Records Archive
+                       </h3>
+                       <div className="bg-gray-950 border border-gray-800 rounded-2xl overflow-hidden opacity-80">
+                         <table className="w-full text-left">
+                            <thead className="bg-gray-800/50">
+                                <tr>
+                                   <th className="px-6 py-3 text-[10px] font-black uppercase text-gray-500">Case ID</th>
+                                   <th className="px-6 py-3 text-[10px] font-black uppercase text-gray-500">Patient</th>
+                                   <th className="px-6 py-3 text-[10px] font-black uppercase text-gray-500">Lead Doctor</th>
+                                   <th className="px-6 py-3 text-[10px] font-black uppercase text-gray-500">Closed Date</th>
+                                   <th className="px-6 py-3 text-right"></th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-800">
+                                {(allCasesData?.cases?.filter(c => c.status === 'closed') || []).length === 0 ? (
+                                   <tr><td colSpan="5" className="px-6 py-10 text-center text-gray-600 italic text-sm">No records in historical archive.</td></tr>
+                                ) : (
+                                   allCasesData.cases.filter(c => c.status === 'closed').map(c => (
+                                      <tr key={c._id} className="hover:bg-gray-900 transition-colors group">
+                                         <td className="px-6 py-4 font-bold text-gray-400 text-sm">{c.caseCode}</td>
+                                         <td className="px-6 py-4 text-xs text-gray-500">{c.patient?.fullName || 'N/A'}</td>
+                                         <td className="px-6 py-4 text-xs text-gray-500">Dr. {c.doctor?.fullName || 'Root'}</td>
+                                         <td className="px-6 py-4 text-[10px] font-black uppercase text-gray-600 font-mono">{new Date(c.updatedAt).toLocaleDateString()}</td>
+                                         <td className="px-6 py-4 text-right">
+                                            <button 
+                                              onClick={() => window.location.href=`/cases/${c._id}`}
+                                              className="text-[10px] font-black uppercase text-gray-500 hover:text-white transition-colors"
+                                            >
+                                              Review →
+                                            </button>
+                                         </td>
+                                      </tr>
+                                   ))
+                                )}
+                            </tbody>
+                         </table>
+                       </div>
+                    </div>
+                    </>
+                    )}
+                 </div>
               ) : activeTab === 'logs' ? (
                 <table className="w-full text-left">
                   <thead>
@@ -843,7 +883,7 @@ export default function AdminDashboard() {
                      <div className="text-center mb-12">
                         <div className="w-20 h-20 bg-gray-900 rounded-3xl mx-auto flex items-center justify-center text-3xl shadow-xl border border-gray-800 mb-6">📥</div>
                         <h2 className="text-4xl font-black text-white italic uppercase tracking-tighter">Bulk Migration Engine</h2>
-                        <p className="text-gray-500 font-medium">Character-perfect legacy ingestion manifold for large-scale clinical datasets.</p>
+                        <p className="text-gray-500 font-medium">Bulk import old medical records into the new secure system.</p>
                      </div>
 
                      <div className="card !p-10 bg-gray-900 border-brand-500/10 shadow-2xl">
@@ -858,29 +898,44 @@ export default function AdminDashboard() {
                               </button>
                               <button 
                                 type="button" 
-                                onClick={() => setMigrationType('doctors')}
-                                className={`py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all ${migrationType === 'doctors' ? 'bg-brand-600 text-white border-brand-500 shadow-lg shadow-brand-900/20' : 'bg-gray-950 text-gray-500 border-gray-800'}`}
+                                onClick={() => setMigrationType('cases')}
+                                className={`py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all ${migrationType === 'cases' ? 'bg-brand-600 text-white border-brand-500 shadow-lg shadow-brand-900/20' : 'bg-gray-950 text-gray-500 border-gray-800'}`}
                               >
-                                Specialist Pool Import
+                                Historical Case Import
                               </button>
                            </div>
 
-                           <div className="p-12 border-2 border-dashed border-gray-800 rounded-[2.5rem] text-center group hover:border-brand-500/30 transition-all">
-                              <input type="file" className="hidden" id="mig-file" accept=".json" onChange={(e) => setMigrationFile(e.target.files[0])} />
+                           {migrationType === 'patients' && (
+                              <div className="space-y-4">
+                                 <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-4">Set Institutional Default Password</label>
+                                 <input 
+                                   type="text" 
+                                   className="input !bg-gray-950 !border-gray-800 text-brand-400 font-mono" 
+                                   value={defaultPassword}
+                                   onChange={(e) => setDefaultPassword(e.target.value)}
+                                   placeholder="e.g. Welcome2RoboMed!"
+                                 />
+                                 <p className="text-[9px] text-gray-600 italic ml-4">Patients will be asked to change this during their first login.</p>
+                              </div>
+                           )}
+
+                           <div className="p-12 border-2 border-dashed border-gray-800 rounded-[2.5rem] text-center group hover:border-brand-500/30 transition-all bg-gray-950/50">
+                              <input type="file" className="hidden" id="mig-file" accept=".csv" onChange={(e) => setMigrationFile(e.target.files[0])} />
                               <label htmlFor="mig-file" className="cursor-pointer block">
                                  <span className="text-4xl block mb-4 group-hover:scale-110 transition-transform">📄</span>
                                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
-                                    {migrationFile ? migrationFile.name : 'Select Clinical JSON Manifest'}
+                                    {migrationFile ? migrationFile.name : 'Select Institutional CSV Manifest'}
                                  </span>
+                                 <p className="text-[9px] text-gray-600 mt-2">Maximum file size: 50MB</p>
                               </label>
                            </div>
 
                            <button 
                               type="submit" 
-                              className="w-full bg-brand-600 hover:bg-brand-500 text-white font-black text-[10px] uppercase tracking-[0.3em] py-5 rounded-3xl transition-all shadow-xl shadow-brand-900/20"
+                              className="w-full bg-brand-600 hover:bg-brand-500 text-white font-black text-[10px] uppercase tracking-[0.3em] py-5 rounded-3xl transition-all shadow-xl shadow-brand-900/20 active:scale-95"
                               disabled={!migrationFile}
                            >
-                              Initialize High-Fidelity Migration →
+                              {typeof migrationStatus === 'string' && migrationStatus.includes('📡') ? "Streaming Data..." : "Execute Migration Protocol →"}
                            </button>
 
                            {migrationStatus && (
@@ -1069,7 +1124,46 @@ export default function AdminDashboard() {
                          </div>
                      </div>
                  </div>
-               ) : (
+               ) : activeTab === 'research' ? (
+                  <div className="p-10 max-w-5xl mx-auto space-y-12 animate-in fade-in slide-in-from-bottom-5 duration-700 no-print">
+                      <div className="text-center space-y-4">
+                         <div className="w-20 h-20 bg-gray-900 rounded-[2.5rem] mx-auto flex items-center justify-center text-3xl shadow-2xl border border-gray-800">🔬</div>
+                         <h2 className="text-4xl font-black text-white italic uppercase tracking-tighter">Anonymized Research Vault</h2>
+                         <p className="text-gray-500 max-w-xl mx-auto">Accessing the institutional dataset for clinical evolution and AI training. All data is character-perfectly anonymized to protect patient sovereignty.</p>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                         <div className="card !bg-gray-900/50 border-brand-500/10 p-8 hover:border-brand-500/40 transition-all">
+                            <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                               <span className="w-2 h-2 bg-brand-500 rounded-full"></span>
+                               Dataset Integrity
+                            </h3>
+                            <p className="text-gray-400 text-[11px] leading-relaxed italic">"Every closed case is automatically ingested here. This dataset includes clinical symptoms, diagnostic outcomes, age, and gender metrics."</p>
+                         </div>
+                         <div className="card !bg-gray-900/50 border-brand-500/10 p-8 hover:border-brand-500/40 transition-all">
+                            <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                               <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                               AI Training Resource
+                            </h3>
+                            <p className="text-gray-400 text-[11px] leading-relaxed italic">"This export is formatted for character-perfect compatibility with the Oelod Python-Science microservice for future model re-tuning."</p>
+                         </div>
+                      </div>
+
+                      <div className="p-16 bg-brand-500/5 border border-brand-500/20 rounded-[4rem] text-center space-y-10 group shadow-[0_0_50px_rgba(var(--brand-500-rgb),0.05)]">
+                         <div className="space-y-2">
+                            <p className="text-brand-500 text-[10px] font-black uppercase tracking-[0.4em]">Level 3 Authority Only</p>
+                            <h4 className="text-3xl font-black text-white italic">Execute Statutory Research Export</h4>
+                         </div>
+                         <button 
+                            onClick={handleDownloadResearchVault} 
+                            className="bg-brand-600 hover:bg-brand-500 text-white !px-16 !py-6 text-[11px] uppercase font-black tracking-[0.3em] rounded-full shadow-2xl shadow-brand-500/40 transition-all hover:scale-105 active:scale-95 group-hover:shadow-brand-500/60"
+                         >
+                            Download Research Manifest (CSV) 📥
+                         </button>
+                         <p className="text-[9px] text-gray-600 font-bold uppercase tracking-widest">Protocol: All extractions are logged to the Master Audit Trail.</p>
+                      </div>
+                  </div>
+                ) : (
                 <div className="p-32 text-center opacity-30 select-none">
                    <div className="text-6xl mb-6">🔍</div>
                    <p className="text-lg font-black text-white italic uppercase tracking-tighter">Enter criteria to begin Discovery</p>

@@ -14,4 +14,8 @@ router.get('/', requireRole('admin'), ctrl.getAllReports);
 router.get('/my', requireRole('patient'), ctrl.getMyReports);
 router.patch('/:reportId', requireRole('admin'), ctrl.updateReport);
 
+// Institutional Aggregate Exports
+router.get('/export/volumetric', requireRole('admin'), ctrl.exportVolumetricData);
+router.get('/export/workload', requireRole('admin'), ctrl.exportSpecialtyWorkload);
+
 module.exports = router;

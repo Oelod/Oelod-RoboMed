@@ -1,0 +1,14 @@
+[
+  {
+    "symptoms": "fever;cough;fatigue",
+    "disease": "Common Cold (Developmental Sample)",
+    "specialty": "General Medicine",
+    "priority": "LOW"
+  },
+  {
+    "symptoms": "chest pain;shortness of breath",
+    "disease": "Potential Cardiac Event (Developmental Sample)",
+    "specialty": "Cardiology",
+    "priority": "CRITICAL"
+  }
+]

@@ -58,6 +58,9 @@ router.post('/refresh-token', ctrl.refreshTokenCtrl);
 // POST /api/auth/logout
 router.post('/logout', ctrl.logout);
 
+// POST /api/auth/change-password
+router.post('/change-password', isAuth, ctrl.changePassword);
+
 // POST /api/auth/request-role
 router.post('/request-role', isAuth, validate(roleRequestSchema), ctrl.requestRole);
 

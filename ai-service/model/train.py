@@ -1,9 +1,9 @@
 """
-RoboMed AI Triage — Model Training Script
+RoboMed AI Triage  Model Training Script
 ==========================================
 Trains two classifiers:
-  1. specialty_model  — predicts recommended_specialty
-  2. priority_model   — predicts priority_level (LOW | MEDIUM | HIGH)
+  1. specialty_model   predicts recommended_specialty
+  2. priority_model    predicts priority_level (LOW | MEDIUM | HIGH)
 
 Both use a Random Forest over a MultiLabelBinarizer feature matrix.
 Models are serialised to disk and a model_info.json version file is written.
@@ -29,13 +29,13 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, f1_score, classification_report
 from sklearn.pipeline import Pipeline
 
-# ─── Paths ────────────────────────────────────────────────────────────────────
+#  Paths 
 BASE_DIR   = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH  = os.path.join(BASE_DIR, "..", "data", "symptoms_dataset.csv")
 MODEL_DIR  = BASE_DIR  # save pkl files next to this script
 INFO_PATH  = os.path.join(MODEL_DIR, "model_info.json")
 
-# ─── Hyper-parameters ─────────────────────────────────────────────────────────
+#  Hyper-parameters 
 RANDOM_STATE    = 42
 N_ESTIMATORS    = 200
 TEST_SIZE       = 0.2
@@ -57,7 +57,7 @@ def build_features(df):
 
 
 def train_classifier(X_train, y_train, label_name="specialty"):
-    print(f"\n🏋️  Training {label_name} classifier …")
+    print(f"\n[TRAINING] {label_name} classifier ...")
     clf = RandomForestClassifier(
         n_estimators=N_ESTIMATORS,
         class_weight="balanced",
@@ -66,7 +66,7 @@ def train_classifier(X_train, y_train, label_name="specialty"):
     )
     t0 = time.time()
     clf.fit(X_train, y_train)
-    print(f"   Done in {time.time() - t0:.1f}s")
+    print(f"   Done.")
     return clf
 
 
@@ -74,7 +74,7 @@ def evaluate(clf, X_test, y_test, le, label_name):
     y_pred  = clf.predict(X_test)
     acc     = accuracy_score(y_test, y_pred)
     f1      = f1_score(y_test, y_pred, average="weighted")
-    print(f"\n📊 {label_name} Results")
+    print(f"\n[RESULTS] {label_name}")
     print(f"   Accuracy  : {acc:.4f}")
     print(f"   F1 (wt)   : {f1:.4f}")
     print(classification_report(y_test, y_pred, target_names=le.classes_))
@@ -92,10 +92,10 @@ def bump_version(info_path):
 
 
 def main():
-    print("🚀 RoboMed AI — Training Pipeline\n" + "=" * 40)
+    print("AI Pipeline: RoboMed\n" + "=" * 40)
 
     # 1. Load
-    print(f"📂 Loading dataset: {DATA_PATH}")
+    print(f" Loading dataset: {DATA_PATH}")
     df = load_and_parse(DATA_PATH)
     print(f"   Rows: {len(df)}  |  Specialties: {df['specialty'].nunique()}")
 
@@ -126,10 +126,10 @@ def main():
 
     # 7. Enforce accuracy threshold
     assert acc_s >= MIN_ACCURACY, (
-        f"❌ Specialty accuracy {acc_s:.4f} < threshold {MIN_ACCURACY}. "
+        f" Specialty accuracy {acc_s:.4f} < threshold {MIN_ACCURACY}. "
         "Improve the dataset or model before deploying."
     )
-    print(f"\n✅ Accuracy check passed ({acc_s:.4f} >= {MIN_ACCURACY})")
+    print(f"\n[OK] Accuracy check passed ({acc_s:.4f} >= {MIN_ACCURACY})")
 
     # 8. Save models
     joblib.dump(clf_specialty, os.path.join(MODEL_DIR, "symptom_model.pkl"))
@@ -155,9 +155,9 @@ def main():
     with open(INFO_PATH, "w") as f:
         json.dump(info, f, indent=2)
 
-    print(f"\n💾 Models saved → {MODEL_DIR}")
-    print(f"📄 Version metadata: {version}")
-    print(f"\n🎉 Training complete!\n")
+    print(f"\n Models saved  {MODEL_DIR}")
+    print(f" Version metadata: {version}")
+    print(f"\n[DONE] Training complete!\n")
 
 
 if __name__ == "__main__":

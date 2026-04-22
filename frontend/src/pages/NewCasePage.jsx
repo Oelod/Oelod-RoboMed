@@ -1,95 +1,171 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createCase } from '../api/cases';
+import { useAuth } from '../hooks/useAuth';
+import api from '../api/axiosInstance';
 
 export default function NewCasePage() {
   const navigate = useNavigate();
-  const [symptomsText, setSymptomsText] = useState('');
-  const [description, setDescription] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const { user } = useAuth();
+  const [caseId, setCaseId] = useState(null);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const [error, setError] = useState(null);
+  const scrollRef = useRef(null);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!symptomsText.trim()) {
-      setError('Please enter your symptoms');
-      return;
+  // Auto-initialize O.V.R. session on mount
+  useEffect(() => {
+    if (user && !isInitialized) {
+      initSession();
     }
+  }, [user]);
 
-    const symptoms = symptomsText.split(',').map(s => s.trim()).filter(Boolean);
-    
-    setLoading(true);
-    setError('');
-    
+  const initSession = async () => {
+    setIsTyping(true);
+    setError(null);
     try {
-      const res = await createCase({ symptoms, description });
-      // The backend wraps data inside nested "data" with "case" object
-      navigate(`/cases/${res.data.case._id}`);
+      const response = await api.post('/ai-experiment/start', { userName: user.fullName });
+      const data = response.data;
+      if (data.success) {
+        setCaseId(data.caseId);
+        let text = data.text;
+        if (typeof text === 'object') text = text.content || text.message || JSON.stringify(text);
+        setMessages([{ role: 'assistant', text: text }]);
+        setIsInitialized(true);
+      }
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to submit case');
+      setError("System connection error.");
     } finally {
-      setLoading(false);
+      setIsTyping(false);
     }
   };
 
-  return (
-    <div className="max-w-2xl mx-auto py-8 sm:py-16 px-4">
-      <div className="card !p-6 sm:!p-10 border-brand-500/20 shadow-2xl relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-brand-500/5 rounded-bl-[4rem] group-hover:bg-brand-500/10 transition-all"></div>
-        
-        <h1 className="text-2xl sm:text-3xl font-black text-white italic tracking-tighter uppercase mb-3">Start New Consultation</h1>
-        <p className="text-gray-500 text-sm italic font-medium mb-10 leading-relaxed">
-          Provide clinical details below. Our Triage AI will analyze your symptoms to provide real-time assessment and specialist recommendations.
-        </p>
+  const handleSend = async (e) => {
+    if (e) e.preventDefault();
+    if (!input.trim() || !caseId || isTyping) return;
 
-        {error && (
-          <div className="mb-8 p-5 rounded-2xl bg-red-950/50 border border-red-500/30 text-red-400 text-[10px] font-black uppercase tracking-widest shadow-lg shadow-red-900/10 animate-in fade-in slide-in-from-top-2">
-            🚨 System Alert: {error}
+    const userText = input;
+    setMessages(prev => [...prev, { role: 'user', text: userText }]);
+    setInput('');
+    setIsTyping(true);
+
+    try {
+      const response = await api.post('/ai-experiment/interact', { caseId, text: userText });
+      const data = response.data;
+      
+      if (data.success) {
+        const res = data.response;
+        let msg = typeof res === 'string' ? res : (res.explanation || res.content || JSON.stringify(res));
+        if (typeof msg === 'object') msg = msg.message || msg.content || JSON.stringify(msg);
+        
+        setMessages(prev => [...prev, { role: 'assistant', text: msg }]);
+
+        if (res.type === 'clerkship_final') {
+          // Mark as final for the overlay
+          setMessages(prev => {
+            const newMsgs = [...prev];
+            newMsgs[newMsgs.length - 1].isFinal = true;
+            return newMsgs;
+          });
+          // Redirect to the new dashboard/case page
+          setTimeout(() => navigate(`/cases/${res.caseDbId}`), 2500);
+        }
+      }
+    } catch (err) {
+      setError("Chat was interrupted.");
+    } finally {
+      setIsTyping(false);
+    }
+  };
+
+  useEffect(() => {
+    scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  return (
+    <div className="max-w-4xl mx-auto py-8 sm:py-16 px-4 flex flex-col h-screen max-h-[850px]">
+      <div className="flex-1 bg-gray-900 border border-gray-800 rounded-[3rem] shadow-2xl overflow-hidden flex flex-col relative">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-brand-500/5 rounded-bl-full pointer-events-none"></div>
+        
+        {/* O.V.R. Header */}
+        <div className="p-8 border-b border-white/5 bg-black/20 flex justify-between items-center z-10">
+           <div className="flex items-center gap-6">
+              <div className="w-16 h-16 rounded-3xl bg-gray-800 border border-brand-500/20 flex items-center justify-center text-3xl shadow-lg">👨‍⚕️</div>
+              <div>
+                 <h1 className="text-2xl font-black text-white italic tracking-tighter uppercase leading-none">Oelod Virtual Resident</h1>
+                 <p className="text-[10px] text-brand-500 font-bold uppercase tracking-[0.3em] mt-2">Active Check-in</p>
+              </div>
+           </div>
+           <button 
+             onClick={() => navigate('/dashboard')}
+             className="text-[10px] font-black text-gray-500 uppercase hover:text-white transition-all tracking-widest"
+           >
+             Exit Session
+           </button>
+        </div>
+
+        {/* O.V.R. Messaging Manifold */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-8 space-y-6 custom-scrollbar scroll-smooth">
+           {messages.map((m, i) => (
+             <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-[85%] p-4 sm:p-6 rounded-[1.5rem] sm:rounded-[2rem] text-sm sm:text-md leading-relaxed font-medium shadow-xl ${
+                  m.role === 'user' 
+                    ? 'bg-brand-600 text-white rounded-br-none' 
+                    : 'bg-gray-850/80 backdrop-blur-md text-gray-200 border border-white/5 rounded-bl-none italic'
+                }`}>
+                   {m.text}
+                </div>
+             </div>
+           ))}
+           {isTyping && (
+             <div className="flex items-center gap-3 text-[10px] font-black text-brand-500 uppercase tracking-widest animate-pulse ml-4">
+               <span className="w-2 h-2 rounded-full bg-brand-500"></span>
+               O.V.R. is thinking...
+             </div>
+           )}
+           {error && (
+             <div className="mx-auto p-4 bg-red-950/20 border border-red-500/30 rounded-2xl text-red-400 text-[10px] font-bold uppercase text-center w-fit shadow-2xl animate-bounce">
+               🚨 {error}
+               <button onClick={initSession} className="ml-4 underline hover:text-white">Reconnect</button>
+             </div>
+           )}
+           <div ref={scrollRef} />
+        </div>
+
+        {/* Input Control Center */}
+        <div className="p-4 sm:p-8 bg-black/40 border-t border-white/5">
+           <form onSubmit={handleSend} className="flex gap-4 relative group">
+              <input 
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Type your symptoms or health concerns here..."
+                disabled={isTyping || !isInitialized}
+                className="flex-1 bg-gray-950 border-2 border-gray-800 rounded-3xl px-6 sm:px-8 py-4 sm:py-6 text-white text-md sm:text-lg placeholder:text-gray-600 focus:border-brand-500 outline-none transition-all pr-20 sm:pr-24 shadow-inner"
+              />
+              <button 
+                type="submit"
+                disabled={isTyping || !input.trim() || !isInitialized}
+                className="absolute right-2 top-2 bottom-2 px-4 sm:px-6 bg-brand-600 hover:bg-brand-500 text-white rounded-[1.2rem] flex items-center gap-2 font-black transition-all disabled:opacity-30 active:scale-95"
+              >
+                <span className="hidden sm:inline text-[10px] uppercase tracking-widest">Send</span> 
+                <span className="text-xl">→</span>
+              </button>
+           </form>
+           <p className="text-center text-[9px] text-gray-600 font-bold uppercase tracking-tighter mt-4 sm:mt-6">
+              Highest-level medical data security enabled.
+           </p>
+        </div>
+
+        {/* Finalization Overlay */}
+        {messages.some(m => m.isFinal) && (
+          <div className="absolute inset-0 bg-black/90 backdrop-blur-xl flex flex-col items-center justify-center z-50 animate-in fade-in duration-500">
+             <div className="w-24 h-24 border-4 border-brand-500 border-t-transparent rounded-full animate-spin mb-8"></div>
+             <h2 className="text-3xl font-black text-white italic uppercase tracking-tighter mb-2">Finalizing Referral</h2>
+             <p className="text-brand-500 font-bold text-xs uppercase tracking-widest animate-pulse">Sealing Record & Alerting Specialist...</p>
           </div>
         )}
-
-        <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8 relative z-10">
-          <div>
-            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Symptoms (Comma-Separated) <span className="text-brand-500">*</span></label>
-            <input
-              type="text"
-              className="input w-full !py-4"
-              placeholder="e.g. Chronic Fatigue, Neural Spasms, Migraine"
-              value={symptomsText}
-              onChange={(e) => setSymptomsText(e.target.value)}
-              required
-            />
-            <p className="text-[9px] text-gray-600 font-bold uppercase mt-2 tracking-tighter">List your symptoms clearly to help our AI provide a more accurate assessment.</p>
-          </div>
-
-          <div>
-            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Additional Details (Optional)</label>
-            <textarea
-              className="input w-full min-h-[160px] py-4 resize-none italic font-medium"
-              placeholder="Provide details such as when your symptoms started, your medical history, or any patterns you've noticed..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </div>
-
-          <div className="pt-6 flex flex-col sm:flex-row-reverse gap-4">
-            <button
-              type="submit"
-              className="btn-primary w-full sm:w-auto px-10 py-4 text-xs font-black uppercase tracking-[0.2em] shadow-2xl shadow-brand-600/30 active:scale-95 transition-all"
-              disabled={loading || !symptomsText.trim()}
-            >
-              {loading ? 'Analyzing Symptoms...' : 'Submit Consultation →'}
-            </button>
-            <button
-              type="button"
-              className="w-full sm:w-auto px-6 py-4 rounded-xl text-[10px] font-black text-gray-500 uppercase tracking-widest hover:text-white hover:bg-gray-800 transition-all border border-transparent hover:border-gray-700"
-              onClick={() => navigate('/dashboard')}
-              disabled={loading}
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
       </div>
     </div>
   );

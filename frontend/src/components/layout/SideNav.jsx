@@ -37,13 +37,13 @@ export default function SideNav({ isOpen, setIsOpen }) {
       `}>
         {/* Logo & Controls */}
         <div className="p-8 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-2xl bg-gray-900 border border-brand-500/30 flex items-center justify-center p-2 shadow-2xl shadow-brand-500/10">
+          <div className="flex items-center gap-5">
+            <div className="w-14 h-14 rounded-[1.5rem] bg-gray-900 border border-brand-500/20 flex items-center justify-center p-2.5 shadow-2xl shadow-brand-500/5 hover:border-brand-500/50 transition-all">
               <img src={logo} alt="RoboMed" className="w-full h-full object-contain" />
             </div>
             <div className="flex flex-col">
-              <span className="text-white font-black text-lg italic tracking-tighter uppercase leading-none">OELOD</span>
-              <span className="text-brand-500 font-bold text-[9px] uppercase tracking-[0.2em] opacity-80">RoboMed</span>
+              <span className="text-white font-black text-xl italic tracking-tighter uppercase leading-none">OELOD</span>
+              <span className="text-brand-500 font-bold text-[10px] uppercase tracking-[0.2em] opacity-90">RoboMed</span>
             </div>
           </div>
           

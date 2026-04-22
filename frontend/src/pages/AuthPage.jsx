@@ -177,7 +177,7 @@ export default function AuthPage({ mode = 'login' }) {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Demographic Gender</label>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Gender</label>
                   <select name="gender" className="input py-3" value={form.gender} onChange={handleChange}>
                     <option value="male">Male</option>
                     <option value="female">Female</option>

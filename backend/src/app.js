@@ -24,6 +24,8 @@ const searchRoutes     = require('./routes/search.routes'); // Phase 6
 const chatRoutes       = require('./routes/chat.routes');   // Phase 5
 const departmentRoutes = require('./routes/department.routes'); // Phase 7
 const reportRoutes     = require('./routes/report.routes');     // Phase 8
+const ingestionRoutes  = require('./routes/ingestion.routes');  // Ph 9 - Migration
+const aiExperimentRoutes = require('./routes/aiExperimentRoutes'); // Standalone AI Experiment
 
 
 
@@ -94,6 +96,8 @@ app.use('/api/search',        searchRoutes);       // Phase 6
 app.use('/api/chat',          chatRoutes);         // Phase 5
 app.use('/api/departments',   departmentRoutes);   // Phase 7 - Internal Units
 app.use('/api/reports',       reportRoutes);       // Phase 8 - Governance
+app.use('/api/ingestion',     ingestionRoutes);    // Ph 9 - Migration
+app.use('/api/ai-experiment',  aiExperimentRoutes); // Standalone AI Experiment
 
 
 
