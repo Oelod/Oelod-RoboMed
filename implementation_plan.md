@@ -688,44 +688,41 @@ When a clinical dataset becomes available:
 ---
 
 ## 8. Institutional Operational Audit & Simple User Guide
-> **Relatable Version** · **For Patients, Doctors, and Staff**
+> **Definitive Common Language Version** · **The "Senior Dev" Audit**
 
-This section explains every part of the RoboMed platform in simple words. We have removed the technical jargon so that all participants can understand exactly how to use the system.
+This section explains every single part of the RoboMed platform. Technical jargon has been removed so all participants can operate the system with 100% certainty.
 
-### **8.1 Global Navigation & Entry (The Front Desk)**
-It works just like a front desk at a real hospital.
-*   **Login**: If you already have an account, enter your details here to get in.
-*   **Register**: If you are new, fill in your name and choose your role (Patient, Doctor, etc.) to create your permanent record.
-*   **"Initialize Access"**: This simply means **"Log Me in."**
+### **8.1 Entry & Identity (The Front Gate)**
+*   **"Initialize Access"**: The primary **Login Button**.
+*   **"Clinical Backup Phrase"**: A secret password recovery phrase. **Mandatory**: Store this safely to get back into your account.
 
-### **8.2 For Patients (The Patient Dashboard)**
-Your personal health home where you manage your care.
-*   **"+ Start New Consultation"**: The main button to talk to the AI and find a doctor.
-*   **"My Medical History"**: A list of all your visits. Click **"View Record"** to see notes or chat with your doctor.
-*   **"Account Security Backup"**: Enter a secret phrase to make sure you can always get back into your account if you lose your phone.
-*   **O.V.R. Intake**: When starting a case, chat with the AI about your symptoms. Once finished, click **"Proceed to Specialist"** to see a human doctor.
+### **8.2 For Managers (Administrators)**
+*   **High-Urgency Bar**: **"Acknowledge & Dismiss"** (Clears critical system alerts).
+*   **Navigation Tabs**: **Personnel, Patients, Archive, Reports, Logs, Search, Migration, Manifest, Audit, Health, Safe (Vault).**
+*   **Management Tools (In Tables)**:
+    *   **"Suspend / Restore Access"**: Instant button to stop/start a worker's login.
+    *   **"Management Level"**: Dropdown to promote staff to Level 1, 2, or 3.
+    *   **"Hospital Office"**: Selector for department assignment (Medical Director, Ethics, etc.).
+    *   **"+ Lab / + Pharm"**: Buttons to grant doctors power in other departments.
+    *   **"+ COMPLIANCE"**: Generates a legal report for a patient (**"Export Manifest"** to print).
+*   **Archive Tools**: **"Review →"** (Open patient file) and **"Finalize Re-assign →"** (Move file to a new doctor).
+*   **Safe (Vault)**: (High Level) extract and download research data.
+*   **Audit Tab**: Download the **"Master Institutional Report"** (Excel).
 
-### **8.3 For Doctors (The Clinical Workspace)**
-Designed for fast and accurate patient management.
-*   **"My Assigned Cases"**: Your current patient "To-Do" list. Click **"Manage Case"** to start working.
-*   **"Available Case Queue"**: New patients waiting for a doctor. Click **"View & Accept"** to take on a new case.
-*   **"Search Bar"**: Find any patient or record instantly.
+### **8.3 For Patients (Your Health Home)**
+*   **"+ Start New Consultation"**: The big button to start a new medical visit.
+*   **"Proceed to Human Specialist"**: Appears after the first talk with the AI; sends your file to a real doctor.
+*   **"Sign & Acknowledge Script"**: Green button that confirms you understand your medicine.
 
-### **8.4 The Clinical Command Center (Managing a Patient)**
-The main page where you talk to patients, view tests, and issue treatments.
-*   **"Flag Case"**: Used by doctors or admins to pause a case if something is wrong.
-*   **"Issue RX"**: Opens the form to write **Prescriptions**.
-*   **"Request Lab"**: Used when the doctor needs a **Blood Test** or X-ray.
-*   **"Safe Closure"**: Only clicked when treatment is finished. It saves the final summary and closes the file.
-*   **"Verify Resident Findings"**: Doctors click this to confirm they agree with the AI's first report.
-*   **"Telemedicine & Chat"**: Use the **"Start Call"** button for video visits or the chat box for messaging.
-*   **Voice Recorder**: Doctors can "talk" their notes, and the system types them out for the record.
+### **8.4 For Doctors (Your Workspace)**
+*   **Sidebar Tools**: Buttons for **"Start Video Call"**, **"Start Voice Call"**, and the **"Clinical Voice Recorder"** (creates a **"Medical Audio Player"**).
+*   **Main Action Bar**: **"Accept Case"**, **"Issue RX"**, **"Request Lab"**, **"Safe Closure ✓"**, **"Flag Case"**, and **"Escalate."**
 
-### **8.5 Back Office Staff (Lab & Pharmacy)**
-Specialized workspaces for staff running the underlying hospital services.
-*   **Lab Dashboard**: Technicians see a list of tests and use **"Submit Results"** to upload finding reports.
-*   **Pharmacy Dashboard**: Pharmacists see a list of medicine orders. They click **"Verify & Dispense"** to confirm you received your medicine.
+### **8.5 For Lab & Pharmacy Workers**
+*   **Lab Console**: **"Submit Results →"** (Upload reports with **"Diagnostic Remarks"**).
+*   **Pharmacy Console**: **"✔ Verify & Dispense"** (Final check button). Individual medicines have **"Dispense Medication"** and **"External Fulfillment"** buttons.
 
 ---
 
-**Protocol Note:** Every button click and action is recorded in the system's "Security Trace" (Audit Log) to ensure 100% legal and clinical safety.
+**Hospital Security Note**: Every single button mentioned above is tracked. The system records your name and the time for every click to ensure 100% safety and honesty.
+
