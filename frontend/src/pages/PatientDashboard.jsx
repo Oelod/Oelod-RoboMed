@@ -24,7 +24,10 @@ export default function PatientDashboard() {
         setBackupStatus({ success: true, message: 'Account security key securely backed up.' });
         setBackupPhrase('');
      } catch (err) {
-        setBackupStatus({ success: false, message: 'Secure connection failed: System interrupted.' });
+        const msg = err.message.includes('Missing') 
+           ? 'Local Identity Missing: Please restore your account first.'
+           : 'Secure connection failed: System interrupted.';
+        setBackupStatus({ success: false, message: msg });
      } finally {
         setIsBackingUp(false);
      }
@@ -182,9 +185,10 @@ export default function PatientDashboard() {
               )}
            </form>
  
-           <div className="mt-8 pt-8 border-t border-white/5 flex items-center gap-3">
+           <div className="mt-8 pt-8 border-t border-white/5 flex flex-wrap items-center gap-3">
               <span className="text-[9px] font-black text-gray-600 uppercase tracking-[0.2em]">Data Security Status:</span>
-              <span className="px-2 py-0.5 rounded bg-gray-950 border border-white/5 text-gray-500 text-[8px] font-black uppercase">IDENTITY {user?.publicKey ? 'ENCRYPTED & SYNCED' : 'LOCAL-ONLY'}</span>
+              <span className="px-2 py-0.5 rounded bg-gray-950 border border-white/5 text-gray-500 text-[8px] font-black uppercase">REGISTRY {user?.publicKey ? 'ENCRYPTED & SYNCED' : 'LOCAL-ONLY'}</span>
+              <span className="px-2 py-0.5 rounded bg-gray-950 border border-white/5 text-gray-500 text-[8px] font-black uppercase">LOCAL TERMINAL {user?.publicKey ? 'SECURED' : 'UNSECURED'}</span>
            </div>
         </div>
       </div>

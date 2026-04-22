@@ -39,13 +39,14 @@ const AdminStatCard = ({ label, value, icon }) => (
      </div>
      <div>
         <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">{label}</p>
+        <p className="text-[10px] text-brand-500 font-bold uppercase tracking-[0.3em] mt-2">Personal Health Check-in</p>
         <p className="text-2xl font-black text-white italic tracking-tighter">{value}</p>
      </div>
   </div>
 );
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState('personnel'); // 'personnel' | 'patients' | 'cases' | 'reports' | 'logs' | 'search' | 'migration' | 'policies' | 'audit' | 'office' | 'health' | 'research'
+  const [activeTab, setActiveTab] = useState('staff'); // 'staff' | 'patients' | 'cases' | 'reports' | 'history' | 'search' | 'migration' | 'rules' | 'audit' | 'office' | 'health' | 'research'
   const [migrationFile, setMigrationFile] = useState(null);
   const [migrationType, setMigrationType] = useState('patients'); // 'patients' | 'doctors'
   const [migrationStatus, setMigrationStatus] = useState(null);
@@ -65,13 +66,13 @@ export default function AdminDashboard() {
   const { data: logsData } = useQuery({
     queryKey: ['admin-audit-logs', activeTab],
     queryFn: () => api.get('/admin/audit-log?limit=200').then((r) => r.data.data),
-    enabled: activeTab === 'logs'
+    enabled: activeTab === 'history'
   });
 
   const { data: allCasesData } = useQuery({
     queryKey: ['admin-all-cases', activeTab],
     queryFn: () => api.get('/cases?limit=500').then((r) => r.data.data),
-    enabled: activeTab === 'cases' || activeTab === 'policies'
+    enabled: activeTab === 'cases' || activeTab === 'rules'
   });
 
   const { data: officeMattersData } = useQuery({
@@ -208,7 +209,7 @@ export default function AdminDashboard() {
       link.remove();
     } catch (err) {
       console.error('Audit download failed:', err);
-      alert('Institutional clearance failure: Unable to generate master audit manifest.');
+      alert('Unable to generate the system activity report.');
     }
   };
 
@@ -345,24 +346,24 @@ export default function AdminDashboard() {
                </div>
             )}
 
-            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-10 mb-16 relative Governance-Header">
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-10 mb-16 relative">
           <div className="flex items-center gap-6">
             <div className="w-32 h-16 flex items-center justify-center p-1">
                <img src="/oelod_logo_official.png" className="max-w-full max-h-full object-contain" alt="Oelod Official" />
             </div>
             <div>
               <h1 className="text-3xl font-bold text-white tracking-tight flex items-center gap-3">
-                 Administrative Oversight ⚖️
+                 Management & Record Review ⚖️
               </h1>
-              <p className="text-gray-500 mt-1">Management center for clinical staff and patient records.</p>
+              <p className="text-gray-500 mt-1">Management center for staff and patient records.</p>
             </div>
           </div>
           
           <div className="flex bg-gray-900 p-1 rounded-xl border border-gray-800 no-print flex-wrap">
-             {['personnel', 'patients', 'cases', 'reports', 'logs', 'search', 'migration', 'policies', 'audit', ...(currentUser?.assignedOffice ? ['office'] : []), ...(currentUser?.adminLevel === 3 ? ['health', 'research'] : [])]
+             {['Staff', 'patients', 'cases', 'reports', 'History', 'search', 'migration', 'Rules', 'Audit', ...(currentUser?.assignedOffice ? ['office'] : []), ...(currentUser?.adminLevel === 3 ? ['health', 'research'] : [])]
               .filter(t => {
                 if (currentUser?.adminLevel === 1) {
-                  return ['personnel', 'patients', 'search', 'office', 'reports'].includes(t);
+                  return ['Staff', 'patients', 'search', 'office', 'reports'].includes(t);
                 }
                 return true;
               })
@@ -374,11 +375,11 @@ export default function AdminDashboard() {
                      window.location.href = '/admin/reports';
                      return;
                    }
-                   setActiveTab(t);
+                   setActiveTab(t.toLowerCase());
                  }}
-                 className={`px-6 py-2 rounded-lg text-xs font-semibold uppercase tracking-widest transition-all ${activeTab === t ? 'bg-gray-800 text-white border border-gray-700 shadow-sm' : 'text-gray-500 hover:text-gray-300'}`}
+                 className={`px-6 py-2 rounded-lg text-xs font-semibold uppercase tracking-widest transition-all ${activeTab === t.toLowerCase() ? 'bg-gray-800 text-white border border-gray-700 shadow-sm' : 'text-gray-500 hover:text-gray-300'}`}
                >
-                 {t === 'cases' ? 'archive' : t === 'policies' ? 'manifest' : t === 'office' ? 'Department' : t === 'health' ? 'Health' : t === 'audit' ? 'Audit' : t === 'research' ? 'Vault' : t}
+                 {t === 'cases' ? 'Records' : t === 'Rules' ? 'Policies' : t === 'office' ? 'Department' : t === 'health' ? 'System Status' : t === 'Audit' ? 'Activity Log' : t === 'research' ? 'Data Vault' : t}
                </button>
              ))}
           </div>
@@ -387,25 +388,25 @@ export default function AdminDashboard() {
         {/* Stats Row - Admin/Super Admin Only */}
         {currentUser?.adminLevel > 1 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12 animate-in slide-in-from-top-4 duration-500 no-print">
-             <AdminStatCard label="System Records" value={statsData?.cases?.total?.[0]?.count || 0} icon="📝" />
-             <AdminStatCard label="Performance Metrics" value={`${Math.round((statsData?.cases?.avgConfidence?.[0]?.avg || 0) * 100)}%`} icon="⚡" />
+             <AdminStatCard label="Total Records" value={statsData?.cases?.total?.[0]?.count || 0} icon="📝" />
+             <AdminStatCard label="Review Quality" value={`${Math.round((statsData?.cases?.avgConfidence?.[0]?.avg || 0) * 100)}%`} icon="⚡" />
              <AdminStatCard label="Active Consultations" value={statsData?.cases?.byStatus?.find(s => s._id === 'open')?.count || 0} icon="🔓" />
-             <AdminStatCard label="Resolved Records" value={statsData?.cases?.byStatus?.find(s => s._id === 'closed')?.count || 0} icon="✅" />
+             <AdminStatCard label="Completed Records" value={statsData?.cases?.byStatus?.find(s => s._id === 'closed')?.count || 0} icon="✅" />
           </div>
         )}
 
         {/* Search Matrix */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12 no-print">
-           <div className="card !p-4 sm:!p-5">
-              <p className="text-[9px] sm:text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2 sm:mb-3">Patient Inquiry</p>
-              <SearchBar placeholder="Symptoms or Diseases..." />
-           </div>
-           <div className="card !p-4 sm:!p-5">
-              <p className="text-[9px] sm:text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2 sm:mb-3">File Search</p>
-              <SearchBar placeholder="Patient PID or Case ID..." />
-           </div>
-           <div className="card !p-4 sm:!p-5 md:col-span-2 lg:col-span-1">
-              <p className="text-[9px] sm:text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2 sm:mb-3">Security Logs</p>
+            <div className="card !p-4 sm:!p-5">
+               <p className="text-[9px] sm:text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2 sm:mb-3">Health Search</p>
+               <SearchBar placeholder="Symptoms or Diseases..." />
+            </div>
+            <div className="card !p-4 sm:!p-5">
+               <p className="text-[9px] sm:text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2 sm:mb-3">Action History</p>
+               <SearchBar placeholder="Patient ID or Case ID..." />
+            </div>
+            <div className="card !p-4 sm:!p-5 md:col-span-2 lg:col-span-1">
+               <p className="text-[9px] sm:text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2 sm:mb-3">Health Search</p>
               <div className="relative">
                   <input 
                     type="text" 
@@ -424,13 +425,13 @@ export default function AdminDashboard() {
            <div className="px-8 py-5 border-b border-gray-800 bg-gray-900/50 flex flex-col md:flex-row justify-between items-center gap-6">
               <h2 className="text-lg font-bold text-white capitalize">{activeTab} Monitor</h2>
               <div className="flex gap-3 no-print">
-                 <button onClick={activeTab === 'personnel' ? handleExportUsers : handleExportLogs} className="btn-secondary !py-2 !px-4 text-[10px] uppercase font-bold tracking-widest">⬇ Export CSV</button>
+                 <button onClick={activeTab === 'staff' ? handleExportUsers : handleExportLogs} className="btn-secondary !py-2 !px-4 text-[10px] uppercase font-bold tracking-widest">⬇ Export CSV</button>
                  <button onClick={() => window.print()} className="btn-secondary !py-2 !px-4 text-[10px] uppercase font-bold tracking-widest">📄 Generate PDF</button>
               </div>
            </div>
 
            <div className="overflow-x-auto">
-              {activeTab === 'personnel' ? (
+              {activeTab === 'staff' ? (
                 <table className="w-full text-left">
                    <thead>
                      <tr className="bg-gray-800/30 text-gray-500 border-b border-gray-800">
@@ -490,7 +491,7 @@ export default function AdminDashboard() {
                                 </div>
 
                                 <div className="flex flex-col gap-2 items-end opacity-0 group-hover:opacity-100 transition-all no-print">
-                                  {/* Administrative Delegation (L3 Only) */}
+                                  Management & Records Review ⚖️
                                   {currentUser?.adminLevel === 3 && (
                                     <div className="flex flex-col gap-2 p-3 bg-gray-900/50 border border-gray-800 rounded-xl mb-2">
                                        <span className="text-[8px] font-black text-gray-500 uppercase self-start">Governance Assignment (L3)</span>
@@ -499,7 +500,7 @@ export default function AdminDashboard() {
                                          value={u.assignedOffice || ''}
                                          onChange={(e) => handleUpdateOffice(u._id, e.target.value)}
                                        >
-                                          <option value="">No Institutional Office</option>
+                                          <option value="">No Department Assigned</option>
                                           {OFFICES.map(off => (
                                             <option key={off} value={off}>{off}</option>
                                           ))}
@@ -630,7 +631,7 @@ export default function AdminDashboard() {
                        </div>
                     ) : (
                     <>
-                    {/* Open Cases Table */}
+                    {/* AI Assistant Chat Session */}
                     <div>
                        <h3 className="text-sm font-black text-blue-400 uppercase tracking-widest mb-4 flex items-center gap-2">
                           <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
@@ -783,7 +784,7 @@ export default function AdminDashboard() {
                     </>
                     )}
                  </div>
-              ) : activeTab === 'logs' ? (
+              ) : activeTab === 'history' ? (
                 <table className="w-full text-left">
                   <thead>
                     <tr className="bg-gray-800/30 text-gray-500 border-b border-gray-800">
@@ -955,7 +956,7 @@ export default function AdminDashboard() {
               ) : activeTab === 'policies' ? (
                  <div className="p-10 max-w-6xl mx-auto space-y-16 animate-in slide-in-from-bottom-8 duration-700">
                     <div className="text-center">
-                       <h2 className="text-4xl font-black text-white italic uppercase tracking-tighter mb-2">Institutional Manifest ⚖️</h2>
+                       <h2 className="text-3xl font-black text-white italic uppercase tracking-tighter mb-2">Finalizing Your Summary</h2>
                        <p className="text-gray-500 font-medium">Platform-wide authority protocols and clinical chain of command.</p>
                        <div className="w-24 h-1 bg-brand-500 mx-auto mt-6 rounded-full shadow-[0_0_15px_rgba(var(--brand-500-rgb),0.5)]"></div>
                     </div>

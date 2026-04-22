@@ -356,5 +356,21 @@
       "radiating": false,
       "shortnessOfBreath": true
     }
+  },
+  {
+    "timestamp": "2026-04-22T20:47:48.918Z",
+    "userName": "[DE-IDENTIFIED]",
+    "symptoms": [
+      "diabetic_neuropathy",
+      "angina",
+      "brachial_radiation",
+      "migraine",
+      "gastralgia"
+    ],
+    "focus": "Orthopedics",
+    "specialty": "Orthopedics",
+    "clerkshipData": {
+      "additionalNotes": "Just the pain from the fracture"
+    }
   }
 ]

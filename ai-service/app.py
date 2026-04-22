@@ -58,12 +58,12 @@ class GenerativeManifold:
                 genai.configure(api_key=self.api_key)
                 # Migrating to Lite Node to bypass Free Tier quota exhaustion on main Flash nodes
                 self.model = genai.GenerativeModel('gemini-flash-lite-latest')
-                # Statutory Warm-up: Testing core intelligence
-                self.model.generate_content("Institutional handshake.")
+                # Warm-up: Testing core connection
+                self.model.generate_content("Testing connection.")
                 self.is_active = True
                 logger.info("✅ Generative Manifold Active: O.V.R. Cognitive Core Empowered (Lite).")
             except Exception as e:
-                logger.error(f"❌ Generative Handshake Failed (Quota or API Key): {e}")
+                logger.error(f"❌ Connection Failed (Quota or API Key): {e}")
         else:
             logger.warning("⚠️ No GEMINI_API_KEY detected. Using High-Fidelity Heuristic Fallback.")
 
@@ -77,17 +77,18 @@ class GenerativeManifold:
             return None 
 
         system_instruction = (
-            "You are the Oelod Virtual Resident (O.V.R.), a world-class, high-fidelity clinical intelligence. "
+            "You are the RoboMed AI Assistant, a world-class health assistant designed for medical check-ins. "
             "Your personality is an elite blend of medical professionalism and warm, reassuring empathy. "
-            "STRICT CLINICAL PROTOCOLS: "
-            "1. You are engaging in a sophisticated clinical discussion (Current Stage: {stage}). "
-            "2. Your goal is to guide the patient ({user_name}) through their check-in with high intelligence. "
-            "3. If they ask about your identity, confirm you are an intelligent Oelod AI built for clinical assistance. "
+            "STRICT PROTOCOLS: "
+            "1. You are engaging in a helpful medical discussion. "
+            "2. Your goal is to guide the user ({user_name}) through their health check-in with care and accuracy. "
+            "3. If they ask about your identity, confirm you are the RoboMed AI Assistant built for clinical support and patient care. "
             "4. PHASE MONITOR: Currently in phase '{stage}'. "
             "   - If 'rapport', keep it friendly and open. "
             "   - If 'rapport_closing', gracefully guide the conversation toward physical health. "
-            "5. NEVER provide medical prescriptions or a definitive diagnosis. "
-            "5. Bridge any off-topic discussion back to their physical well-being with medical grace."
+            "5. PLATFORM TRANSITION: Your primary function is to gather details to match the user with a human specialist on this platform. NEVER refer users to external hospitals or urgent care clinics; instead, reassure them that you are preparing their case for immediate review by a RoboMed specialist who will take over soon. "
+            "6. NEVER provide medical prescriptions or a definitive diagnosis. "
+            "7. Bridge any off-topic discussion back to their health and well-being with professionalism."
         ).format(stage=stage, user_name=user_name)
 
         try:
@@ -126,7 +127,7 @@ class ModelRegistry:
     def load_models(self):
         """Institutional Atomic Shadow-Reload: Ensures absolute triage integrity."""
         try:
-            logger.info("Initializing high-fidelity triage load...")
+            logger.info("Initializing check-up analysis models...")
             
             # Load into staging buffer to prevent mismatched predictions
             new_clf_spec = joblib.load(os.path.join(self.model_dir, "symptom_model.pkl"))

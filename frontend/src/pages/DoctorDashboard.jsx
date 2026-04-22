@@ -11,18 +11,18 @@ export default function DoctorDashboard() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   
-  // High-Fidelity Signal Receiver
+  // Real-time Update Receiver
   useEffect(() => {
     const socket = io(import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000');
     
-    // Join the departmental manifold
+    // Connect to the department
     if (user?.specialization) {
       socket.emit('join_specialty', `specialty_${user.specialization}`);
     }
 
     socket.on('case_update', (data) => {
        if (data.type === 'RESIDENT_CLERKSHIP_SEALED') {
-          toast.success(`🆘 NEW CLINICAL ENTRY: ${data.message}`, {
+          toast.success(`🆘 NEW PATIENT UPDATE: ${data.message}`, {
              duration: 8000,
              position: 'top-right',
              style: { background: '#1e1b4b', color: '#818cf8', border: '1px solid #4338ca', fontWeight: 'bold' }
@@ -74,7 +74,7 @@ export default function DoctorDashboard() {
           <div className="card !p-4 sm:!p-6">
             <h2 className="text-lg font-black text-white uppercase italic tracking-tighter mb-6">📌 My Assigned Cases</h2>
             {assignedCases.length === 0 ? (
-              <p className="text-gray-500 text-sm italic text-center py-12 bg-gray-950/50 rounded-2xl border border-gray-900 leading-relaxed">Clinical workspace notice: <br/> No active clinical records found in your queue.</p>
+              <p className="text-gray-500 text-sm italic text-center py-12 bg-gray-950/50 rounded-2xl border border-gray-900 leading-relaxed">Workspace notice: <br/> No active patient records found in your queue.</p>
             ) : (
               <ul className="space-y-4">
                 {assignedCases.map((c) => (

@@ -44,7 +44,7 @@ export default function Navbar() {
             className="bg-gray-900 border border-gray-700 text-brand-300 text-[10px] font-black uppercase tracking-widest rounded-lg px-3 py-1.5 outline-none cursor-pointer hover:bg-gray-800 transition-all"
           >
             {user.roles.map(r => (
-              <option key={r} value={r}>Matrix: {r}</option>
+              <option key={r} value={r}>View as {r}</option>
             ))}
           </select>
         )}
@@ -77,7 +77,7 @@ export default function Navbar() {
             onClick={handleLogout}
             className="ml-2 text-gray-500 hover:text-white font-black text-[10px] uppercase tracking-widest transition-colors"
           >
-            Terminal Shutdown
+            Logout
           </button>
         </div>
       </div>
@@ -110,15 +110,16 @@ export default function Navbar() {
                  </div>
                  <div className="flex flex-col">
                     <span className="text-white font-black text-xl italic uppercase tracking-tighter">{user.fullName}</span>
-                    <span className="text-brand-500 text-xs font-bold uppercase tracking-widest">{user.activeRole} Protocol</span>
+                    <span className="text-brand-500 text-xs font-bold uppercase tracking-widest">{user.activeRole}</span>
                     <button onClick={() => { setIsProfileOpen(true); setIsMobileMenuOpen(false); }} className="text-gray-500 text-[10px] font-black uppercase text-left mt-2 hover:text-white">Adjust Settings â†’</button>
+                    <button onClick={() => { setIsProfileOpen(true); setIsMobileMenuOpen(false); }} className="text-gray-500 text-[10px] font-black uppercase text-left mt-2 hover:text-white">Adjust Settings →</button>
                  </div>
               </div>
 
               {/* Matrix Switcher */}
               {user.roles && user.roles.length > 1 && (
                 <div className="space-y-4">
-                   <p className="text-[10px] text-gray-600 font-black uppercase tracking-[0.3em] px-2">Access Matrix</p>
+                   <p className="text-[10px] text-gray-600 font-black uppercase tracking-[0.3em] px-2">Switch Views</p>
                    <div className="grid grid-cols-1 gap-2">
                      {user.roles.map(r => (
                        <button 
@@ -138,7 +139,7 @@ export default function Navbar() {
                 onClick={handleLogout}
                 className="w-full p-6 bg-red-500 text-white font-black uppercase tracking-[0.2em] rounded-[2rem] hover:bg-black hover:text-red-500 border-2 border-red-500 transition-all shadow-xl shadow-red-500/20"
               >
-                Safe Terminal Shutdown
+                Logout
               </button>
            </div>
         </div>

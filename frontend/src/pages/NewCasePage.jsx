@@ -84,17 +84,17 @@ export default function NewCasePage() {
   }, [messages]);
 
   return (
-    <div className="max-w-4xl mx-auto py-8 sm:py-16 px-4 flex flex-col h-screen max-h-[850px]">
-      <div className="flex-1 bg-gray-900 border border-gray-800 rounded-[3rem] shadow-2xl overflow-hidden flex flex-col relative">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-brand-500/5 rounded-bl-full pointer-events-none"></div>
+    <div className="max-w-4xl mx-auto pt-16 pb-20 px-4">
+      <div className="h-[800px] max-h-[85vh] bg-gray-900 border border-gray-800 rounded-[2.5rem] sm:rounded-[4rem] shadow-2xl overflow-hidden flex flex-col relative animate-slide-up">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-brand-500/10 blur-[100px] rounded-bl-full pointer-events-none"></div>
         
-        {/* O.V.R. Header */}
+        {/* AI Assistant Header */}
         <div className="p-8 border-b border-white/5 bg-black/20 flex justify-between items-center z-10">
            <div className="flex items-center gap-6">
               <div className="w-16 h-16 rounded-3xl bg-gray-800 border border-brand-500/20 flex items-center justify-center text-3xl shadow-lg">👨‍⚕️</div>
               <div>
-                 <h1 className="text-2xl font-black text-white italic tracking-tighter uppercase leading-none">Oelod Virtual Resident</h1>
-                 <p className="text-[10px] text-brand-500 font-bold uppercase tracking-[0.3em] mt-2">Active Check-in</p>
+                 <h1 className="text-2xl font-black text-white italic tracking-tighter uppercase leading-none">RoboMed AI Assistant</h1>
+                 <p className="text-[10px] text-brand-500 font-bold uppercase tracking-[0.3em] mt-2">Health Consultation Check-in</p>
               </div>
            </div>
            <button 
@@ -105,7 +105,7 @@ export default function NewCasePage() {
            </button>
         </div>
 
-        {/* O.V.R. Messaging Manifold */}
+        {/* AI Assistant Chat Session */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-8 space-y-6 custom-scrollbar scroll-smooth">
            {messages.map((m, i) => (
              <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -121,7 +121,7 @@ export default function NewCasePage() {
            {isTyping && (
              <div className="flex items-center gap-3 text-[10px] font-black text-brand-500 uppercase tracking-widest animate-pulse ml-4">
                <span className="w-2 h-2 rounded-full bg-brand-500"></span>
-               O.V.R. is thinking...
+               Assistant is thinking...
              </div>
            )}
            {error && (
@@ -142,7 +142,7 @@ export default function NewCasePage() {
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Type your symptoms or health concerns here..."
                 disabled={isTyping || !isInitialized}
-                className="flex-1 bg-gray-950 border-2 border-gray-800 rounded-3xl px-6 sm:px-8 py-4 sm:py-6 text-white text-md sm:text-lg placeholder:text-gray-600 focus:border-brand-500 outline-none transition-all pr-20 sm:pr-24 shadow-inner"
+                className="flex-1 bg-gray-950 border-2 border-gray-800 rounded-3xl px-6 sm:px-8 py-4 sm:py-6 text-white text-md sm:text-lg placeholder:text-gray-600 focus:border-brand-500 outline-none transition-all pr-24 sm:pr-36 shadow-inner"
               />
               <button 
                 type="submit"
@@ -162,8 +162,8 @@ export default function NewCasePage() {
         {messages.some(m => m.isFinal) && (
           <div className="absolute inset-0 bg-black/90 backdrop-blur-xl flex flex-col items-center justify-center z-50 animate-in fade-in duration-500">
              <div className="w-24 h-24 border-4 border-brand-500 border-t-transparent rounded-full animate-spin mb-8"></div>
-             <h2 className="text-3xl font-black text-white italic uppercase tracking-tighter mb-2">Finalizing Referral</h2>
-             <p className="text-brand-500 font-bold text-xs uppercase tracking-widest animate-pulse">Sealing Record & Alerting Specialist...</p>
+             <h2 className="text-3xl font-black text-white italic uppercase tracking-tighter mb-2">Saving Consultation Summary</h2>
+             <p className="text-brand-500 font-bold text-xs uppercase tracking-widest animate-pulse">Confirming details with clinical staff...</p>
           </div>
         )}
       </div>

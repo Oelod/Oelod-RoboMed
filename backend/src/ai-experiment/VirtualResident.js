@@ -126,7 +126,7 @@ class VirtualResident {
             patientExplanation: explanation
           },
           status: 'open',
-          timeline: [{ event: 'Clinical intake concluded by O.V.R.', note: 'Clerkship sealed.' }]
+          timeline: [{ event: 'Clinical intake concluded by RoboMed AI Assistant', note: 'Summary saved.' }]
         });
         await newCase.save();
         state.savedCaseId = newCase._id;
@@ -318,7 +318,7 @@ class VirtualResident {
       rationale = "to ensure we have a comprehensive understanding of everything you've shared with me today.";
     }
 
-    return `Based on our heart-to-heart, I suspect this could be related to ${focus}. I believe this ${rationale} I am now pushing your case to our ${specialist} department. Your specialist will review this clerkship immediately. Redirecting you to your new Case File now...`;
+    return `Based on our conversation, I suspect this could be related to ${focus}. I believe this ${rationale} I am now sending your case to our ${specialist} department. Your specialist will review this summary immediately. Redirecting you to your Case File now...`;
   }
 
   /**
@@ -326,7 +326,7 @@ class VirtualResident {
    */
   _formatStructuredClerkship(state) {
     return {
-      title: `CLARKSHIP SUMMARY: ${state.caseId}`,
+      title: `MEDICAL SUMMARY: ${state.caseId}`,
       patientHistory: state.symptoms,
       clinicalFindings: state.clarifiedData,
       assessment: {
@@ -334,7 +334,7 @@ class VirtualResident {
         recommendedSpecialty: state.suggestedSpecialty,
         confidenceLevel: 'High (Protocol 01-B Match)'
       },
-      residentNote: "The patient was cooperative during intake. Symptoms are consistent with the detected manifold. Recommend immediate specialist review."
+      residentNote: "The patient was cooperative during intake. Symptoms are consistent with the detected patterns. Recommend immediate specialist review."
     };
   }
 }

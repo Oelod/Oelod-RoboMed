@@ -19,18 +19,18 @@ This guide explains **every single button and link** on the screen. We have remo
 *   **"Critical System Alerts"**: Red boxes at the top with a ⚠️ icon. 
     *   **"Acknowledge & Dismiss"**: Click this to clear the alert once you have read it.
 *   **Navigation Tabs (Main Menu)**:
-    1.  **"Personnel"**: Manage all hospital workers.
+    1.  **"Staff"**: Manage all hospital workers.
     2.  **"Patients"**: Manage everyone receiving care.
-    3.  **"Archive"**: A list of all medical files (Active, Flagged, and Closed).
+    3.  **"Records"**: A list of all medical files (Active, Flagged, and Closed).
     4.  **"Reports"**: (Opens a new page) Review complaints or safety problems.
-    5.  **"Logs"**: A security record of every action taken in the hospital.
+    5.  **"Activity Log"**: A record of every action taken in the hospital.
     6.  **"Search"**: Advanced search for any file or person.
     7.  **"Migration"**: Add thousands of old hospital records from a file.
-    8.  **"Manifest"**: Official list of hospital rules and access levels.
-    9.  **"Audit"**: Download the **"Master Institutional Report"** (Excel file).
+    8.  **"Policies"**: Official list of hospital rules and access levels.
+    9.  **"Audit"**: Download the **"Activity Log"** (Excel file).
     10. **"Department"**: (If assigned) Your specific department workspace.
-    11. **"Health"**: Governance analytics and hospital health stats.
-    12. **"Vault"**: (High Level only) Extract and download data for hospital research.
+    11. **"Status"**: View the current health and status of the hospital system.
+    12. **"Data Archive"**: (High Level only) Extract and download data for hospital research.
 
 ### **Management Tools (In Tables)**
 *   **"Export CSV"**: Download the current list to an Excel file.
@@ -41,9 +41,9 @@ This guide explains **every single button and link** on the screen. We have remo
 *   **"+ Lab" / "Revoke Lab"**: Give or take away a doctor's power to work in the Lab.
 *   **"+ Pharm" / "Revoke Pharm"**: Give or take away power to work in the Pharmacy.
 *   **"+ COMPLIANCE"**: (On Patient rows) Create a complete legal history for that patient.
-    *   **"Export Manifest"**: Inside the compliance window; prints the report.
+    *   **"Export Report"**: Inside the compliance window; prints the report.
 
-### **The Archive Tab (Handling Files)**
+### **The Records Tab (Handling Files)**
 *   **"Current Consultations"**: Active patient files.
 *   **"System Alerts & Management"**: Files that have been **Flagged** or **Escalated** for review.
 *   **"Resolved Records Archive"**: Completed and locked files.
@@ -59,8 +59,8 @@ This guide explains **every single button and link** on the screen. We have remo
 *   **"View Case Details →"**: See your tests, talk to your doctor, or see your medicine.
 *   **"Account Security Backup"**: View your secret recovery words again.
 
-### **The First Check-up (AI Assistant)**
-*   **"Proceed to Human Specialist"**: Click this when the assistant is done to talk to a real human doctor.
+### **The First Check-up (Virtual Resident)**
+*   **"Proceed to Human Specialist"**: Click this when the resident is done to talk to a real human doctor.
 
 ---
 
@@ -87,6 +87,20 @@ This guide explains **every single button and link** on the screen. We have remo
 *   **Lab Console**: **"Submit Results →"** is the primary button for technicians to upload reports.
 *   **Pharmacy Console**: **"✔ Verify & Dispense"** is the final click to say the patient received their medicine.
 *   **"Dispense Medication" / "External Fulfillment"**: Buttons to track if individual pills came from the hospital or somewhere else.
+
+---
+
+## 🛡️ 6. Account Security Backup (Protecting Your Account)
+This section is found at the bottom of every Dashboard. It is the most important step for keeping your medical records safe.
+
+**How to create your backup:**
+1.  **Find the Box**: Look for the section titled **"Account Security Backup"**.
+2.  **Enter Your Secret Phrase**: Type in a strong secret phrase (something only you know, like a long sentence or 12 random words).
+3.  **Click Secure**: Click the button **"Secure My Identity Now →"**.
+4.  **The Result**: Your account is now "Locked" to that secret phrase.
+
+**Why do this?**
+RoboMed uses high-level encryption. If you lose your password or buy a new phone, the **ONLY** way to get your medical records back is to type in that secret phrase. The hospital staff cannot "reset" this for you because your data is private.
 
 ---
 

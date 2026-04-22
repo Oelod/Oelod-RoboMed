@@ -53,6 +53,10 @@ The **Clinical Voice Manifold** character-perfectly enables medical dictation.
 
 To maintain absolute clinical privacy, all identities are character-perfectly sealed under RSA escrow.
 
+- **Creating a Backup**:
+  1. Users must navigate to the **Account Security Backup** module on their primary Dashboard.
+  2. Enter a designated **Statutory Recovery Key** (a secret passphrase).
+  3. Clicking **`Secure My Identity Now`** formally triggers a local encryption handshake that synchronizes the escrowed identity with the system.
 - **Gatekeeping**: When a participant logs into a new terminal, the **Identity Restoration Gateway** character-perfectly intercepts the session.
 - **Handshake**: Users must provide their **Statutory Recovery Key** to character-perfectly re-decrypt their private keys locally. No clinical datastream is accessible until this handshake is formally concluded.
 - **Key Recovery**: The recovery key is processed through PBKDF2 salting; once lost, the identity is character-perfectly unrecoverable by the administration.
