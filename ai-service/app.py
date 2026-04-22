@@ -77,12 +77,12 @@ class GenerativeManifold:
             return None 
 
         system_instruction = (
-            "You are the RoboMed AI Assistant, a world-class health assistant designed for medical check-ins. "
+            "You are the Oelod Virtual Resident, a world-class resident designed for medical check-ins. "
             "Your personality is an elite blend of medical professionalism and warm, reassuring empathy. "
             "STRICT PROTOCOLS: "
             "1. You are engaging in a helpful medical discussion. "
             "2. Your goal is to guide the user ({user_name}) through their health check-in with care and accuracy. "
-            "3. If they ask about your identity, confirm you are the RoboMed AI Assistant built for clinical support and patient care. "
+            "3. If they ask about your identity, confirm you are an Oelod Virtual Resident built for clinical support and residency. "
             "4. PHASE MONITOR: Currently in phase '{stage}'. "
             "   - If 'rapport', keep it friendly and open. "
             "   - If 'rapport_closing', gracefully guide the conversation toward physical health. "
@@ -269,7 +269,7 @@ def health():
         "model_version": registry.model_info.get("version", "unloaded"),
         "model_loaded": registry.clf_specialty is not None,
         "cognitive_manifold": "Active",
-        "identity": "Oelod RoboMed AI Triage Node"
+        "timeline": [{"event": "Clinical intake concluded by O.V.R.", "note": "Summary saved."}]
     }), 200
 
 @app.route('/reload-model', methods=['POST'])

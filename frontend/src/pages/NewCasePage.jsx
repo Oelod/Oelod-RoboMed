@@ -93,8 +93,8 @@ export default function NewCasePage() {
            <div className="flex items-center gap-6">
               <div className="w-16 h-16 rounded-3xl bg-gray-800 border border-brand-500/20 flex items-center justify-center text-3xl shadow-lg">👨‍⚕️</div>
               <div>
-                 <h1 className="text-2xl font-black text-white italic tracking-tighter uppercase leading-none">RoboMed AI Assistant</h1>
-                 <p className="text-[10px] text-brand-500 font-bold uppercase tracking-[0.3em] mt-2">Health Consultation Check-in</p>
+                 <h1 className="text-2xl font-black text-white italic tracking-tighter uppercase leading-none">Oelod Virtual Resident</h1>
+                 <p className="text-[10px] text-brand-500 font-bold uppercase tracking-[0.3em] mt-2">Personal Health Check-in</p>
               </div>
            </div>
            <button 
@@ -121,7 +121,7 @@ export default function NewCasePage() {
            {isTyping && (
              <div className="flex items-center gap-3 text-[10px] font-black text-brand-500 uppercase tracking-widest animate-pulse ml-4">
                <span className="w-2 h-2 rounded-full bg-brand-500"></span>
-               Assistant is thinking...
+               Resident is thinking...
              </div>
            )}
            {error && (
@@ -162,8 +162,8 @@ export default function NewCasePage() {
         {messages.some(m => m.isFinal) && (
           <div className="absolute inset-0 bg-black/90 backdrop-blur-xl flex flex-col items-center justify-center z-50 animate-in fade-in duration-500">
              <div className="w-24 h-24 border-4 border-brand-500 border-t-transparent rounded-full animate-spin mb-8"></div>
-             <h2 className="text-3xl font-black text-white italic uppercase tracking-tighter mb-2">Saving Consultation Summary</h2>
-             <p className="text-brand-500 font-bold text-xs uppercase tracking-widest animate-pulse">Confirming details with clinical staff...</p>
+             <h2 className="text-3xl font-black text-white italic uppercase tracking-tighter mb-2">Saving Summary</h2>
+             <p className="text-brand-500 font-bold text-xs uppercase tracking-widest animate-pulse">Resident is preparing your summary...</p>
           </div>
         )}
       </div>

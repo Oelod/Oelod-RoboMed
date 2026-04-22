@@ -126,7 +126,7 @@ class VirtualResident {
             patientExplanation: explanation
           },
           status: 'open',
-          timeline: [{ event: 'Clinical intake concluded by RoboMed AI Assistant', note: 'Summary saved.' }]
+          timeline: [{ event: 'Clinical intake concluded by O.V.R.', note: 'Summary saved.' }]
         });
         await newCase.save();
         state.savedCaseId = newCase._id;

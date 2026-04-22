@@ -684,6 +684,7 @@ export default function CaseDetailPage() {
                                   </span>
                                </div>
                                
+                               <div className="text-[8px] font-black uppercase text-brand-500 tracking-[0.2em] mb-2">Resident Ready 📋</div>
                                <div className="flex gap-4 text-[10px] font-black lowercase text-gray-500 tracking-tighter mb-4">
                                   <span>{d.dosage}</span>
                                   <span>·</span>
@@ -808,7 +809,7 @@ export default function CaseDetailPage() {
                <div className="flex items-center gap-4 mb-8">
                   <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-2xl border border-indigo-500/20 shadow-inner">👨‍⚕️</div>
                    <div>
-                     <h2 className="text-xl font-black text-white italic tracking-tighter uppercase leading-none">Consultation Summary</h2>
+                     <h2 className="text-xl font-black text-white italic tracking-tighter uppercase leading-none">O.V.R. Summary</h2>
                      <p className="text-[10px] text-indigo-400 font-bold uppercase tracking-[0.2em] mt-1 italic">Official Reference #{medicalCase._id.slice(-6)}</p>
                    </div>
                </div>
@@ -839,7 +840,7 @@ export default function CaseDetailPage() {
                   </div>
 
                   <div className="flex justify-between items-center opacity-40 grayscale hover:grayscale-0 transition-all cursor-default">
-                      <span className="text-[8px] font-black text-gray-500 uppercase tracking-widest leading-none italic">Verified by RoboMed AI System</span>
+                      <span className="text-[8px] font-black text-gray-500 uppercase tracking-widest leading-none italic">Verified by Virtual Resident</span>
                       <span className="text-[8px] font-black text-gray-500 uppercase tracking-widest leading-none">Status: SAVED</span>
                   </div>
                </div>
