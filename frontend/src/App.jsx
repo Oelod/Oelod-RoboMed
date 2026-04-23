@@ -30,6 +30,7 @@ export default function App() {
     <div className="min-h-screen bg-gray-950 flex flex-col">
       <GlobalNotifications />
       <GlobalSignalReceiver />
+      <RestorationOverlay />
       <div className="flex-1 overflow-auto">
         <Routes>
           {/* Public Manifolds */}

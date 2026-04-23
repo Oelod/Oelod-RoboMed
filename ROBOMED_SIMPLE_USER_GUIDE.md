@@ -102,6 +102,12 @@ This section is found at the bottom of every Dashboard. It is the most important
 **Why do this?**
 RoboMed uses high-level encryption. If you lose your password or buy a new phone, the **ONLY** way to get your medical records back is to type in that secret phrase. The hospital staff cannot "reset" this for you because your data is private.
 
+**Restoring Your Access (The "Secure Access Required" Screen):**
+If you see a screen that says **"Secure Access Required,"** it means the system doesn't recognize your browser (common if you use "Incognito" mode).
+1.  **Enter Your Phrase**: Type in the secret phrase you created.
+2.  **Default Testing Phrase**: During this testing phase, you can use the phrase: **RoboMed-Secure-2026** to get back in.
+3.  **Reset & Start Fresh**: If you forget your phrase, you can click "Reset My Identity" to start over (Note: this will hide your old records).
+
 ---
 
 **Hospital Security Note**: Every single button click mentioned in this guide is legally tracked with your name and time to ensure 100% accountability and safety.

@@ -34,6 +34,7 @@ class VirtualResident {
       currentFocus: null,
       suggestedSpecialty: null,
       rapportTurns: 0,
+      lastQuestionKey: 'initialConcern', // Initialize correctly to avoid 'undefined' keys
       patientId: patientId, // Linked to Statutory Identity
       handleStart(name) {
         const safeName = name || 'Valued Patient';
@@ -204,6 +205,7 @@ class VirtualResident {
   }
 
   _updateClinicalContext(state, text) {
+    if (!state.lastQuestionKey) state.lastQuestionKey = 'additionalDetails';
     const lower = text.toLowerCase();
     // Heuristic capture of clinical qualifiers
     if (lower.includes('yes') || lower.includes('true') || lower.includes('radiating')) {
@@ -254,7 +256,7 @@ class VirtualResident {
 
     // Default Fallback: Only hit this if no focus is detected or after all clarifications
     state.lastQuestionKey = 'additionalNotes';
-    return "Is there anything else, even something small, that you think your doctor should know about your health right now? Once you share that, I'll finalize your specialist referral.";
+    return "Is there anything else, even something small, that you think your doctor should know about your health right now? Once you share that, I'll finalize your referral to an Oelod RoboMed Human Specialist.";
   }
 
   _syncSpecialty(state) {
@@ -280,6 +282,8 @@ class VirtualResident {
 
     if (matchedSpec) {
       state.suggestedSpecialty = matchedSpec;
+      // Also update focus to match specialty for consistency in headers
+      state.currentFocus = matchedSpec;
     }
 
     if (!state.suggestedSpecialty && state.currentFocus) {
@@ -287,10 +291,16 @@ class VirtualResident {
        const match = intelligenceService.predict(state.symptoms).find(m => 
           (m.disease === state.currentFocus || m.label === state.currentFocus) && m.specialty
        );
-       if (match) state.suggestedSpecialty = match.specialty;
+       if (match) {
+         state.suggestedSpecialty = match.specialty;
+         state.currentFocus = match.specialty;
+       }
     }
     
-    if (!state.suggestedSpecialty) state.suggestedSpecialty = 'General Medicine';
+    if (!state.suggestedSpecialty) {
+      state.suggestedSpecialty = 'General Medicine';
+      state.currentFocus = 'General Medicine';
+    }
   }
 
   _isClerkshipComplete(state) {
@@ -318,7 +328,7 @@ class VirtualResident {
       rationale = "to ensure we have a comprehensive understanding of everything you've shared with me today.";
     }
 
-    return `Based on our conversation, I suspect this could be related to ${focus}. I believe this ${rationale} I am now sending your case to our ${specialist} department. Your specialist will review this summary immediately. Redirecting you to your Case File now...`;
+    return `Based on our conversation, I suspect this could be related to ${focus}. I believe this ${rationale} I am now sending your case to our ${specialist} department. Your Oelod RoboMed Human Specialist will review this summary immediately. Redirecting you to your Case File now...`;
   }
 
   /**

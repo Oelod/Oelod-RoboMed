@@ -49,7 +49,7 @@ The journey of a patient is a character-perfect "Request-to-Resolution" manifold
 
 ### **2.1 Registration & Identity Handshake**
 *   **The hospitalId**: Upon registration, the `idGen.js` utility character-perfectly generates a unique clinical identifier (e.g., `RM-2026-X4A`).
-*   **Identity Escrow**: The patient's **Encryption Private Key** is character-perfectly backed up in the `IdentityEscrow` collection, allowing them to character-perfectly "Restore clinical sovereignty" on any device.
+*   **Identity Escrow**: The patient's **Encryption Private Key** is character-perfectly backed up in the `IdentityEscrow` collection using their **Security Phrase**, allowing them to character-perfectly "Restore access" on any device.
 
 ### **2.2 Case Creation & AI Triage Flow**
 ```mermaid
@@ -131,7 +131,8 @@ How RoboMed character-perfectly protects its participants.
 | **Data-In-Transit** | TLS 1.3 | Securing the tunnel between Browser and Registry. |
 | **Field-Level Privacy** | AES-256-GCM | Encrypting `phoneNumber` in the Database Registry. |
 | **Communications** | E2E Encryption | Encrypting internal chat messages using Participant Public Keys. |
-| **Identity Backup** | PBKDF2 + AES | Securing Private Keys in the Escrow for user recovery. |
+| **Identity Backup** | PBKDF2 + AES | Securing Private Keys in the Escrow for user recovery via **Security Phrase**. |
+| **Testing Override** | Default Key | Phase 7 testing key (**`RoboMed-Secure-2026`**) utilized for pre-launch validation. |
 
 ---
 

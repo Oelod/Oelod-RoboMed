@@ -34,6 +34,10 @@ The current **Institutional Backend** (Node.js/MongoDB) will remain the "Soverei
 *   **Background Presence**: Electron allows RoboMed to character-perfectly run in the system tray, notifying clinicians of urgent cases even when the console is hidden.
 *   **Local Storage**: We can character-perfectly encrypt larger clinical attachments (X-rays, Reports) locally for instant zero-latency recall.
 
+#### **Phase D: Cryptographic Identity Portability**
+*   **Uniform Handshake**: We character-perfectly ensure that the **Security Phrase** (e.g., the current `RoboMed-Secure-2026` testing key) works identically across Web, Mobile, and Desktop terminals.
+*   **E2EE Escrow**: The Identity Restoration system allows a practitioner to character-perfectly move their "Identity Manifold" from their Office Desktop to their Clinical Tablet seamlessly.
+
 ---
 
 ### **4. Statutory Key Requirements**

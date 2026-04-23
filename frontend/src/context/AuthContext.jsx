@@ -9,6 +9,8 @@ export function AuthProvider({ children }) {
   const [token, setToken]     = useState(null);  // kept in memory — NOT localStorage
   const [loading, setLoading] = useState(true);
   const [requiresRestoration, setRequiresRestoration] = useState(false);
+  
+  const DEFAULT_RECOVERY_PHRASE = "RoboMed-Secure-2026";
 
   // Attach token to all future requests
   useEffect(() => {
@@ -59,6 +61,12 @@ export function AuthProvider({ children }) {
       const pubKeyStr = await cryptoService.exportPublicKey(keyPair.publicKey);
       
       await api.patch('/auth/public-key', { publicKey: pubKeyStr });
+      
+      // Industrial Auto-Escrow: Secure with default phrase during Phase 7 testing
+      try {
+        await cryptoService.backupIdentity(targetUser._id, DEFAULT_RECOVERY_PHRASE);
+      } catch (e) { console.warn("Auto-Escrow Failed"); }
+
       setUser(prev => ({ ...prev, publicKey: pubKeyStr }));
       setRequiresRestoration(false);
     } catch (err) {
@@ -70,6 +78,18 @@ export function AuthProvider({ children }) {
     try {
        await cryptoService.restoreIdentity(user._id, phrase);
        setRequiresRestoration(false);
+       return true;
+    } catch (err) {
+       throw err;
+    }
+  };
+
+  const handleIdentityReset = async () => {
+    try {
+       await api.delete('/auth/identity/reset');
+       setRequiresRestoration(false);
+       // Re-trigger E2EE initialization to generate a new character-perfect keypair
+       await initE2EE(user);
        return true;
     } catch (err) {
        throw err;
@@ -138,7 +158,7 @@ export function AuthProvider({ children }) {
   return (
     <AuthContext.Provider value={{ 
       user, token, loading, requiresRestoration,
-      login, register, logout, switchRole, refreshUser, handleIdentityRestoration 
+      login, register, logout, switchRole, refreshUser, handleIdentityRestoration, handleIdentityReset 
     }}>
       {children}
     </AuthContext.Provider>

@@ -62,14 +62,17 @@ export default function NewCasePage() {
         setMessages(prev => [...prev, { role: 'assistant', text: msg }]);
 
         if (res.type === 'clerkship_final') {
-          // Mark as final for the overlay
+          // Mark as final for the overlay and show the manual proceed button
           setMessages(prev => {
             const newMsgs = [...prev];
             newMsgs[newMsgs.length - 1].isFinal = true;
+            newMsgs[newMsgs.length - 1].caseDbId = res.caseDbId;
             return newMsgs;
           });
-          // Redirect to the new dashboard/case page
-          setTimeout(() => navigate(`/cases/${res.caseDbId}`), 2500);
+          // Reduce redirect timer for snappier feel
+          setTimeout(() => {
+            if (res.caseDbId) navigate(`/cases/${res.caseDbId}`);
+          }, 1500);
         }
       }
     } catch (err) {
@@ -115,6 +118,14 @@ export default function NewCasePage() {
                     : 'bg-gray-850/80 backdrop-blur-md text-gray-200 border border-white/5 rounded-bl-none italic'
                 }`}>
                    {m.text}
+                   {m.isFinal && m.caseDbId && (
+                     <button 
+                       onClick={() => navigate(`/cases/${m.caseDbId}`)}
+                       className="mt-6 w-full py-4 bg-brand-500 hover:bg-brand-400 text-white font-black uppercase tracking-[0.2em] text-[10px] rounded-xl shadow-lg animate-in zoom-in-95 duration-500"
+                     >
+                        Proceed to Case File →
+                     </button>
+                   )}
                 </div>
              </div>
            ))}
@@ -159,13 +170,20 @@ export default function NewCasePage() {
         </div>
 
         {/* Finalization Overlay */}
-        {messages.some(m => m.isFinal) && (
-          <div className="absolute inset-0 bg-black/90 backdrop-blur-xl flex flex-col items-center justify-center z-50 animate-in fade-in duration-500">
-             <div className="w-24 h-24 border-4 border-brand-500 border-t-transparent rounded-full animate-spin mb-8"></div>
-             <h2 className="text-3xl font-black text-white italic uppercase tracking-tighter mb-2">Saving Summary</h2>
-             <p className="text-brand-500 font-bold text-xs uppercase tracking-widest animate-pulse">Resident is preparing your summary...</p>
-          </div>
-        )}
+         {messages.some(m => m.isFinal) && (
+           <div className="absolute inset-0 bg-black/90 backdrop-blur-xl flex flex-col items-center justify-center z-50 animate-in fade-in duration-500">
+              <div className="w-24 h-24 border-4 border-brand-500 border-t-transparent rounded-full animate-spin mb-8"></div>
+              <h2 className="text-3xl font-black text-white italic uppercase tracking-tighter mb-2">Summary Sealed</h2>
+              <p className="text-brand-500 font-bold text-xs uppercase tracking-widest animate-pulse mb-8">Redirecting to your specialist queue...</p>
+              
+              <button 
+                onClick={() => navigate('/dashboard')}
+                className="px-8 py-4 bg-gray-900 border border-white/10 text-gray-400 text-[10px] font-black uppercase tracking-widest rounded-xl hover:text-white transition-all"
+              >
+                Go to Dashboard instead
+              </button>
+           </div>
+         )}
       </div>
     </div>
   );

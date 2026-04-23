@@ -6,9 +6,10 @@ import { useAuth } from '../hooks/useAuth';
  * Formally guides clinical participants through the identity restoration handshake.
  */
 export default function RestorationOverlay() {
-  const { requiresRestoration, handleIdentityRestoration, logout } = useAuth();
+  const { requiresRestoration, handleIdentityRestoration, handleIdentityReset, logout } = useAuth();
   const [phrase, setPhrase] = useState('');
   const [isRestoring, setIsRestoring] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
   const [error, setError] = useState('');
 
   if (!requiresRestoration) return null;
@@ -21,9 +22,21 @@ export default function RestorationOverlay() {
     try {
       await handleIdentityRestoration(phrase);
     } catch (err) {
-      setError('Handshake Failed: Recovery phrase might be incorrect or corrupted.');
+      setError('Verification Failed: The phrase entered does not match your registered security key.');
     } finally {
       setIsRestoring(false);
+    }
+  };
+
+  const handleReset = async () => {
+    if (!window.confirm("WARNING: Resetting your identity will allow you to log in with the new default phrase, but you will lose access to any old encrypted records. Continue?")) return;
+    setIsResetting(true);
+    try {
+      await handleIdentityReset();
+    } catch (err) {
+      setError('System Error: Unable to reset identity manifold.');
+    } finally {
+      setIsResetting(false);
     }
   };
 
@@ -42,18 +55,24 @@ export default function RestorationOverlay() {
           </div>
           
           <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter mb-4 leading-tight">
-            Institutional Identity <br/> Restoration Required
+            Secure Access <br/> Required
           </h2>
           
           <p className="text-gray-500 text-xs sm:text-sm font-medium leading-relaxed mb-10 italic">
-            "Your cryptographic identity is character-perfectly secured on the Registry, but requires local restoration on this terminal."
+            "Your account is secured with a private phrase. To access your medical records on this browser, please enter it below."
           </p>
+          
+          {process.env.NODE_ENV === 'development' && (
+            <div className="mb-6 p-4 rounded-xl bg-brand-900/10 border border-brand-500/20 text-[10px] font-bold text-brand-400 uppercase tracking-widest italic">
+               Current Default Phrase: <span className="text-white font-black ml-2">RoboMed-Secure-2026</span>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="relative">
               <input 
                 type="password" 
-                placeholder="Enter Statutory Recovery Phrase..." 
+                placeholder="Enter Security Phrase..." 
                 className="input !py-5 pr-14 text-center placeholder:text-gray-700 font-mono tracking-widest"
                 value={phrase}
                 onChange={(e) => setPhrase(e.target.value)}
@@ -64,8 +83,18 @@ export default function RestorationOverlay() {
             </div>
 
             {error && (
-              <div className="p-4 rounded-xl bg-red-900/20 border border-red-500/30 text-red-400 text-[10px] font-black uppercase tracking-widest animate-in shake duration-300">
-                🚨 {error}
+              <div className="space-y-4">
+                <div className="p-4 rounded-xl bg-red-900/20 border border-red-500/30 text-red-400 text-[10px] font-black uppercase tracking-widest animate-in shake duration-300">
+                  🚨 {error}
+                </div>
+                <button 
+                   type="button"
+                   onClick={handleReset}
+                   disabled={isResetting}
+                   className="w-full p-4 rounded-xl bg-gray-900 border border-gray-800 text-[9px] font-black text-gray-500 uppercase tracking-widest hover:text-white transition-all"
+                >
+                   {isResetting ? 'Resetting...' : 'Reset My Identity & Start Fresh'}
+                </button>
               </div>
             )}
 
@@ -74,7 +103,7 @@ export default function RestorationOverlay() {
               className="btn-primary w-full !py-5 text-xs font-black uppercase tracking-[0.3em] shadow-2xl shadow-brand-500/20 active:scale-95 transition-all"
               disabled={isRestoring || !phrase}
             >
-              {isRestoring ? 'Processing Recovery Handshake…' : 'Restore Clinical Identity →'}
+              {isRestoring ? 'Verifying...' : 'Verify & Access Records →'}
             </button>
           </form>
 

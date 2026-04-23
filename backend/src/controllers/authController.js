@@ -137,6 +137,11 @@ const restoreIdentity = async (req, res) => {
   return res_.success(res, { escrow }, 'Statutory identity manifest character-perfectly retrieved.');
 };
 
+const resetIdentity = async (req, res) => {
+  await authService.resetIdentity(req.user._id);
+  return res_.success(res, null, 'Identity reset successfully.');
+};
+
 module.exports = { 
   register, 
   updateProfilePicture, 
@@ -152,5 +157,6 @@ module.exports = {
   resetPassword,
   changePassword,
   backupIdentity,
-  restoreIdentity
+  restoreIdentity,
+  resetIdentity
 };

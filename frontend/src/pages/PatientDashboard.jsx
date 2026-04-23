@@ -153,9 +153,15 @@ export default function PatientDashboard() {
              <span className="w-8 h-8 rounded-lg bg-gray-950 border border-white/5 flex items-center justify-center text-sm not-italic">🔑</span>
              Account Security Backup
            </h2>
-           <p className="text-gray-500 text-[11px] mb-8 font-medium max-w-xl leading-relaxed">
+           <p className="text-gray-500 text-[11px] mb-4 font-medium max-w-xl leading-relaxed">
              Create a secure backup of your clinical identity. This allows you to safely restore your access on new devices using your security phrase.
            </p>
+           
+           {process.env.NODE_ENV === 'development' && (
+             <div className="mb-8 p-4 rounded-xl bg-brand-900/10 border border-brand-500/20 text-[9px] font-bold text-brand-400 uppercase tracking-widest inline-block italic">
+                Current Default Key: <span className="text-white font-black ml-2">RoboMed-Secure-2026</span>
+             </div>
+           )}
  
            <form onSubmit={handleIdentityBackup} className="max-w-md space-y-4">
               <div className="relative">
@@ -181,14 +187,21 @@ export default function PatientDashboard() {
               {backupStatus && (
                 <div className={`mt-4 p-4 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all animate-in slide-in-from-top-2 ${backupStatus.success ? 'bg-brand-900/20 border-brand-500/30 text-brand-400' : 'bg-red-900/20 border-red-500/30 text-red-400'}`}>
                    {backupStatus.success ? '✓' : '🚨'} {backupStatus.message}
+                   {!backupStatus.success && backupStatus.message.includes('Missing') && (
+                      <p className="mt-2 text-gray-500 font-medium normal-case italic">Refresh the page to trigger the Identity Restoration Handshake.</p>
+                   )}
                 </div>
               )}
            </form>
  
            <div className="mt-8 pt-8 border-t border-white/5 flex flex-wrap items-center gap-3">
-              <span className="text-[9px] font-black text-gray-600 uppercase tracking-[0.2em]">Data Security Status:</span>
-              <span className="px-2 py-0.5 rounded bg-gray-950 border border-white/5 text-gray-500 text-[8px] font-black uppercase">REGISTRY {user?.publicKey ? 'ENCRYPTED & SYNCED' : 'LOCAL-ONLY'}</span>
-              <span className="px-2 py-0.5 rounded bg-gray-950 border border-white/5 text-gray-500 text-[8px] font-black uppercase">LOCAL TERMINAL {user?.publicKey ? 'SECURED' : 'UNSECURED'}</span>
+              <span className="text-[9px] font-black text-gray-600 uppercase tracking-[0.2em]">Institutional Security Status:</span>
+              <span className={`px-2 py-0.5 rounded bg-gray-950 border text-[8px] font-black uppercase ${user?.publicKey ? 'border-brand-500/30 text-brand-400' : 'border-white/5 text-gray-600'}`}>
+                 REGISTRY: {user?.publicKey ? 'ENCRYPTED & SYNCED' : 'UNSECURED'}
+              </span>
+              <span className={`px-2 py-0.5 rounded bg-gray-950 border text-[8px] font-black uppercase ${user?.publicKey ? 'border-brand-500/30 text-brand-400' : 'border-white/5 text-gray-600'}`}>
+                 TERMINAL: {user?.publicKey ? 'SECURED' : 'UNSECURED'}
+              </span>
            </div>
         </div>
       </div>

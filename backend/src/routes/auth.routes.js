@@ -72,8 +72,8 @@ router.get('/public-key/:userId', isAuth, ctrl.getPublicKey);
 
 // Password Recovery
 router.post('/forgot-password', ctrl.forgotPassword);
-// Cryptographic Identity Manifold
 router.post('/identity/backup', isAuth, ctrl.backupIdentity);
 router.get('/identity/restore', isAuth, ctrl.restoreIdentity);
+router.delete('/identity/reset', isAuth, ctrl.resetIdentity);
 
 module.exports = router;

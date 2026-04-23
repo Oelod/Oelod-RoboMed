@@ -358,6 +358,14 @@ const restoreIdentity = async (userId) => {
   return escrow;
 };
 
+const resetIdentity = async (userId) => {
+  await Promise.all([
+    userRepo.updateById(userId, { publicKey: null }),
+    IdentityEscrow.deleteOne({ userId })
+  ]);
+  return { success: true };
+};
+
 module.exports = {
   register, login, refreshToken, logout, requestRole,
   switchRole, approveRole, rejectRole, suspendUser, activateUser,
@@ -366,5 +374,6 @@ module.exports = {
   resetPassword,
   changePassword,
   backupIdentity,
-  restoreIdentity
+  restoreIdentity,
+  resetIdentity
 };

@@ -533,9 +533,10 @@ export default function CaseDetailPage() {
                      <div>
                         <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3">Initial Summary</h4>
                         <div className="p-4 bg-gray-950 border border-gray-800 rounded-2xl">
-                           <p className="text-sm font-bold text-white mb-1 uppercase italic">{medicalCase.residentClerkship.assessment.primaryFocus}</p>
-                           <p className="text-[10px] text-brand-400 font-black uppercase tracking-widest mb-3">Priority Level: {medicalCase.residentClerkship.assessment.confidenceLevel}</p>
-                           <p className="text-[12px] text-gray-400 leading-relaxed italic">"{medicalCase.residentClerkship.patientExplanation}"</p>
+                           <h5 className="text-[9px] font-black text-brand-500 uppercase tracking-widest mb-1">Recommended Specialty</h5>
+                           <p className="text-sm font-bold text-white mb-2 uppercase italic">{medicalCase.residentClerkship.assessment.recommendedSpecialty || medicalCase.residentClerkship.assessment.primaryFocus}</p>
+                           <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest mb-3">Triage Priority: {medicalCase.residentClerkship.assessment.confidenceLevel}</p>
+                           <p className="text-[12px] text-gray-400 leading-relaxed italic border-t border-white/5 pt-3 mt-1">"{medicalCase.residentClerkship.patientExplanation}"</p>
                         </div>
                      </div>
                      <div>
@@ -819,17 +820,20 @@ export default function CaseDetailPage() {
                      <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3 italic">Consultation Details</h3>
                     <div className="space-y-2">
                        {Object.entries(medicalCase.residentClerkship.findings || {}).map(([key, val], idx) => (
-                         <div key={idx} className="flex justify-between items-center py-2 border-b border-white/5">
-                            <span className="text-xs text-gray-400 font-medium capitalize">{key.replace(/([A-Z])/g, ' $1')}</span>
-                            <span className="text-xs text-white font-bold">{val === true ? 'Yes' : val === false ? 'No' : val}</span>
+                         <div key={idx} className={`flex ${typeof val === 'string' && val.length > 20 ? 'flex-col items-start gap-1' : 'justify-between items-center'} py-3 border-b border-white/5`}>
+                            <span className="text-[10px] text-gray-500 font-black uppercase tracking-widest">{key.replace(/([A-Z])/g, ' $1')}</span>
+                            <span className={`text-xs text-white font-bold ${typeof val === 'string' && val.length > 20 ? 'mt-1 leading-relaxed' : ''}`}>
+                               {val === true ? 'Yes' : val === false ? 'No' : val}
+                            </span>
                          </div>
                        ))}
                     </div>
                   </div>
 
                   <div className="p-6 bg-indigo-500/5 rounded-3xl border border-indigo-500/10">
-                     <h3 className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-3 italic">AI Assessment</h3>
-                    <p className="text-sm text-gray-300 font-medium leading-relaxed italic">"{medicalCase.residentClerkship.assessment?.primaryFocus}: {medicalCase.residentClerkship.residentNote}"</p>
+                     <h3 className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-3 italic">Clinical Specialty</h3>
+                    <p className="text-sm text-gray-300 font-bold uppercase tracking-tight mb-2">{medicalCase.residentClerkship.assessment?.recommendedSpecialty || 'General Medicine'}</p>
+<p className="text-xs text-gray-400 font-medium leading-relaxed italic border-t border-white/5 pt-3 mt-1">"{medicalCase.residentClerkship.residentNote}"</p>
                   </div>
 
                   <div className="pt-4 border-t border-white/5">

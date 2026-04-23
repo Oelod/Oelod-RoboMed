@@ -372,5 +372,29 @@
     "clerkshipData": {
       "additionalNotes": "Just the pain from the fracture"
     }
+  },
+  {
+    "timestamp": "2026-04-23T22:14:15.844Z",
+    "userName": "[DE-IDENTIFIED]",
+    "symptoms": [
+      "angina",
+      "brachial_radiation",
+      "dyspnea",
+      "gastralgia",
+      "copd",
+      "diabetic_neuropathy",
+      "insomnia",
+      "palpitations",
+      "anxiety",
+      "migraine",
+      "paresthesia"
+    ],
+    "focus": "General Medicine",
+    "specialty": "Cardiology",
+    "clerkshipData": {
+      "undefined": "I am having little difficulty in breathing, and a chest pain",
+      "radiating": "Its just a sharp pain",
+      "shortnessOfBreath": true
+    }
   }
 ]
