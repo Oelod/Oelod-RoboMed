@@ -66,9 +66,11 @@ This guide explains **every single button and link** on the screen. We have remo
 
 ## 👨‍⚕️ 4. For Doctors (Your Workspace)
 ### **Sidebar Tools (On the Right)**
-*   **"Telemedicine Hub"**: 
-    *   **"Start Video Call"**: Start a video visit.
-    *   **"Start Voice Call"**: Start a phone-style call.
+*   **Telemedicine Hub (Unified Hub)**: 
+    *   **"Initialize Video"**: Clicking this on a patient file starts a consultation.
+    *   **Floating Card**: Once started, a video box will appear at the **top-right** of your screen. This stays visible even if you look at other pages.
+    *   **"Identity Verification"**: Patients will see your full name (e.g., "DR. SMITH") on their screen before accepting.
+    *   **Voice Fallback**: If your camera is being used by another window, the system automatically switches to a **Secure Voice Call** so you can still talk to the patient.
 *   **"Clinical Voice Recorder"**: 
     *   **"🎙️ Record Note"**: Talk your notes out loud; the system will save them as an official audio file.
 *   **"Chat Panel"**: Send a text message to the patient.

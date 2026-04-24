@@ -6,7 +6,7 @@ import api from '../api/axiosInstance';
 import { useAuth } from '../hooks/useAuth';
 import ChatPanel from '../components/ChatPanel';
 import ClinicalVoiceRecorder from '../components/ClinicalVoiceRecorder';
-import TelemedicineHub from '../components/TelemedicineHub';
+import TelemedicineTrigger from '../components/TelemedicineTrigger';
 import { toast } from 'react-hot-toast';
 
 export default function CaseDetailPage() {
@@ -788,7 +788,7 @@ export default function CaseDetailPage() {
 
           {/* AI & Meta Sidebar */}
           <div className="space-y-6">
-            <TelemedicineHub 
+            <TelemedicineTrigger 
               caseId={caseId} 
               targetUserId={String(isDoctor ? medicalCase.patient?._id : medicalCase.doctor?._id)}
               isDoctor={isDoctor}

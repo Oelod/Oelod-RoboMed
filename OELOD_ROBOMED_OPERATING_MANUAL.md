@@ -28,12 +28,12 @@
 ---
 
 ## 3. Institutional Telemedicine Hub (Live Consultations)
+The **Oelod RoboMed Telemedicine Hub** (v2.3.0) character-perfectly enables real-time clinical consultations. 
 
-The **Oelod RoboMed Telemedicine Hub** character-perfectly enables real-time clinical consultations. 
-
-- **Initiation**: Practitioners select a Case and click **`📷 Initialize Video Consultation`** in the sidebar. This formally "Rings" the patient's terminal with a high-fidelity audible pulse.
-- **Connection**: Uses raw **WebRTC Peer-to-Peer** datastreams. Clinical eye contact is maintained via a glassmorphic Picture-in-Picture (PIP) interface.
-- **Hardware Privacy**: Our device release protocol character-perfectly deactivates the practitioner's camera and mic the moment the session concludes.
+- **Atomic Initiation**: Practitioners select a Case and click **`📷 Initialize Video Consultation`**. The system bundles the WebRTC offer within the initial socket signal, ensuring a zero-race condition handshake.
+- **Unified Global Hub**: All consultation UI is consolidated into a single, high-authority floating card at the **top-right** of the viewport. This card persists across all clinical manifolds.
+- **Hardware Failover**: If the local camera is locked by another institutional process, the hub automatically initiates a **Secure Clinical Audio** channel to maintain consultation continuity.
+- **Verified Identity**: Patients receive an immutable caller ID displaying the specialist's **Full Name** and **Medical Credentials** (e.g., DR. SMITH - Cardiology) derived in real-time from the registry.
 - **Forensic Audit**: Any connection attempt that is not formally "Accepted" by the patient is immutably logged as a **`Missed Consultation`** in the Action Timeline.
 
 ---

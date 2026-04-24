@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const emitter = require('../events/emitter');
 const { client: redis } = require('../utils/redisClient');
+const User = require('../models/User');
 
 module.exports = (io) => {
   // Listen for internal chat events to broadcast to specific case rooms
@@ -66,13 +67,35 @@ module.exports = (io) => {
       }
     });
 
-    socket.on('call_initiate', ({ caseId, targetUserId }) => {
-      const target = String(targetUserId);
-      io.to(target).emit('call_incoming', { 
-        caseId, 
-        callerId: userIdString, 
-        callerName: socket.user.fullName || 'Clinical Specialist'
-      });
+    socket.on('call_initiate', async ({ caseId, targetUserId, signalData }) => {
+      try {
+        const target = String(targetUserId);
+        console.log(`[Signaling] Initiation: Case ${caseId} from Doctor ${socket.user._id} to Patient ${target}`);
+
+        // Fail-safe room check: Ensure the target user is actually joined to their room
+        const roomSize = io.sockets.adapter.rooms.get(target)?.size || 0;
+        if (roomSize === 0) {
+          console.warn(`[Signaling] Warning: Target Patient ${target} is currently offline or unjoined.`);
+        }
+        
+        let identity = socket.user.fullName || 'Clinical Specialist';
+        try {
+          const freshUser = await User.findById(socket.user._id).select('fullName specialization');
+          if (freshUser) {
+            const specs = Array.isArray(freshUser.specialization) ? freshUser.specialization.join(', ') : '';
+            identity = `${freshUser.fullName || identity}${specs ? ` (${specs})` : ''}`;
+          }
+        } catch (e) {}
+        
+        io.to(target).emit('call_incoming', { 
+          caseId, 
+          callerId: userIdString, 
+          callerName: identity,
+          signalData
+        });
+      } catch (err) {
+        console.error('Statutory Signal Rupture:', err);
+      }
     });
 
     socket.on('call_signal', ({ targetUserId, signalData }) => {

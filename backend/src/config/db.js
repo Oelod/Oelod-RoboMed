@@ -7,13 +7,20 @@ mongoose.set('bufferCommands', false);
 const connectDB = async () => {
   try {
     console.log('📡 [Registry] Initiating High-Latency Handshake (45s window)...');
-    const conn = await mongoose.connect(process.env.MONGODB_URI, {
-      serverSelectionTimeoutMS: 45000, // accommodate high-latency connections
+    
+    // Industrial Diagnostic: Force certain TLS behaviors for Windows stability
+    const connectionOptions = {
+      serverSelectionTimeoutMS: 45000,
       bufferCommands: false,
-    });
+      // Temporary diagnostic: bypass local SSL stack issues if Atlas is rejecting handshake
+      tlsInsecure: process.env.NODE_ENV === 'development' 
+    };
+
+    const conn = await mongoose.connect(process.env.MONGODB_URI, connectionOptions);
     console.log(`✅ MongoDB connected: ${conn.connection.host}`);
   } catch (error) {
-    console.error(`❌ MongoDB connection error: ${error.message}`);
+    console.error(`❌ Institutional Initialization Ruptured: ${error.message}`);
+    console.error('💡 PRO-TIP: Check your MongoDB Atlas IP Whitelist at https://cloud.mongodb.com');
     throw error;
   }
 };

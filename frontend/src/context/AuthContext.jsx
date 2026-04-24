@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import api from '../api/axiosInstance';
 import * as cryptoService from '../services/cryptoService';
 
@@ -23,18 +23,26 @@ export function AuthProvider({ children }) {
 
   // On mount: try silent refresh using httpOnly refresh cookie
   useEffect(() => {
+    let isMounted = true;
     const silentRefresh = async () => {
       try {
         const res = await api.post('/auth/refresh-token', {}, { withCredentials: true });
-        setToken(res.data.data.token);
-        setUser(res.data.data.user);
-      } catch {
-        // No valid session — user stays logged out
+        if (isMounted) {
+          setToken(res.data.data.token);
+          setUser(res.data.data.user);
+        }
+      } catch (err) {
+        console.warn('Institutional Session: No active clinical context found.', err.message);
+        if (isMounted) {
+          setToken(null);
+          setUser(null);
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
     silentRefresh();
+    return () => { isMounted = false; };
   }, []);
 
   // --- Institutional E2EE Handshake ---
@@ -96,9 +104,15 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const hasInitialized = useRef(false);
+
   useEffect(() => {
-    if (user && token && !loading) {
+    if (user && token && !loading && !hasInitialized.current) {
+       hasInitialized.current = true;
        initE2EE(user);
+    }
+    if (!user) {
+       hasInitialized.current = false;
     }
   }, [user?._id, token, loading, initE2EE]);
 

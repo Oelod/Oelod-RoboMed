@@ -715,6 +715,11 @@ This section explains every single part of the RoboMed platform. Technical jargo
 *   **"Sign & Acknowledge Script"**: Green button that confirms you understand your medicine.
 
 ### **8.4 For Doctors (Your Workspace)**
+*   **Telemedicine Hub (Floating Card)**: 
+    *   **"Initialize Video"**: Appears on the Case Page. Once started, a floating window appears at the **top-right** of your screen. This window stays with you even if you look at other patient files or your dashboard.
+    *   **"Accept / Reject"**: Patients see a single, clear box at the top-right to pick up the call.
+    *   **"Identity ID"**: You will see the doctor's name (e.g., "DR. SMITH") before you pick up.
+    *   **"Hardware Failover"**: If your camera is busy, the system will automatically switch to a **Secure Voice Call** so the consultation can continue.
 *   **Sidebar Tools**: Buttons for **"Start Video Call"**, **"Start Voice Call"**, and the **"Clinical Voice Recorder"** (creates a **"Medical Audio Player"**).
 *   **Main Action Bar**: **"Accept Case"**, **"Issue RX"**, **"Request Lab"**, **"Safe Closure ✓"**, **"Flag Case"**, and **"Escalate."**
 

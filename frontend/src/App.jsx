@@ -19,8 +19,8 @@ import AiSandbox         from './ai-playground/AiSandbox';
 // Guards
 import ProtectedRoute    from './components/ProtectedRoute';
 import GlobalNotifications from './components/GlobalNotifications';
-import GlobalSignalReceiver from './components/GlobalSignalReceiver';
 import RestorationOverlay from './components/RestorationOverlay';
+import TelemedicineHub from './components/TelemedicineHub';
 import DashboardLayout from './components/layout/DashboardLayout';
 
 export default function App() {
@@ -29,7 +29,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gray-950 flex flex-col">
       <GlobalNotifications />
-      <GlobalSignalReceiver />
+      <TelemedicineHub />
       <RestorationOverlay />
       <div className="flex-1 overflow-auto">
         <Routes>
