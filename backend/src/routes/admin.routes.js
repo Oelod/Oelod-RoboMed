@@ -16,6 +16,7 @@ router.patch('/users/:userId/reject-role',  ctrl.rejectRole);
 router.patch('/users/:userId/roles',     ctrl.updateRoles);
 router.patch('/users/:userId/suspend',   ctrl.suspendUser);
 router.patch('/users/:userId/activate',  ctrl.activateUser);
+router.patch('/users/:userId/reset-identity', ctrl.resetUserIdentity);
 router.get('/stats',                     ctrl.getStats);
 router.get('/audit-log',                 ctrl.getAuditLog);
 router.get('/compliance-report/:userId', ctrl.getComplianceReport);

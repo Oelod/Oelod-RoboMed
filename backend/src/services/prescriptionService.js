@@ -27,13 +27,17 @@ const addPrescription = async (caseId, doctorId, drugs, notes) => {
   return rx;
 };
 
-const getPrescriptions = async (caseId, userId, activeRole) => {
-  // Wait, I will just return the prescriptions. Security guard is inside caseService usually, so we'll just check if they have access to the case
+const getPrescriptions = async (caseId, userId, activeRole, adminLevel) => {
   const c = await Case.findById(caseId);
   if (!c) { const e = new Error('Case not found'); e.statusCode = 404; throw e; }
   
+  // Sovereign Oversight: Level 3 Super Admin bypasses all clinical guards
+  if (activeRole === 'admin' && adminLevel === 3) {
+    return await Prescription.find({ caseId }).sort('-issuedAt').populate('doctorId', 'fullName specialization');
+  }
+
   if (activeRole === 'patient' && c.patient.toString() !== userId.toString()) {
-     const e = new Error('Forbidden'); e.statusCode = 403; throw e;
+     const e = new Error('Forbidden: You are not authorized to view prescriptions for this clinical context'); e.statusCode = 403; throw e;
   }
 
   const rxs = await Prescription.find({ caseId }).sort('-issuedAt').populate('doctorId', 'fullName specialization');

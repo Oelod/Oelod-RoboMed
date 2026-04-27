@@ -12,6 +12,15 @@ module.exports = (io) => {
   emitter.on('chat.message_updated', ({ conversationId, messageId, text }) => {
     io.to(`conversation_${conversationId}`).emit('chat.message_update', { messageId, text });
   });
+  
+  // Real-time Clinical Dispatch: Notify Lab and Pharmacy Units
+  emitter.on('lab.requested', ({ testType }) => {
+    io.to('specialty_lab').emit('new_lab_request', { testType });
+  });
+
+  emitter.on('prescription.issued', ({ doctorName }) => {
+    io.to('specialty_pharmacist').emit('new_prescription', { doctorName });
+  });
 
   // Middleware to authenticate socket connections
   io.use((socket, next) => {
@@ -51,6 +60,14 @@ module.exports = (io) => {
           socket.join(room);
         });
       });
+    }
+
+    if (socket.user.roles.includes('lab')) {
+      socket.join('specialty_lab');
+    }
+
+    if (socket.user.roles.includes('pharmacist')) {
+      socket.join('specialty_pharmacist');
     }
 
     socket.on('join_conversation', (conversationId) => {

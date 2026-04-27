@@ -4,12 +4,12 @@ const res_ = require('../utils/apiResponse');
 const getOrCreateConversation = async (req, res) => {
   const { caseId } = req.body;
   if (!caseId) { return res_.error(res, 'caseId is required', 400); }
-  const conv = await chatService.getOrCreateConversation(caseId, req.user._id);
+  const conv = await chatService.getOrCreateConversation(caseId, req.user._id, req.user.activeRole);
   return res_.success(res, { conversation: conv }, 'Conversation retrieved');
 };
 
 const getMessages = async (req, res) => {
-  const msgs = await chatService.getMessages(req.params.conversationId, req.user._id);
+  const msgs = await chatService.getMessages(req.params.conversationId, req.user._id, req.user.activeRole);
   return res_.success(res, { messages: msgs }, 'Messages fetched');
 };
 

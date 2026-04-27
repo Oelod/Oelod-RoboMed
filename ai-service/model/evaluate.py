@@ -56,6 +56,26 @@ def main():
     )
     print(classification_report(y_te, y_pred, target_names=le_spec.classes_))
 
+    # Generate confusion matrix
+    cm = confusion_matrix(y_te, y_pred)
+    cm_df = pd.DataFrame(cm, index=le_spec.classes_, columns=le_spec.classes_)
+    
+    print("\n" + "=" * 60)
+    print("Institutional Confusion Matrix (Predicted x Actual)")
+    print("=" * 60)
+    print(cm_df)
+    print("=" * 60 + "\n")
+
+    # Export results for documentation
+    summary = {
+        "accuracy": float(acc),
+        "f1_weighted": float(f1),
+        "report": report
+    }
+    with open(os.path.join(BASE_DIR, "evaluation_results.json"), "w") as f:
+        json.dump(summary, f, indent=4)
+    print(f"DONE: Metrics formally archived to evaluation_results.json")
+
     # Per-class F1 assertions
     failed = []
     for specialty in le_spec.classes_:
@@ -64,14 +84,14 @@ def main():
             failed.append((specialty, per_f1))
 
     if failed:
-        print("⚠️  Classes below per-class F1 threshold:")
+        print("WARNING: Classes below per-class F1 threshold:")
         for name, score in failed:
             print(f"   {name}: {score:.4f} < {MIN_PER_CLASS_F1}")
     else:
-        print(f"✅ All classes F1 >= {MIN_PER_CLASS_F1}")
+        print(f"PASS: All classes F1 >= {MIN_PER_CLASS_F1}")
 
     assert acc >= MIN_ACCURACY, f"Accuracy {acc:.4f} below threshold {MIN_ACCURACY}"
-    print(f"✅ Overall accuracy check passed ({acc:.4f})")
+    print(f"PASS: Overall accuracy check passed ({acc:.4f})")
 
 
 if __name__ == "__main__":

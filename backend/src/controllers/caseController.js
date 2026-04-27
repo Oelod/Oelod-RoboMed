@@ -37,7 +37,7 @@ const AuditLog = require('../models/AuditLog');
 
 // GET /api/cases/:caseId
 const getCaseById = async (req, res) => {
-  const c = await caseService.getCaseById(req.params.caseId, req.user._id, req.user.activeRole);
+  const c = await caseService.getCaseById(req.params.caseId, req.user._id, req.user.activeRole, req.user.adminLevel);
   
   // Log PHI Access for Audit Compliance (HIPAA/GDPR)
   await AuditLog.create({
@@ -135,7 +135,7 @@ const assignDoctor = async (req, res) => {
 
 // GET /api/cases/:caseId/history
 const getCaseHistory = async (req, res) => {
-  const c = await caseService.getCaseById(req.params.caseId, req.user._id, req.user.activeRole);
+  const c = await caseService.getCaseById(req.params.caseId, req.user._id, req.user.activeRole, req.user.adminLevel);
   return res_.success(res, { timeline: c.timeline }, 'Case history fetched');
 };
 
@@ -171,7 +171,7 @@ const uploadLabResult = async (req, res) => {
 // GET /api/cases/:caseId/labs
 const getCaseLabs = async (req, res) => {
   // Validate basic access against caseService
-  await caseService.getCaseById(req.params.caseId, req.user._id, req.user.activeRole);
+  await caseService.getCaseById(req.params.caseId, req.user._id, req.user.activeRole, req.user.adminLevel);
   const data = await labService.getLabArchitecture(req.params.caseId);
   return res_.success(res, data, 'Case labs fetched successfully');
 };
@@ -185,7 +185,7 @@ const addPrescription = async (req, res) => {
 
 // GET /api/cases/:caseId/prescriptions
 const getCasePrescriptions = async (req, res) => {
-  const rxs = await prescriptionService.getPrescriptions(req.params.caseId, req.user._id, req.user.activeRole);
+  const rxs = await prescriptionService.getPrescriptions(req.params.caseId, req.user._id, req.user.activeRole, req.user.adminLevel);
   return res_.success(res, { prescriptions: rxs }, 'Prescriptions fetched successfully');
 };
 
@@ -200,7 +200,7 @@ const getPatientClinicalHistory = async (req, res) => {
   if (req.user.activeRole !== 'doctor' && req.user.activeRole !== 'admin') {
     return res_.forbidden(res, 'Access restricted to clinical staff');
   }
-  const history = await caseService.getPatientHistory(req.params.patientId, req.user._id);
+  const history = await caseService.getPatientHistory(req.params.patientId, req.user._id, req.user.activeRole, req.user.adminLevel);
   return res_.success(res, { history }, 'Patient medical history retrieved');
 };
 

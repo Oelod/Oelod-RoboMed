@@ -65,12 +65,15 @@ const getCases = async ({ userId, activeRole, specialization, status, search, pa
 };
 
 // ── Get single case ───────────────────────────────────────────────────────────
-const getCaseById = async (caseId, userId, activeRole) => {
+const getCaseById = async (caseId, userId, activeRole, adminLevel) => {
   const c = await Case.findById(caseId)
     .populate('patient', 'fullName hospitalId email')
     .populate('doctor',  'fullName specialization email');
 
   if (!c) { const e = new Error('Case not found'); e.statusCode = 404; throw e; }
+
+  // Sovereign Oversight: Level 3 Super Admin bypasses all clinical guards
+  if (activeRole === 'admin' && adminLevel === 3) return c;
 
   // Access control
   if (activeRole === 'patient') {
@@ -104,13 +107,16 @@ const getCaseById = async (caseId, userId, activeRole) => {
 };
 
 // ── Get Patient History for Doctor ────────────────────────────────────────────
-const getPatientHistory = async (patientId, doctorId) => {
+const getPatientHistory = async (patientId, doctorId, activeRole, adminLevel) => {
   // Verify relationship (must have an active case or be assigned to a case for this patient)
-  const relationship = await Case.findOne({ patient: patientId, doctor: doctorId });
-  if (!relationship) {
-    const e = new Error('Forbidden: No clinical relationship established with this patient');
-    e.statusCode = 403;
-    throw e;
+  // Sovereign Oversight: Level 3 Super Admin bypasses for institutional auditing
+  if (activeRole !== 'admin' || adminLevel < 3) {
+    const relationship = await Case.findOne({ patient: patientId, doctor: doctorId });
+    if (!relationship) {
+      const e = new Error('Forbidden: No clinical relationship established with this patient');
+      e.statusCode = 403;
+      throw e;
+    }
   }
 
   const history = await Case.find({ 

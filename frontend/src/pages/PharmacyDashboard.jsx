@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../api/axiosInstance';
 import { useAuth } from '../hooks/useAuth';
+import { useSocketContext } from '../context/SocketContext';
+import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 
 export default function PharmacyDashboard() {
@@ -9,6 +11,18 @@ export default function PharmacyDashboard() {
   const queryClient = useQueryClient();
   const [processing, setProcessing] = useState(false);
   const [tab, setTab] = useState('queue'); // 'queue' | 'history'
+  const { socket } = useSocketContext();
+  
+  useEffect(() => {
+    if (!socket) return;
+    
+    socket.on('new_prescription', (data) => {
+      toast.success(`NEW PRESCRIPTION DISPATCHED by ${data.doctorName}`, { icon: '💊', duration: 6000 });
+      queryClient.invalidateQueries({ queryKey: ['pharmacy-queue'] });
+    });
+    
+    return () => socket.off('new_prescription');
+  }, [socket, queryClient]);
 
   const { data: queueData, isLoading: queueLoading } = useQuery({
     queryKey: ['pharmacy-queue'],

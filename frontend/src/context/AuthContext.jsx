@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
-import api from '../api/axiosInstance';
+import api, { setTokenRefreshListener } from '../api/axiosInstance';
 import * as cryptoService from '../services/cryptoService';
 
 const AuthContext = createContext(null);
@@ -42,7 +42,16 @@ export function AuthProvider({ children }) {
       }
     };
     silentRefresh();
-    return () => { isMounted = false; };
+    
+    // Industrial Sync: Listen for background refreshes in axiosInstance
+    setTokenRefreshListener((newToken) => {
+      if (isMounted) setToken(newToken);
+    });
+
+    return () => { 
+      isMounted = false; 
+      setTokenRefreshListener(null);
+    };
   }, []);
 
   // --- Institutional E2EE Handshake ---

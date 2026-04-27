@@ -8,7 +8,7 @@ import { useTelemedicine } from '../context/TelemedicineContext';
  */
 export default function TelemedicineHub() {
   const { 
-    callActive, incomingCall, localStream, remoteStream, isConnecting, activeCaseId,
+    callActive, incomingCall, localStream, remoteStream, isConnecting, activeCaseId, peerOffline,
     handleAcceptCall, terminateCall 
   } = useTelemedicine();
 
@@ -76,17 +76,24 @@ export default function TelemedicineHub() {
               /* Active Call View */
               <div className="space-y-4">
                  <div className="aspect-video bg-gray-900 rounded-[2rem] overflow-hidden relative border border-white/10 shadow-inner">
-                    {remoteStream ? (
+                    {remoteStream && !peerOffline ? (
                       <video ref={remoteVideoRef} autoPlay playsInline className="w-full h-full object-cover" />
                     ) : (
-                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
+                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-gray-900/95 backdrop-blur-md">
                          <div className="relative">
                             <div className="animate-ping absolute inset-0 rounded-full bg-brand-500/10"></div>
-                            <div className="w-12 h-12 rounded-2xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-2xl">👤</div>
+                            <div className="w-12 h-12 rounded-2xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-2xl">
+                               {peerOffline ? '📡' : '👤'}
+                            </div>
                          </div>
-                         <p className="text-[8px] font-black text-brand-500 uppercase tracking-[0.2em] animate-pulse text-center">
-                            {isConnecting ? 'Handshaking Protocol...' : 'Awaiting Data Stream...'}
-                         </p>
+                         <div className="text-center px-6">
+                            <p className="text-[10px] font-black text-brand-500 uppercase tracking-widest mb-1 italic">
+                               {peerOffline ? 'Institutional Link Dropped' : isConnecting ? 'Handshaking Protocol...' : 'Awaiting Data Stream...'}
+                            </p>
+                            <p className="text-[8px] font-medium text-gray-500 uppercase tracking-[0.2em] animate-pulse">
+                               {peerOffline ? 'Attempting to re-establish statutory connection...' : 'Securing clinical datastream...'}
+                            </p>
+                         </div>
                       </div>
                     )}
 

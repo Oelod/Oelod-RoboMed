@@ -3,14 +3,18 @@ const Message = require('../models/Message');
 const Case = require('../models/Case');
 const emitter = require('../events/emitter');
 
-const getOrCreateConversation = async (caseId, userId) => {
+const getOrCreateConversation = async (caseId, userId, activeRole) => {
   const c = await Case.findById(caseId);
   if (!c) {
     const e = new Error('Case not found'); e.statusCode = 404; throw e;
   }
-  // Verify access
-  if (c.patient.toString() !== userId.toString() && c.doctor?.toString() !== userId.toString()) {
-    const e = new Error('Only the assigned doctor and patient can access this chat'); e.statusCode = 403; throw e;
+  // Verify access: Patient, Assigned Doctor, or Super Admin Oversight
+  const isPatient = c.patient.toString() === userId.toString();
+  const isDoctor = c.doctor?.toString() === userId.toString();
+  const isSuperAdmin = activeRole === 'admin' && adminLevel === 3;
+
+  if (!isPatient && !isDoctor && !isSuperAdmin) {
+    const e = new Error('Forbidden: Only the assigned clinical staff or Super Admin supervisors can access this chat'); e.statusCode = 403; throw e;
   }
 
   let conv = await Conversation.findOne({ caseId }).populate('participants', 'fullName role profilePicture publicKey');
@@ -23,11 +27,15 @@ const getOrCreateConversation = async (caseId, userId) => {
   return conv;
 };
 
-const getMessages = async (conversationId, userId) => {
+const getMessages = async (conversationId, userId, activeRole) => {
   const conv = await Conversation.findById(conversationId);
-  const isParticipant = conv?.participants.some(p => p.toString() === userId.toString());
-  if (!conv || !isParticipant) {
-    const e = new Error('Not authorized to view these messages'); e.statusCode = 403; throw e;
+  if (!conv) { const e = new Error('Conversation not found'); e.statusCode = 404; throw e; }
+
+  const isParticipant = conv.participants.some(p => p.toString() === userId.toString());
+  const isSuperAdmin = activeRole === 'admin' && adminLevel === 3;
+
+  if (!isParticipant && !isSuperAdmin) {
+    const e = new Error('Not authorized to view these clinical messages'); e.statusCode = 403; throw e;
   }
   return await Message.find({ conversationId }).sort('createdAt').populate('sender', 'fullName role profilePicture publicKey');
 };

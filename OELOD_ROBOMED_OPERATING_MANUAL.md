@@ -60,8 +60,8 @@ To maintain absolute clinical privacy, all identities are character-perfectly se
 - **Gatekeeping**: When a participant logs into a new terminal or Private mode, the **Identity Restoration Gateway** character-perfectly intercepts the session.
 - **Handshake**: Users must provide their **Security Phrase** to character-perfectly re-decrypt their private keys locally. 
 - **Testing Override (Phase 7)**: During the current pre-launch phase, a default recovery phrase is character-perfectly pre-configured: **`RoboMed-Secure-2026`**.
-- **Institutional Reset**: In the event of a phrase mismatch or corruption, the **`Reset My Identity`** protocol formally wipes the escrowed keys on the server, allowing for a character-perfect re-initialization of the clinical identity.
-- **Key Recovery**: The recovery key is processed through PBKDF2 salting; once in production, the identity is character-perfectly unrecoverable by the administration if the phrase is lost.
+- **Institutional Reset**: In the event of a phrase mismatch or corruption, the **Super Admin (Level 3)** can authorize a **`Sovereign Identity Reset`**. This formally wipes the escrowed keys on the server, allowing for a character-perfect re-initialization of the clinical identity for the patient.
+- **Key Recovery**: The recovery key is processed through PBKDF2 salting; once in production, the identity is character-perfectly unrecoverable by the administration if the phrase is lost, unless a **Sovereign Reset** is performed.
 
 ---
 
@@ -76,7 +76,10 @@ To maintain absolute clinical privacy, all identities are character-perfectly se
 *   **Redis-Backed Throttling**: Precision rate-limiting protects institutional resources from distributed throughput spikes.
 *   **Zero-Trust Secrets**: Decoupled credential management (Vault-Ready) ensures no sensitive data is local.
 
----
+### **6.3 Administrative Sovereignty (Level 3)**
+*   **Absolute Oversight**: Level 3 Administrators have sovereign access to all clinical records, transcripts, and lab results across the entire platform, bypassing standard relationship checks for governance audits.
+*   **Unit Dispatch**: Automated real-time "Push" notifications ensure that **Laboratory** and **Pharmacy** units are alerted instantly when clinical orders are issued.
+*   **PHI Portability**: The **Clinical Export Manifold** allows for the generation of branded, statutory PDF records of any closed case for external clinical handover.
 
 ## 7. Operational Telemetry & Deployment
 Administrator and IT leads utilize the following "Heartbeat" endpoints:

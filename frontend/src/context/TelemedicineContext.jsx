@@ -119,6 +119,8 @@ export function TelemedicineProvider({ children }) {
     }
   };
 
+  const [peerOffline, setPeerOffline] = useState(false);
+
   const terminateCall = (shouldEmit = true) => {
     stopRingTone();
     const wasAccepted = !!remoteStream;
@@ -143,6 +145,7 @@ export function TelemedicineProvider({ children }) {
     setIsConnecting(false);
     setActiveCaseId(null);
     setTargetUserId(null);
+    setPeerOffline(false);
   };
 
   useEffect(() => {
@@ -173,20 +176,35 @@ export function TelemedicineProvider({ children }) {
       toast('Consultation Terminated by Remote Participant');
     };
 
+    const onPresenceUpdate = ({ userId, status }) => {
+      if (targetUserId && userId === targetUserId) {
+        if (status === 'offline') {
+          setPeerOffline(true);
+          toast.loading('Connection Unstable: Waiting for peer to return...', { id: 'peer-offline-toast' });
+        } else if (status === 'online') {
+          setPeerOffline(false);
+          toast.success('Connection Restored: Peer has returned.', { id: 'peer-offline-toast' });
+          // If we had a drop, we might need a fresh offer, but for now, simple state recovery
+        }
+      }
+    };
+
     socket.on('call_incoming', onIncomingCall);
     socket.on('call_signal_received', onSignalReceived);
     socket.on('call_disconnected', onDisconnected);
+    socket.on('user_presence', onPresenceUpdate);
 
     return () => {
       socket.off('call_incoming', onIncomingCall);
       socket.off('call_signal_received', onSignalReceived);
       socket.off('call_disconnected', onDisconnected);
+      socket.off('user_presence', onPresenceUpdate);
     };
   }, [socket, connected, callActive, targetUserId]);
 
   return (
     <TelemedicineContext.Provider value={{ 
-      callActive, incomingCall, localStream, remoteStream, isConnecting, activeCaseId,
+      callActive, incomingCall, localStream, remoteStream, isConnecting, activeCaseId, peerOffline,
       startCall, handleAcceptCall, terminateCall, setIncomingCall, stopRingTone
     }}>
       {children}

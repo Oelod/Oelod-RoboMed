@@ -621,7 +621,33 @@ npx artillery quick --count 50 --num 10 http://localhost:5000/health
 | 1 | AI Triage Response Time | p99 < 300ms under load |
 | 2 | DB Query Performance | All clinical lookups < 50ms with indexing |
 | 3 | Secure PHI Access | 100% of PII access recorded in AuditLog |
-| 4 | Service Isolation | AI service cannot access the main DB (only via REST) |
+| 4 | Service Isolation | AI Service cannot access the main DB (only via REST) |
+
+---
+
+### Phase 10 — Institutional Hardening (Senior Dev Observations) [COMPLETED]
+
+**Goal:** Resolve real-world deployment friction points identified during pre-production stress testing.
+
+#### What was built
+
+- **Anti-Zombie Consultation Heartbeat**: Implemented a socket-driven presence detector in the `TelemedicineHub`. If a connection drops, a "📡 Institutional Link Dropped" recovery overlay prevents UI interaction while trying to re-establish the stream.
+- **Dual-Device Session Grace Period**: Updated `authService.js` and `RefreshToken.js` to support a 30-second grace window. Simultaneous refresh requests from multiple devices (or race conditions) no longer trigger "Dual-Device Kickout."
+- **Real-time Clinical Dispatch**: Bridged the Laboratory and Pharmacy units via WebSockets. Doctors hitting "Order" now trigger instant "Push" notifications on the respective unit consoles.
+- **PHI Portability (Clinical Export)**: Integrated `jsPDF` for generating professional, branded "Clinical Handover" records. Patients can download their symptoms, AI triage data, and doctor summaries for external clinical use.
+- **Sovereign Identity Reset**: Empowered Super Admins (Level 3) with a "Reset Identity" protocol. If a patient loses their 12-word recovery phrase, the Admin can authorize an identity manifold wipe, allowing the patient to generate new credentials and resume care.
+
+#### ✅ Phase 10 Test Suite
+
+| # | Test Description | Pass Condition |
+|---|---|---|
+| 1 | Simulated dual-refresh (Parallel fetch) | Session remains active (Grace window) |
+| 2 | Peer disconnect mid-call | Heartbeat triggers "Connection Unstable" overlay |
+| 3 | Doctor issues Lab Request | Lab Tech sees instant Toast notification + auto-refresh |
+| 4 | Doctor issues Prescription | Pharmacist sees instant notification |
+| 5 | Patient exports closed case | Branded PDF downloads with full clinical history |
+| 6 | Super Admin resets identity | User `publicKey` cleared; reset logged in Audit Log |
+| 7 | Level 2 Admin tries identity reset | 403 Forbidden |
 
 ---
 

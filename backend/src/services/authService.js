@@ -113,9 +113,20 @@ const refreshToken = async (token) => {
   }
 
   // Find token in DB
-  const existingToken = await RefreshToken.findOne({ token, revoked: false });
+  let existingToken = await RefreshToken.findOne({ token });
   if (!existingToken) {
-    const err = new Error('Invalid or revoked session token');
+    const err = new Error('Invalid session token');
+    err.statusCode = 401;
+    throw err;
+  }
+
+  // Grace Period: If token was revoked less than 30 seconds ago, allow it (prevents race conditions)
+  const isRecentlyRevoked = existingToken.revoked && 
+                           existingToken.revokedAt && 
+                           (new Date() - new Date(existingToken.revokedAt)) < 30000;
+
+  if (existingToken.revoked && !isRecentlyRevoked) {
+    const err = new Error('Replay Attack Detected: Session token has been revoked.');
     err.statusCode = 401;
     throw err;
   }
@@ -137,9 +148,12 @@ const refreshToken = async (token) => {
     throw err;
   }
 
-  // Revoke OLD token (Rotation)
-  existingToken.revoked = true;
-  await existingToken.save();
+  // Revoke OLD token (Rotation) if not already revoked
+  if (!existingToken.revoked) {
+    existingToken.revoked = true;
+    existingToken.revokedAt = new Date();
+    await existingToken.save();
+  }
 
   const tokenPayload = { 
     _id: user._id.toString(), 

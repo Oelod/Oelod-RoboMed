@@ -386,9 +386,28 @@ const exportResearchData = async (req, res) => {
   return res.send(csv);
 };
 
+/**
+ * PATCH /api/admin/users/:userId/reset-identity
+ * Allows a Super Admin to sovereignly reset a user's cryptographic identity manifold.
+ * This is used when a patient loses their 12-word phrase.
+ */
+const resetUserIdentity = async (req, res) => {
+  if (req.user.adminLevel < 3) return res_.forbidden(res, 'Super Admin required for identity manifold reset.');
+  
+  await authService.resetIdentity(req.params.userId);
+  await AuditLog.create({ 
+    actorId: req.user._id, 
+    action: 'IDENTITY_RESET', 
+    targetId: req.params.userId,
+    note: 'Sovereign reset of cryptographic identity manifold due to recovery loss.' 
+  });
+
+  return res_.success(res, null, 'User identity manifold has been sovereignly reset. They may now generate a new 12-word phrase.');
+};
+
 module.exports = { 
   getUsers, getUserById, approveRole, rejectRole, updateRoles,
   suspendUser, activateUser, getStats, getAuditLog, getComplianceReport,
   getEscalatedCases, updateOffice, getGovernanceHealth, migrateData,
-  downloadGovernanceReport, exportResearchData
+  downloadGovernanceReport, exportResearchData, resetUserIdentity
 };

@@ -102,18 +102,52 @@ NOISE_SYMPTOMS = [
 # ─── Priority to numeric label ────────────────────────────────────────────────
 PRIORITY_MAP = {"high": "HIGH", "medium": "MEDIUM", "low": "LOW"}
 
+# --- Linguistic Manifold: Mapping medical terms to common slang/typos ---
+SYMPTOM_VARIANTS = {
+    "fever": ["high temp", "running hot", "feever", "fver", "feeling hot"],
+    "headache": ["pounding head", "migraine", "head ach", "throbbing head", "head pain"],
+    "chest pain": ["heart pain", "chest tightness", "chest hurts", "pressure in chest"],
+    "abdominal pain": ["stomach ache", "tummy pain", "belly ache", "gut pain"],
+    "fatigue": ["tired all the time", "no energy", "exhaustion", "weakness"],
+    "shortness of breath": ["can't breathe", "breathless", "struggling for air", "panting"],
+    "dizziness": ["room spinning", "lightheaded", "feeling faint", "vertigo"],
+    "cough": ["coughing", "hacking", "chest cough", "dry cough"],
+}
+
+CLINICAL_NOISE_PHRASES = [
+    "I'm really worried because", "I noticed that", "It started when",
+    "I've been feeling", "actually", "maybe", "like", "sort of",
+    "I think I have", "my friend said", "it's really bad"
+]
 
 def generate_record(specialty, disease_name, core_symptoms, priority):
-    symptoms = list(core_symptoms)
-    # Inject 0-2 noise symptoms
-    n_noise = random.randint(0, 2)
-    symptoms += random.sample(NOISE_SYMPTOMS, n_noise)
-    # Randomly drop 0-1 core symptom
-    if len(symptoms) > 2 and random.random() < 0.3:
-        symptoms.pop(random.randint(0, len(core_symptoms) - 1))
-    random.shuffle(symptoms)
+    raw_symptoms = list(core_symptoms)
+    
+    # 1. Inject 0-3 noise symptoms
+    n_noise = random.randint(0, 3)
+    raw_symptoms += random.sample(NOISE_SYMPTOMS, n_noise)
+    
+    # 2. Randomly drop 0-1 core symptom (Simulate patient forgetting info)
+    if len(raw_symptoms) > 2 and random.random() < 0.2:
+        raw_symptoms.pop(random.randint(0, len(core_symptoms) - 1))
+    
+    processed_symptoms = []
+    for s in raw_symptoms:
+        # 3. Linguistic Mapping: 40% chance to swap medical term for slang/typo
+        if s in SYMPTOM_VARIANTS and random.random() < 0.4:
+            processed_symptoms.append(random.choice(SYMPTOM_VARIANTS[s]))
+        else:
+            processed_symptoms.append(s)
+            
+    # 4. Clinical Noise: 30% chance to wrap the whole thing in conversational noise
+    if random.random() < 0.3:
+        noise_prefix = random.choice(CLINICAL_NOISE_PHRASES)
+        processed_symptoms[0] = f"{noise_prefix} {processed_symptoms[0]}"
+
+    random.shuffle(processed_symptoms)
+    
     return {
-        "symptoms": ";".join(symptoms),
+        "symptoms": ";".join(processed_symptoms),
         "specialty": specialty,
         "priority": PRIORITY_MAP[priority],
         "possible_conditions": disease_name,
@@ -140,7 +174,7 @@ def generate_dataset(n_samples=10000, output_path="data/symptoms_dataset.csv"):
         writer.writeheader()
         writer.writerows(records)
 
-    print(f"✅ Generated {len(records)} records → {output_path}")
+    print(f"DONE: Generated {len(records)} records -> {output_path}")
     print(f"   Specialties: {len(specialties)}")
     print(f"   Samples per specialty: {samples_per_specialty}")
 

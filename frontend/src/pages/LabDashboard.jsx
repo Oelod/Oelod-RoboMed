@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../api/axiosInstance';
 import { useAuth } from '../hooks/useAuth';
+import { useSocketContext } from '../context/SocketContext';
+import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 
 export default function LabDashboard() {
@@ -11,7 +13,19 @@ export default function LabDashboard() {
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [comment, setComment] = useState('');
   const [file, setFile] = useState(null);
+  const { socket } = useSocketContext();
   const [tab, setTab] = useState('queue'); 
+  
+  useEffect(() => {
+    if (!socket) return;
+    
+    socket.on('new_lab_request', (data) => {
+      toast.success(`NEW DISPATCH: ${data.testType}`, { icon: '🧪', duration: 6000 });
+      queryClient.invalidateQueries({ queryKey: ['lab-queue'] });
+    });
+    
+    return () => socket.off('new_lab_request');
+  }, [socket, queryClient]);
 
   const { data: queueData, isLoading: queueLoading } = useQuery({
     queryKey: ['lab-queue'],

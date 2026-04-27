@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getCaseById, acceptCase, closeCase, uploadAttachments, requestLab, uploadLabResult, getCaseLabs, addPrescription, getCasePrescriptions, acknowledgePrescription, getFullPatientHistory, flagCase, escalateCase, assignDoctor } from '../api/cases';
 import { submitMisconductReport } from '../api/reports';
@@ -97,6 +99,115 @@ export default function CaseDetailPage() {
     } finally {
       setActionLoading(false);
     }
+  };
+
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+    const title = `RoboMed Clinical Record - ${medicalCase._id.slice(-8).toUpperCase()}`;
+    const date = new Date().toLocaleString();
+
+    // Institutional Header
+    doc.setFontSize(22);
+    doc.setTextColor(30, 41, 59);
+    doc.text('ROBOMED AI HEALTHCARE', 14, 22);
+    
+    doc.setFontSize(10);
+    doc.setTextColor(100, 116, 139);
+    doc.text(`Institutional Case ID: ${medicalCase._id.toUpperCase()}`, 14, 30);
+    doc.text(`Generated At: ${date}`, 14, 35);
+    doc.line(14, 40, 196, 40);
+
+    // Patient & Clinical Context
+    doc.setFontSize(14);
+    doc.setTextColor(30, 41, 59);
+    doc.text('PATIENT IDENTITY & CONTEXT', 14, 52);
+    
+    const contextData = [
+      ['Patient Name', medicalCase.patient?.fullName || 'Anonymous'],
+      ['Hospital ID', medicalCase.patient?.hospitalId || 'N/A'],
+      ['Case Status', medicalCase.status.toUpperCase()],
+      ['Priority', medicalCase.priority.toUpperCase()],
+      ['Assigned Doctor', medicalCase.doctor?.fullName ? `Dr. ${medicalCase.doctor.fullName}` : 'UNASSIGNED']
+    ];
+
+    doc.autoTable({
+      startY: 58,
+      head: [['Metric', 'Value']],
+      body: contextData,
+      theme: 'striped',
+      headStyles: { fillGray: true }
+    });
+
+    // Clinical Presentation
+    let currentY = doc.lastAutoTable.finalY + 15;
+    doc.setFontSize(14);
+    doc.text('CLINICAL PRESENTATION', 14, currentY);
+    
+    doc.setFontSize(10);
+    doc.setTextColor(71, 85, 105);
+    doc.text('SYMPTOMS:', 14, currentY + 8);
+    doc.setFont(undefined, 'bold');
+    doc.text(medicalCase.symptoms.join(', '), 40, currentY + 8);
+    
+    doc.setFont(undefined, 'normal');
+    doc.text('DESCRIPTION:', 14, currentY + 16);
+    const splitDesc = doc.splitTextToSize(medicalCase.description, 160);
+    doc.text(splitDesc, 14, currentY + 22);
+
+    // AI Triage Data
+    currentY = currentY + 30 + (splitDesc.length * 5);
+    doc.setFontSize(14);
+    doc.setTextColor(30, 41, 59);
+    doc.text('AI TRIAGE MANIFOLD', 14, currentY);
+    
+    doc.autoTable({
+      startY: currentY + 6,
+      head: [['Metric', 'Institutional Analysis']],
+      body: [
+        ['AI Priority', medicalCase.aiTriage?.priority || 'Standard'],
+        ['Assigned Specialty', medicalCase.assignedSpecialty || 'General Practice']
+      ],
+      theme: 'grid'
+    });
+
+    // Final Clinical Summary
+    if (medicalCase.status === 'closed' && medicalCase.summary) {
+      currentY = doc.lastAutoTable.finalY + 15;
+      doc.setFontSize(14);
+      doc.text('FINAL CLINICAL SUMMARY', 14, currentY);
+      const splitSummary = doc.splitTextToSize(medicalCase.summary, 170);
+      doc.setFontSize(10);
+      doc.text(splitSummary, 14, currentY + 8);
+    }
+
+    // Prescriptions
+    if (prescriptions.length > 0) {
+      doc.addPage();
+      doc.setFontSize(14);
+      doc.text('ACTIVE INSTITUTIONAL PRESCRIPTIONS', 14, 22);
+      
+      const rxData = prescriptions.flatMap(rx => rx.drugs.map(d => [
+        d.name, d.dosage, d.frequency, d.status
+      ]));
+
+      doc.autoTable({
+        startY: 28,
+        head: [['Medication', 'Dosage', 'Frequency', 'Status']],
+        body: rxData
+      });
+    }
+
+    // Statutory Footer
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(150);
+      doc.text(`Statutory Clinical Record · Confidential · Page ${i} of ${pageCount}`, 105, 285, { align: 'center' });
+    }
+
+    doc.save(`RoboMed_Record_${medicalCase._id.slice(-8).toUpperCase()}.pdf`);
+    toast.success('Clinical Handover Record Exported');
   };
 
   const handleClose = async () => {
@@ -427,6 +538,14 @@ export default function CaseDetailPage() {
                 Safe Closure ✓
               </button>
             </>
+          )}
+          {medicalCase.status === 'closed' && (
+            <button 
+              className="btn-secondary border-blue-500/30 text-blue-400 hover:bg-blue-500/10 px-4 text-[10px] uppercase font-black tracking-widest flex items-center gap-2"
+              onClick={exportToPDF}
+            >
+              <span>📄</span> Export Record
+            </button>
           )}
         </div>
       </div>
