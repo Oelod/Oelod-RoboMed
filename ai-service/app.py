@@ -499,5 +499,11 @@ def transcribe():
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5001))
     debug = os.environ.get('FLASK_ENV', 'development') == 'development'
-    logger.info(f"Oelod RoboMed AI Node live at http://localhost:{port}")
-    app.run(host='0.0.0.0', port=port, debug=debug)
+    
+    if debug:
+        logger.info(f"Oelod RoboMed AI Node live at http://localhost:{port} (Development Mode)")
+        app.run(host='0.0.0.0', port=port, debug=True)
+    else:
+        logger.info(f"Oelod RoboMed AI Node live at http://localhost:{port} (Production WSGI Shield Active)")
+        from waitress import serve
+        serve(app, host='0.0.0.0', port=port, threads=8)
