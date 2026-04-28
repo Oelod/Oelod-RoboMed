@@ -4,6 +4,7 @@ require('express-async-errors');
 const express      = require('express');
 const cors         = require('cors');
 const helmet       = require('helmet');
+const compression  = require('compression');
 const morgan       = require('morgan');
 const cookieParser = require('cookie-parser');
 const { createServer } = require('http');
@@ -66,7 +67,24 @@ app.set('io', io); // make io accessible in controllers via req.app.get('io')
 
 // ─── Core Middleware ──────────────────────────────────────────────────────────
 app.use(helmet());
-app.use(cors({ origin: true, credentials: true }));
+app.use(compression()); // Reduce response payloads by up to 70%
+
+// Restrict CSRF vulnerability by enforcing strict origin checking
+const allowedOrigins = process.env.FRONTEND_URL 
+  ? [process.env.FRONTEND_URL, 'http://localhost:5173'] 
+  : ['http://localhost:5173'];
+
+app.use(cors({ 
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Institutional Firewall: CORS Origin Blocked.'));
+    }
+  }, 
+  credentials: true 
+}));
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 app.use(mongoSanitize());
