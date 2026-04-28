@@ -244,7 +244,7 @@ export default function LabDashboard() {
                           <td className="px-8 py-6">
                              <div className="flex flex-col">
                                 <span className="text-sm font-black text-white italic group-hover:text-brand-400 transition-colors">#{item.caseId?._id?.slice(-8).toUpperCase()}</span>
-                                <span className="text-[9px] font-black text-gray-600 uppercase mt-0.5">Clinical Stream</span>
+                                <span className="text-[9px] font-black text-gray-600 uppercase mt-0.5">Medical Record</span>
                              </div>
                           </td>
                           <td className="px-8 py-6">

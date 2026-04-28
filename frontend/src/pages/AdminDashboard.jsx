@@ -178,7 +178,7 @@ export default function AdminDashboard() {
     formData.append('file', migrationFile);
     formData.append('defaultPassword', defaultPassword);
 
-    setMigrationStatus('📡 Initiating Statutory Migration Stream...');
+    setMigrationStatus('📡 Initiating Secure Data Import...');
     try {
       const endpoint = `/ingestion/${migrationType}`;
       const res = await api.post(endpoint, formData, {
@@ -187,13 +187,13 @@ export default function AdminDashboard() {
       
       const stats = res.data.data.stats;
       setMigrationStatus({
-        summary: `Migration Protocol Finalized: ${stats.successful} Successful, ${stats.failed} Failed / Skipped`,
+        summary: `Import Process Finalized: ${stats.successful} Successful, ${stats.failed} Failed / Skipped`,
         total: stats.total,
         timestamp: new Date().toLocaleString()
       });
       refetchUsers();
     } catch (err) {
-      setMigrationStatus('❌ Migration Protocol Ruptured: ' + (err.response?.data?.message || 'Handshake Failure'));
+      setMigrationStatus('❌ Import Process Interrupted: ' + (err.response?.data?.message || 'Connection Failure'));
     }
   };
 
@@ -239,14 +239,14 @@ export default function AdminDashboard() {
   };
 
   const handleResetIdentity = async (userId) => {
-    if (!window.confirm("CRITICAL PROTOCOL: Are you sure you want to SOVEREIGNLY RESET this user's cryptographic identity? They will LOSE ACCESS to all previous encrypted transcripts and must generate a NEW 12-word phrase.")) return;
+    if (!window.confirm("CRITICAL SECURITY ACTION: Are you sure you want to AUTHORIZE A MASTER RESET for this user's security profile? They will LOSE ACCESS to all previous encrypted transcripts and must generate a NEW recovery phrase.")) return;
     
     try {
       await api.patch(`/admin/users/${userId}/reset-identity`);
-      alert('Sovereign Reset Successful: The user manifold has been cleared. They may now generate a new 12-word recovery phrase upon next login.');
+      alert('Reset Successful: The security profile has been cleared. The user can now generate a new recovery phrase upon their next login.');
       refetchUsers();
     } catch (err) {
-      alert('Identity Reset Failed: ' + (err.response?.data?.message || err.message));
+      alert('Action Failed: ' + (err.response?.data?.message || err.message));
     }
   };
 
@@ -624,9 +624,14 @@ export default function AdminDashboard() {
                                      </div>
                                   )}
 
-                                                                     <button onClick={() => handleGenerateComplianceReport(u._id)} className="px-2 py-1 bg-brand-600 text-white border border-brand-500 rounded-lg text-[9px] font-black uppercase hover:bg-brand-500 transition-all tracking-widest shadow-lg shadow-brand-900/20 active:scale-95">📘 + COMPLIANCE</button>
+                                  <button onClick={() => handleGenerateComplianceReport(u._id)} className="px-2 py-1 bg-brand-600 text-white border border-brand-500 rounded-lg text-[9px] font-black uppercase hover:bg-brand-500 transition-all tracking-widest shadow-lg shadow-brand-900/20 active:scale-95">📘 + COMPLIANCE</button>
                                    {currentUser?.adminLevel === 3 && (
-                                     <button onClick={() => handleResetIdentity(u._id)} className="px-2 py-1 bg-red-600/10 text-red-500 border border-red-500/20 rounded-lg text-[9px] font-black uppercase hover:bg-red-600 hover:text-white transition-all tracking-widest">⚠️ Reset Identity</button>
+                                     <button 
+                                       onClick={() => handleResetIdentity(u._id)}
+                                       className="px-2 py-1 bg-red-600/10 text-red-500 border border-red-500/20 rounded-lg text-[9px] font-black uppercase hover:bg-red-600 hover:text-white transition-all tracking-widest"
+                                     >
+                                       ⚠️ Reset Security Profile
+                                     </button>
                                    )}
 
                                   <button onClick={() => handleUniversalUnitGrant(u, 'lab')} className={`px-2 py-1 border rounded-lg text-[9px] font-black uppercase transition-all ${u.roles.includes('lab') ? 'bg-white text-black border-white' : 'bg-gray-900 text-gray-500 border-gray-800 hover:text-white'}`}>{u.roles.includes('lab') ? 'Revoke Lab' : '+ Lab'}</button>

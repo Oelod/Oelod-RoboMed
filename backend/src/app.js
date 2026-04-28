@@ -12,7 +12,7 @@ const { Server }   = require('socket.io');
 const connectDB            = require('./config/db');
 const { apiLimiter }       = require('./middlewares/rateLimiter');
 const { globalErrorHandler } = require('./middlewares/errorHandler');
-
+const mongoSanitize = require('express-mongo-sanitize');
 
 // ─── Route imports ───────────────────────────────────────────────────────────
 const authRoutes      = require('./routes/auth.routes');       // Phase 1
@@ -67,8 +67,9 @@ app.set('io', io); // make io accessible in controllers via req.app.get('io')
 // ─── Core Middleware ──────────────────────────────────────────────────────────
 app.use(helmet());
 app.use(cors({ origin: true, credentials: true }));
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+app.use(mongoSanitize());
 app.use(cookieParser());
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 if (process.env.NODE_ENV !== 'development') {
