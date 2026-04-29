@@ -3,10 +3,9 @@
  * Generates high-fidelity CSV strings for Governance and Compliance.
  */
 const generateCSV = (data, fields) => {
-  if (!data || !data.length) return "";
-  
-  // Header Row
   const header = fields.map(f => `"${f.label}"`).join(",") + "\n";
+  if (!data || !data.length) return header;
+
   
   // Data Rows
   const rows = data.map(item => {

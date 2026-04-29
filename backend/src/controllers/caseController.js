@@ -74,10 +74,10 @@ const closeCase = async (req, res) => {
      await AnonymizedCase.create({
         age: patient.age || 0,
         gender: patient.gender || 'unknown',
-        description: c.description,
+        description: c.description || 'No clinical description provided.',
         symptoms: c.symptoms,
         diagnosis: req.body.summary, // The doctor's final summary acts as the diagnosis
-        specialty: c.assignedSpecialty,
+        specialty: c.assignedSpecialty || 'General',
         priority: c.priority
      });
      console.log(`[ResearchVault] Case ${c._id} successfully archived for clinical study.`);
